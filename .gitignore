@@ -1,0 +1,92 @@
+# Java
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# 컴파일 출력
+/build/
+/target/
+/dist/
+/bin/
+*.log
+
+# Eclipse
+.settings/
+.classpath
+.project
+.metadata/
+.recommenders/
+*.launch
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+.cursor/
+*.code-workspace
+
+# Maven
+/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+/build/
+!gradle-wrapper.jar
+gradle-app.setting
+!gradle-wrapper.properties
+
+# Tomcat
+/Servers/
+/.metadata/
+
+# 로그 파일
+*.log
+logs/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# 임시 파일
+*.tmp
+*.bak
+*.swp
+*~.nib
+*.orig
+
+# 업로드 파일 (필요시 수정)
+/uploads/
+/upload/
+
+# 기타
+*.properties.local
+local.properties
