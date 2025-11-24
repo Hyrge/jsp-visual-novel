@@ -17,7 +17,7 @@
 
         <!-- 캐릭터 이미지 -->
         <div class="character"
-             style="background-image: url('${pageContext.request.contextPath}/resources/${scene.character}/${scene.image}');">
+             style="background-image: url('${pageContext.request.contextPath}/resources/${scene.image}');">
         </div>
 
         <!-- 대화창 -->
