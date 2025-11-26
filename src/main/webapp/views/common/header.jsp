@@ -27,7 +27,7 @@
                     <a href="${pageContext.request.contextPath}/views/board/kdolTalkBoard.jsp" class="first_a">케이돌토크</a>
                 </li>
                 <li class="dropdown ${param.page == 'report' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/views/board/reportBoard.jsp" class="first_a">신고게시판</a>
+                    <a href="${pageContext.request.contextPath}/views/board/reportBoard.jsp" class="first_a">신고</a>
                 </li>
             </ul>
         </nav>

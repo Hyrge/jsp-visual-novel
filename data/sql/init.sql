@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS player;
 
 -- 테이블 생성
 CREATE TABLE player (
-    pid BIGINT PRIMARY KEY AUTO_INCREMENT,
+    pid VARCHAR(10) PRIMARY KEY,
     save_path VARCHAR(100) NOT NULL COMMENT '저장 폴더 경로 (saves/1)',
     last_access DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '마지막 접속 시간',
     state ENUM('PLAYING', 'CLEAR') NOT NULL DEFAULT 'PLAYING' COMMENT '게임 상태',
