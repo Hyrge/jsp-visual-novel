@@ -34,14 +34,7 @@
 
         <!-- 우측 메뉴 -->
         <div class="navbar-right">
-            <ul class="navbar-nav">
-                <li class="dropdown">
-                    <a href="#" class="first_a">로그인</a>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="first_a">검색</a>
-                </li>
-            </ul>
+            <a href="#" class="first_a">로그인</a>
         </div>
     </div>
 </div>
