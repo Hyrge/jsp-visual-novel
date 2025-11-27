@@ -108,7 +108,7 @@ a:hover, a:focus { color: #1e2b58; }
 }
 .gnb li.dropdown.active a.first_a {
     background-color: #fff; 
-    color: #1e2b58; 
+    color: #1e2b58 !important; 
     font-weight: bold; 
     border-radius: 4px;
 }
