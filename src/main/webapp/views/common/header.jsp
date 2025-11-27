@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!-- 헤더 영역 -->
-<div class="header">
+<header class="header">
     <div class="xe_width clearBoth">
         <h1><a href="${pageContext.request.contextPath}/">더꾸</a></h1>
 
@@ -34,7 +34,10 @@
 
         <!-- 우측 메뉴 -->
         <div class="navbar-right">
-            <a href="#" class="first_a">로그인</a>
+            <a href="#" class="first_a" onclick="return false;">
+                <img src="${pageContext.request.contextPath}/resources/image/message.png" alt="쪽지" style="height: 20px; vertical-align: middle;">
+            </a>
+            <a href="${pageContext.request.contextPath}/" class="first_a">로그아웃</a>
         </div>
     </div>
-</div>
+</header>
