@@ -1,6 +1,7 @@
 package model.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import model.enums.EventCategory;
 import model.enums.EventStatus;
 import model.enums.EventType;
@@ -13,8 +14,8 @@ public class Event {
     private String title;
     private String description;
     private EventStatus status; // ACTIVE, RESOLVED, EXPIRED
-    private LocalDateTime triggeredAt;
-    private LocalDateTime expiresAt;
+    private LocalDate triggeredAt;
+    private LocalTime triggeredTime;
     private int immediateReputation; // 발생 시 즉시 평판 변화
 
     public String getId() {
@@ -73,20 +74,20 @@ public class Event {
         this.status = status;
     }
 
-    public LocalDateTime getTriggeredAt() {
+    public LocalDate getTriggeredAt() {
         return triggeredAt;
     }
 
-    public void setTriggeredAt(LocalDateTime triggeredAt) {
+    public void setTriggeredAt(LocalDate triggeredAt) {
         this.triggeredAt = triggeredAt;
     }
 
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
+    public void setTriggeredTime(LocalTime triggeredTime) {
+        this.triggeredTime = triggeredTime;
     }
 
-    public void setExpiresAt(LocalDateTime expiresAt) {
-        this.expiresAt = expiresAt;
+    public LocalTime getTriggeredTime() {
+        return triggeredTime;
     }
 
     public int getImmediateReputation() {

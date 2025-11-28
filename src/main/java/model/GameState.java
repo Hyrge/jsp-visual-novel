@@ -3,7 +3,7 @@ package model;
 import java.util.Map;
 
 public class GameState {
-    private int reputation = 50;
+    private int reputation = 20;
     private EventBus eventBus;
 
     public GameState(EventBus eventBus) {
