@@ -1,7 +1,20 @@
 package model;
 
-import java.util.Map;
+public class EventBus {
+    // 싱글톤 패턴 적용
+    private static EventBus instance;
 
-public interface EventBus {
-    void emit(String eventName, Map<String, Object> data);
+    private EventBus() {
+    }
+
+    public static EventBus getInstance() {
+        if (instance == null) {
+            instance = new EventBus();
+        }
+        return instance;
+    }
+
+    public void emit(String eventName, Object data) {
+        // TODO: Implement event emission
+    }
 }
