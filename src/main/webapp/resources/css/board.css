@@ -1,0 +1,185 @@
+@charset "utf-8";
+
+/* Board Specific Styles */
+
+/* Board Header */
+.board-header {
+    padding: 30px 0 20px 0;
+    border-bottom: 2px solid #1e2b58;
+    margin-bottom: 20px;
+}
+
+.board-header h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.board-category {
+    display: flex;
+    gap: 10px;
+}
+
+.board-category a {
+    padding: 8px 15px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.board-category a:hover {
+    background: #1e2b58;
+    color: #fff;
+}
+
+.board-category a.active {
+    background: #1e2b58;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Search Bar */
+.board_search_bar {
+    margin-bottom: 20px;
+    padding: 15px 0;
+}
+
+.board_search_bar form {
+    display: flex;
+    gap: 10px;
+    max-width: 400px;
+}
+
+#board_search {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+#board_search:focus {
+    outline: none;
+    border-color: #1e2b58;
+}
+
+.btn-search {
+    padding: 10px 20px;
+    background: #1e2b58;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.btn-search:hover {
+    background: #151e40;
+}
+
+/* Board List Table */
+.board-list {
+    margin-bottom: 30px;
+}
+
+.board-list table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.board-list thead {
+    background: #f8f9fa;
+    border-top: 2px solid #333;
+    border-bottom: 1px solid #ddd;
+}
+
+.board-list thead th {
+    padding: 12px 8px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+.board-list tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s ease;
+}
+
+.board-list tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.board-list tbody tr.notice {
+    background: #fffbf0;
+}
+
+.board-list tbody tr.notice:hover {
+    background: #fff5e1;
+}
+
+.board-list tbody td {
+    padding: 12px 8px;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* Table Columns */
+.col-no { width: 60px; }
+.col-category { width: 100px; }
+.col-title { text-align: left !important; padding-left: 15px !important; }
+.col-author { width: 120px; }
+.col-date { width: 100px; }
+.col-view { width: 60px; }
+.col-like { width: 60px; }
+
+/* Badge */
+.badge-notice {
+    display: inline-block; padding: 3px 8px; background: #ff6b6b; color: #fff;
+    border-radius: 3px; font-size: 11px; font-weight: bold;
+}
+
+/* Comment Count */
+.comment-count {
+    color: #1e2b58; font-weight: bold; margin-left: 5px;
+}
+
+/* Pagination */
+.pagination {
+    text-align: center; padding: 30px 0;
+}
+
+.page-link {
+    display: inline-block; padding: 8px 12px; margin: 0 2px; background: #fff;
+    border: 1px solid #ddd; color: #333; border-radius: 4px; font-size: 13px; transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    background: #1e2b58; color: #fff; border-color: #1e2b58;
+}
+
+.page-link.active {
+    background: #1e2b58; color: #fff; border-color: #1e2b58; font-weight: bold;
+}
+
+/* Board Actions */
+.board-actions {
+    text-align: right; padding: 20px 0;
+}
+
+.btn {
+    padding: 10px 20px; background: #1e2b58; color: #fff; border: none; border-radius: 4px;
+    cursor: pointer; font-size: 13px; text-decoration: none; display: inline-block; transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background: #151e40;
+}
+
+.btn-write {
+    padding: 12px 30px; font-weight: bold;
+}
