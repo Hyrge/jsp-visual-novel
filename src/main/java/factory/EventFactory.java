@@ -24,11 +24,14 @@ public class EventFactory {
         return event;
     }
 
-    public static Event createRandomEvent(Map<String, Object> eventConfig) {
+    public static Event createRandomEvent(Map<String, Object> eventConfig, LocalDate today) {
         Event event = createCommonEvent(eventConfig);
+        event.setTriggeredAt(today);
 
         if (eventConfig.containsKey("scheduledTime")) {
             event.setTriggeredTime(LocalTime.parse((String) eventConfig.get("scheduledTime")));
+        } else {
+            event.setTriggeredTime(LocalTime.of(12, 0));
         }
 
         return event;

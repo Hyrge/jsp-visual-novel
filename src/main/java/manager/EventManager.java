@@ -27,49 +27,44 @@ public class EventManager {
     }
 
     public void loadEventConfig() {
-        this.eventConfig = JsonLoader.loadJSON("event_config.json");
-        for (Map<String, Object> eventConfig : this.eventConfig) {
-            String triggerType = (String) eventConfig.get("triggerType");
+        this.eventConfig = JsonLoader.loadJSON("data/event_config.json");
+        if (this.eventConfig != null) {
+            for (Map<String, Object> eventConfig : this.eventConfig) {
+                String triggerType = (String) eventConfig.get("triggerType");
 
-            if ("SCHEDULED".equals(triggerType)) {
-                Event event = EventFactory.createScheduledEvent(eventConfig);
-                event.setStatus(EventStatus.ACTIVE);
-                this.scheduledEvents.put(event.getId(), event);
+                if ("SCHEDULED".equals(triggerType)) {
+                    Event event = EventFactory.createScheduledEvent(eventConfig);
+                    event.setStatus(EventStatus.ACTIVE);
+                    this.scheduledEvents.put(event.getId(), event);
 
+                }
+                if ("RANDOM".equals(triggerType)) {
+                    this.randomEventConfigs.add(eventConfig);
+                }
             }
-            if ("RANDOM".equals(triggerType)) {
-                this.randomEventConfigs.add(eventConfig);
-            }
-
         }
-
     }
 
     public void checkEvents(LocalDate today) {
-
-    }
-
-    public List<Event> tryTriggerRandomEvents(LocalDate today) {
-        List<Event> triggeredEvents = new ArrayList<>();
         for (Map<String, Object> config : randomEventConfigs) {
+            String id = (String) config.get("id");
+            if (activeEvents.containsKey(id)) {
+                continue;
+            }
+
             double probability = 0.0;
             if (config.containsKey("probability")) {
                 probability = ((Number) config.get("probability")).doubleValue();
             }
 
             if (Math.random() < probability) {
-                Event event = EventFactory.createRandomEvent(config);
-                event.setTriggeredAt(today);
-                if (event.getTriggeredTime() == null) {
-                    event.setTriggeredTime(LocalTime.of(12, 0));
-                }
+                Event event = EventFactory.createRandomEvent(config, today);
 
                 activeEvents.put(event.getId(), event);
                 EventBus.getInstance().emit("EVENT_TRIGGERED", event);
-                triggeredEvents.add(event);
+                break; // Trigger only one event per day
             }
         }
-        return triggeredEvents;
     }
 
     public Event triggerEvent(EventType type) {

@@ -6,8 +6,13 @@ import java.io.IOException;
 import java.util.List;
 
 public class JsonLoader {
-    public static <T> T loadJSON(String filePath) throws IOException {
+    public static <T> T loadJSON(String filePath) {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(new File(filePath), List.class);
+        try {
+            return objectMapper.readValue(new File(filePath), List.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
