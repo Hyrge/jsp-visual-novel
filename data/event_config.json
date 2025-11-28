@@ -1,0 +1,26 @@
+[
+    {
+        "id": "bullying_001",
+        "type": "BULLYING_SCANDAL",
+        "category": "NEGATIVE",
+        "title": "학폭 논란",
+        "description": "과거 학교폭력 의혹이 제기되었습니다.",
+        "severity": 5,
+        "reputationEffect": -10,
+        "triggerType": "RANDOM",
+        "scheduledTime": "18:33:00",
+        "probability": 0.02,
+        "image": "bullying_001.png"
+    },
+    {
+        "id": "comeback_001",
+        "type": "NEW_SONG_RELEASE",
+        "category": "POSITIVE",
+        "title": "컴백 발표",
+        "description": "새 앨범 발매가 공지되었습니다.",
+        "triggerType": "SCHEDULED",
+        "scheduledDate": "2025-03-15",
+        "scheduledTime": "10:00:00",
+        "image": "comeback_001.png"
+    }
+]
