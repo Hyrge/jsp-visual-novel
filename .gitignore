@@ -94,4 +94,5 @@ local.properties
 # 세이브 데이터 저장 폴더
 saves/
 .antigravity/
-run_server.ps1run_server.ps1
+run_server.ps1
+CLAUDE.md
