@@ -1,15 +1,14 @@
 package factory;
 
-import model.entity.Event;
-import model.enums.EventCategory;
-import model.enums.EventStatus;
-import model.enums.EventType;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import model.entity.Event;
+import model.enums.EventCategory;
+import model.enums.EventStatus;
+import model.enums.EventType;
 
 public class EventFactory {
 

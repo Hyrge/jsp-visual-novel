@@ -1,28 +1,30 @@
 package factory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import manager.DataManager;
 import model.entity.Quest;
 import model.entity.QuestObjective;
 import model.enums.QuestIssuer;
 import model.enums.QuestStatus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 public class QuestFactory {
     public static Quest createQuest(String id) {
         DataManager dataManager = DataManager.getInstance();
-        if (dataManager.getQuestConfig() == null)
-            return null;
+        if (dataManager.getQuestConfig() == null) {
+			return null;
+		}
 
         Map<String, Object> config = dataManager.getQuestConfig().stream()
                 .filter(c -> id.equals(c.get("id")))
                 .findFirst()
                 .orElse(null);
 
-        if (config == null)
-            return null;
+        if (config == null) {
+			return null;
+		}
 
         Quest quest = new Quest();
         quest.setId((String) config.get("id"));
@@ -56,7 +58,9 @@ public class QuestFactory {
             List<QuestObjective> objectives = new ArrayList<>();
 
             for (Object obj : rawObjectives) {
-                if (!(obj instanceof Map)) continue;
+                if (!(obj instanceof Map)) {
+					continue;
+				}
                 Map<?, ?> o = (Map<?, ?>) obj;
 
                 QuestObjective qo = new QuestObjective();

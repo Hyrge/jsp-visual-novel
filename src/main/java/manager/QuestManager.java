@@ -2,11 +2,12 @@ package manager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import factory.QuestFactory;
+import model.EventBus;
+import model.GameState;
 import model.entity.Quest;
 import model.enums.QuestStatus;
-import model.GameState;
-import model.EventBus;
-import factory.QuestFactory;
 
 public class QuestManager {
     private List<Quest> quests = new ArrayList<>();
@@ -22,10 +23,9 @@ public class QuestManager {
                 .findFirst()
                 .orElse(null);
 
-        if (quest == null)
-            return;
-        if (quest.getStatus() == QuestStatus.COMPLETED)
-            return;
+        if ((quest == null) || (quest.getStatus() == QuestStatus.COMPLETED)) {
+			return;
+		}
 
         // TODO: Check if requirements are met (currentProgress >= requiredProgress)
         // For now, we assume calling completeQuest forces completion or checks are done

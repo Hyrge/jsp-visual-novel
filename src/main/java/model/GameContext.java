@@ -21,8 +21,9 @@ public class GameContext {
     }
 
     public void init(String pid, DataManager dataManager) {
-        if (this.pid != null)
-            return; // 이미 초기화됨
+        if (this.pid != null) {
+			return; // 이미 초기화됨
+		}
 
         this.pid = pid;
         // 1. GameState 생성 (EventBus는 싱글톤 사용)

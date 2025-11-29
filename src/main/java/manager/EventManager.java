@@ -1,19 +1,18 @@
 package manager;
 
 import java.time.LocalDate;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import factory.EventFactory;
+import model.EventBus;
 import model.GameState;
 import model.entity.Event;
 import model.enums.EventStatus;
 import model.enums.EventType;
-import model.EventBus;
-import util.JsonLoader;
-import factory.EventFactory;
 
 public class EventManager {
     private List<Map<String, Object>> eventConfig;
@@ -84,7 +83,9 @@ public class EventManager {
         for (String subsequentId : triggeredEvent.getSubsequentEventIds()) {
             // config에서 해당 이벤트 찾기
             Map<String, Object> subsequentConfig = findEventConfigById(subsequentId);
-            if (subsequentConfig == null) continue;
+            if (subsequentConfig == null) {
+				continue;
+			}
 
             // 후속 이벤트 생성
             Event subsequentEvent = EventFactory.createScheduledEvent(subsequentConfig);
@@ -102,7 +103,9 @@ public class EventManager {
 
     // ID로 이벤트 config 찾기
     private Map<String, Object> findEventConfigById(String eventId) {
-        if (eventConfig == null) return null;
+        if (eventConfig == null) {
+			return null;
+		}
 
         for (Map<String, Object> config : eventConfig) {
             if (eventId.equals(config.get("id"))) {

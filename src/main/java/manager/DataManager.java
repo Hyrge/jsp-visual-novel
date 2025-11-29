@@ -1,9 +1,9 @@
 package manager;
 
-import util.JsonLoader;
-import java.io.File;
 import java.util.List;
 import java.util.Map;
+
+import util.JsonLoader;
 
 public class DataManager {
     private static DataManager instance;

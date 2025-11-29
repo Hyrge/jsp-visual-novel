@@ -3,6 +3,7 @@ package model.entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+
 import model.enums.EventCategory;
 import model.enums.EventStatus;
 import model.enums.EventType;

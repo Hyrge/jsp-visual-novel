@@ -1,6 +1,7 @@
 package model.entity;
 
 import java.time.LocalDateTime;
+
 import model.enums.UserActionType;
 
 public class UserActionResult {
