@@ -11,26 +11,21 @@ public class DataManager {
     private List<Map<String, Object>> questConfig;
 
     private DataManager() {
+        loadAll();
     }
 
-    public static synchronized DataManager getInstance() {
+    public static DataManager getInstance() {
         if (instance == null) {
             instance = new DataManager();
         }
         return instance;
     }
 
-    public void loadAll(String rootPath) {
-        // 경로 보정 (끝에 구분자 확인)
-        if (!rootPath.endsWith(File.separator)) {
-            rootPath += File.separator;
-        }
-        String dataPath = rootPath + "data" + File.separator;
-
-        System.out.println("DataManager: Loading data from " + dataPath);
+    private void loadAll() {
+        System.out.println("DataManager: Loading data");
 
         // 이벤트 설정 로드
-        this.eventConfig = JsonLoader.loadJSON(dataPath + "event_config.json");
+        this.eventConfig = JsonLoader.loadJSON("../resources/event_config.json");
 
         if (this.eventConfig != null) {
             System.out.println("DataManager: Loaded " + this.eventConfig.size() + " events.");
@@ -39,7 +34,7 @@ public class DataManager {
         }
 
         // 퀘스트 설정 로드
-        this.questConfig = JsonLoader.loadJSON(dataPath + "quest_config.json");
+        this.questConfig = JsonLoader.loadJSON("../resources/quest_config.json");
 
         if (this.questConfig != null) {
             System.out.println("DataManager: Loaded " + this.questConfig.size() + " quests.");
