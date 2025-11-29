@@ -24,7 +24,15 @@ a:hover, a:focus { color: #1e2b58; }
 /* Content Grid */
 .content-wrapper { display: flex; gap: 20px; }
 .board-area { flex: 1; min-width: 0; }
-.sidebar-area { width: 280px; flex-shrink: 0; }
+.sidebar-area {
+    width: 280px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+/* 쪽지함 사이드바 숨김 상태 */
+.sidebar-area.hidden {
+    display: none;
+}
 
 /* Header */
 .header {
@@ -102,15 +110,27 @@ a:hover, a:focus { color: #1e2b58; }
 /* Nav Hover/Active */
 .gnb li a.first_a:hover, .gnb li a.first_a:focus,
 .navbar-right li a.first_a:hover, .navbar-right li a.first_a:focus {
-    background-color: #fff; 
-    color: #1e2b58; 
+    background-color: #fff;
+    color: #1e2b58;
     border-radius: 4px;
 }
 .gnb li.dropdown.active a.first_a {
-    background-color: #fff; 
-    color: #1e2b58 !important; 
-    font-weight: bold; 
+    background-color: #fff;
+    color: #1e2b58 !important;
+    font-weight: bold;
     border-radius: 4px;
+}
+
+/* 쪽지함 버튼 스타일 */
+#message-toggle-btn {
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 8px 12px !important;
+    transition: all 0.3s ease;
+}
+#message-toggle-btn:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.05);
 }
 
 /* Footer */
