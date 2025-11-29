@@ -1,0 +1,39 @@
+[
+  {
+    "id": "quest1",
+    "origin": "COMPANY",
+    "issuer": "COMPANY",
+    "title": "긴급 공지!! 이번 앨범 컨셉 관련",
+    "description": "이번 앨범 컨셉에 대해 커뮤니티 여론을 확인해주세요. 반응 보고서 작성.",
+    "required": true,
+    "status": "AVAILABLE",
+    "requiredProgress": 1,
+    "rewardReputation": 10,
+    "penaltyReputation": 5
+  },
+  {
+    "id": "quest2",
+    "origin": "SYSTEM",
+    "issuer": "SYSTEM",
+    "title": "튜토리얼: 첫 번째 댓글 작성",
+    "description": "커뮤니티에 첫 번째 댓글을 작성하여 분위기를 파악하세요.",
+    "required": true,
+    "status": "AVAILABLE",
+    "requiredProgress": 1,
+    "rewardReputation": 5,
+    "penaltyReputation": 0,
+    "nextQuestId": "quest3"
+  },
+  {
+    "id": "quest3",
+    "origin": "SYSTEM",
+    "issuer": "SYSTEM",
+    "title": "튜토리얼: 게시글 신고하기",
+    "description": "악성 게시글을 찾아 신고하세요.",
+    "required": false,
+    "status": "AVAILABLE",
+    "requiredProgress": 1,
+    "rewardReputation": 5,
+    "penaltyReputation": 0
+  }
+]

@@ -1,20 +1,34 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
 public class EventBus {
-    // 싱글톤 패턴 적용
     private static EventBus instance;
+    private Map<String, List<Consumer<Object>>> listeners = new HashMap<>();
 
     private EventBus() {
     }
 
-    public static EventBus getInstance() {
+    public static synchronized EventBus getInstance() {
         if (instance == null) {
             instance = new EventBus();
         }
         return instance;
     }
 
+    public void subscribe(String eventName, Consumer<Object> listener) {
+        listeners.computeIfAbsent(eventName, k -> new ArrayList<>()).add(listener);
+    }
+
     public void emit(String eventName, Object data) {
-        // TODO: Implement event emission
+        if (listeners.containsKey(eventName)) {
+            for (Consumer<Object> listener : listeners.get(eventName)) {
+                listener.accept(data);
+            }
+        }
     }
 }
