@@ -8,7 +8,7 @@ import java.util.Map;
 public class DataManager {
     private static DataManager instance;
     private List<Map<String, Object>> eventConfig;
-    // 추후 퀘스트 설정 등 추가
+    private List<Map<String, Object>> questConfig;
 
     private DataManager() {
     }
@@ -37,9 +37,22 @@ public class DataManager {
         } else {
             System.err.println("DataManager: Failed to load event_config.json");
         }
+
+        // 퀘스트 설정 로드
+        this.questConfig = JsonLoader.loadJSON(dataPath + "quest_config.json");
+
+        if (this.questConfig != null) {
+            System.out.println("DataManager: Loaded " + this.questConfig.size() + " quests.");
+        } else {
+            System.err.println("DataManager: Failed to load quest_config.json");
+        }
     }
 
     public List<Map<String, Object>> getEventConfig() {
         return eventConfig;
+    }
+
+    public List<Map<String, Object>> getQuestConfig() {
+        return questConfig;
     }
 }
