@@ -1,7 +1,7 @@
 package manager;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,20 +26,20 @@ public class EventManager {
         this.gameState = gameState;
     }
 
-    public void loadEventConfig() {
-        this.eventConfig = JsonLoader.loadJSON("data/event_config.json");
+    public void setEventConfig(List<Map<String, Object>> eventConfig) {
+        this.eventConfig = eventConfig;
         if (this.eventConfig != null) {
-            for (Map<String, Object> eventConfig : this.eventConfig) {
-                String triggerType = (String) eventConfig.get("triggerType");
+            for (Map<String, Object> config : this.eventConfig) {
+                String triggerType = (String) config.get("triggerType");
 
                 if ("SCHEDULED".equals(triggerType)) {
-                    Event event = EventFactory.createScheduledEvent(eventConfig);
+                    Event event = EventFactory.createScheduledEvent(config);
                     event.setStatus(EventStatus.ACTIVE);
                     this.scheduledEvents.put(event.getId(), event);
 
                 }
                 if ("RANDOM".equals(triggerType)) {
-                    this.randomEventConfigs.add(eventConfig);
+                    this.randomEventConfigs.add(config);
                 }
             }
         }

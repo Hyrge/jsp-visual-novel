@@ -21,8 +21,16 @@ public class QuestManager {
                 .filter(q -> q.getId().equals(id))
                 .findFirst()
                 .orElse(null);
-        if (!quest.isComplete())
+
+        if (quest == null)
             return;
+        if (quest.getStatus() == QuestStatus.COMPLETED)
+            return;
+
+        // TODO: Check if requirements are met (currentProgress >= requiredProgress)
+        // For now, we assume calling completeQuest forces completion or checks are done
+        // elsewhere.
+
         quest.setStatus(QuestStatus.COMPLETED);
         gameState.addReputation(quest.getRewardReputation());
 
@@ -30,9 +38,16 @@ public class QuestManager {
 
         if (quest.hasNextQuest()) {
             String nextQuestId = quest.getNextQuestId();
-            QuestFactory.createQuest(nextQuestId);
+            Quest nextQuest = QuestFactory.createQuest(nextQuestId);
+            if (nextQuest != null) {
+                quests.add(nextQuest);
+                EventBus.getInstance().emit("QUEST_ADDED", nextQuest);
+            }
         }
+    }
 
+    public void addQuest(Quest quest) {
+        quests.add(quest);
     }
 
 }
