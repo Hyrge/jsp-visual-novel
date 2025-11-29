@@ -1,32 +1,37 @@
 package model.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 import model.enums.QuestIssuer;
-import model.enums.QuestOrigin;
 import model.enums.QuestStatus;
 
 public class Quest {
     private String id;
-    private QuestOrigin origin; // EVENT, COMPANY, SYSTEM, DAILY
-    private String originId;
     private QuestIssuer issuer; // SYSTEM, COMPANY
     private String title;
     private String description;
-    private boolean required;
     private QuestStatus status; // AVAILABLE, IN_PROGRESS, COMPLETABLE, COMPLETED, FAILED
     private LocalDateTime deadline;
-
     // 단일 목표
     private int currentProgress;
     private int requiredProgress;
+
+    // 서브 목표 (UI 표시용)
+    private List<QuestObjective> objectives;
 
     // 평판 보상/페널티
     private int rewardReputation;
     private int penaltyReputation;
 
+    // 예상 소요 시간 (분)
+    private int spentTime;
+
     // 체이닝
     private String nextQuestId;
-    private int sequence;
+
+    // 관련 이벤트 ID (있다면)
+    private String relatedEventId;
 
     public boolean isComplete() {
         return currentProgress >= requiredProgress;
@@ -46,22 +51,6 @@ public class Quest {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public QuestOrigin getOrigin() {
-        return origin;
-    }
-
-    public void setOrigin(QuestOrigin origin) {
-        this.origin = origin;
-    }
-
-    public String getOriginId() {
-        return originId;
-    }
-
-    public void setOriginId(String originId) {
-        this.originId = originId;
     }
 
     public QuestIssuer getIssuer() {
@@ -86,14 +75,6 @@ public class Quest {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public boolean isRequired() {
-        return required;
-    }
-
-    public void setRequired(boolean required) {
-        this.required = required;
     }
 
     public QuestStatus getStatus() {
@@ -128,6 +109,14 @@ public class Quest {
         this.requiredProgress = requiredProgress;
     }
 
+    public List<QuestObjective> getObjectives() {
+        return objectives;
+    }
+
+    public void setObjectives(List<QuestObjective> objectives) {
+        this.objectives = objectives;
+    }
+
     public int getRewardReputation() {
         return rewardReputation;
     }
@@ -144,6 +133,14 @@ public class Quest {
         this.penaltyReputation = penaltyReputation;
     }
 
+    public int getSpentTime() {
+        return spentTime;
+    }
+
+    public void setSpentTime(int spentTime) {
+        this.spentTime = spentTime;
+    }
+
     public String getNextQuestId() {
         return nextQuestId;
     }
@@ -152,11 +149,12 @@ public class Quest {
         this.nextQuestId = nextQuestId;
     }
 
-    public int getSequence() {
-        return sequence;
+    public String getRelatedEventId() {
+        return relatedEventId;
     }
 
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
+    public void setRelatedEventId(String relatedEventId) {
+        this.relatedEventId = relatedEventId;
     }
+
 }

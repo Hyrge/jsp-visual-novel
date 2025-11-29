@@ -3,24 +3,61 @@
         "id": "bullying_001",
         "type": "BULLYING_SCANDAL",
         "category": "NEGATIVE",
-        "title": "학폭 논란",
-        "description": "과거 학교폭력 의혹이 제기되었습니다.",
+        "title": "학폭 논란!!",
+        "description": "MiNa의 과거 학교폭력 의혹이 제기되었습니다. \"선생님도 다 알고 있었어요\" 라는 증언까지 나오며 여론이 폭발적 비난으로 번지고 있습니다. 추가 폭로 예고글이 올라온 가운데, 소속사는 사실 확인에 들어갔습니다.",
         "severity": 5,
-        "reputationEffect": -10,
+        "reputationEffect": -20,
         "triggerType": "RANDOM",
+        "scheduledDate": null,
         "scheduledTime": "18:33:00",
         "probability": 0.02,
-        "image": "bullying_001.png"
+        "image": "bullying_001.png",
+        "subsequentEventIds": ["bullying_002", "bullying_003"]
     },
+
+    {
+        "id": "bullying_002",
+        "type": "BULLYING_SCANDAL",
+        "category": "NEGATIVE",
+        "title": "학폭 논란 사실 확인 결과",
+        "description": "내부 조사 결과 MiNa의 과거 일진·학교폭력 논란이 일부 사실로 확인되었습니다. 다만 인터넷에서 과장·왜곡된 부분도 있어 회사와 MiNa는 억울함을 호소하며 수습 방안을 모색 중입니다.",
+        "severity": 4,
+        "reputationEffect": -10,
+        "triggerType": "SCHEDULED",
+        "scheduledDate": null,
+        "scheduledTime": "19:00:00",
+        "probability": null,
+        "image": "bullying_002.png",
+        "subsequentEventIds": null
+    },
+
+    {
+        "id": "bullying_003",
+        "type": "BULLYING_SCANDAL",
+        "category": "POSITIVE",
+        "title": "학폭 논란 관련 정정 기사 게재",
+        "description": "회사에서 추가 조사 결과를 바탕으로 과장되거나 사실과 다른 부분에 대한 정정 기사를 냈습니다. 일부 여론은 \"~~는 아니라던데?\" 식의 반응을 보이며 조금씩 방향을 바꾸고 있습니다.",
+        "severity": 2,
+        "reputationEffect": 5,
+        "triggerType": "SCHEDULED",
+        "scheduledDate": null,
+        "scheduledTime": "20:00:00",
+        "probability": null,
+        "image": "bullying_003.png",
+        "subsequentEventIds": null
+    },
+
     {
         "id": "comeback_001",
         "type": "NEW_SONG_RELEASE",
         "category": "POSITIVE",
         "title": "컴백 발표",
-        "description": "새 앨범 발매가 공지되었습니다.",
+        "content": "새 앨범 발매가 공지되었습니다.",
+        "severity": null,
         "triggerType": "SCHEDULED",
-        "scheduledDate": "2025-03-15",
+        "scheduledDate": "2025-10-15",
         "scheduledTime": "10:00:00",
+        "probability": null,
         "image": "comeback_001.png"
     }
 ]

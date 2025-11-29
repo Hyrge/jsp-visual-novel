@@ -1,39 +1,202 @@
-[
+[ 
   {
-    "id": "quest1",
-    "origin": "COMPANY",
-    "issuer": "COMPANY",
-    "title": "긴급 공지!! 이번 앨범 컨셉 관련",
-    "description": "이번 앨범 컨셉에 대해 커뮤니티 여론을 확인해주세요. 반응 보고서 작성.",
-    "required": true,
+    "id": "start",
+    "issuer": "SYSTEM",
+    "title": "더꾸에 상주하는 안티팬 3명 영구 정지 먹이기",
+    "content": "커뮤니티에 상주하는 안티팬은 존재만으로도 아티스트의 평판에 크게 영향을 줍니다. 회유하는 것으로 부정도를 낮출 수는 있어도 그들은 절대 개심하지 않을 겁니다. 유일한 방법은 오로지 부단한 노력으로 신고하는 것뿐입니다. <br> - 부정적인 댓글과 게시글을 보는 족족 신고하세요 <br> - 지속적으로 안티팬의 행적을 추적하여 증거를 수집하세요 <br> - 신고 게시판에 그동안의 증거들을 모아 정지를 요구하세요 <br> 건승을 빕니다",
     "status": "AVAILABLE",
-    "requiredProgress": 1,
-    "rewardReputation": 10,
-    "penaltyReputation": 5
+    "requiredProgress": 3,
+    "objectives": null,
+    "rewardReputation": 0,
+    "penaltyReputation": 0,
+    "spentTime": 0,
+    "nextQuestId": null,
+    "relatedEventId": null
   },
   {
-    "id": "quest2",
-    "origin": "SYSTEM",
-    "issuer": "SYSTEM",
-    "title": "튜토리얼: 첫 번째 댓글 작성",
-    "description": "커뮤니티에 첫 번째 댓글을 작성하여 분위기를 파악하세요.",
-    "required": true,
+    "id": "d1",
+    "issuer": "COMPANY",
+    "title": "MiNa에 대한 여론 조사 후 보고서 쓰기[1]",
+    "content": "MiNa, 미나, 노민아 등 아티스트에 대해 다양한 키워드로 써치해보세요",
     "status": "AVAILABLE",
+    "requiredProgress": 3,
+    "objectives": [
+	    {"id": 1, "description": "`MiNa`로 써치하기", "visible": true},
+	    {"id": 2, "description": "`미나`로 써치하기", "visible": true},
+	    {"id": 3, "description": "`노민아`로 써치하기", "visible": true}
+    ],
+    "rewardReputation": 1,
+    "penaltyReputation": 0,
+    "spentTime": 30,
+    "nextQuestId": "d2",
+    "relatedEventId": null
+  },
+  {
+    "id": "d2",
+    "issuer": "COMPANY",
+    "title": "MiNa에 대한 여론 조사 후 보고서 쓰기[2]",
+    "content": "대중의 여론을 조사하여 보고합니다",
+    "status": "PENDING",
     "requiredProgress": 1,
+    "objectives": [
+	    {"id": 4, "description": "회사 계정으로 쪽지 보내기", "visible": true}
+    ],
+    "rewardReputation": 3,
+    "penaltyReputation": 0,
+    "spentTime": 60,
+    "nextQuestId": "d3",
+    "relatedEventId": null
+  },
+
+  {
+    "id": "d3",
+    "issuer": "COMPANY",
+    "title": "MiNa에 대한 여론 조사 후 보고서 쓰기[3]",
+    "content": "팬들이 주로 사용하는 별명을 조사하여 써치해보고 팬들의 반응 위주로 여론을 보고합니다.",
+    "status": "PENDING",
+    "requiredProgress": 1,
+    "objectives": [
+	    {"id": 5, "description": "`노미남`으로 써치하기", "visible": false},
+	    {"id": 6, "description": "`밍토끼`로 써치하기", "visible": false},
+      {"id": 7, "description": "회사 계정으로 쪽지 보내기(목표 달성 시)", "visible": true}
+    ],
     "rewardReputation": 5,
     "penaltyReputation": 0,
-    "nextQuestId": "quest3"
+    "spentTime": 120,
+    "nextQuestId": null,
+    "relatedEventId": null
+  },
+
+  {
+    "id": "t1",
+    "issuer": "COMPANY",
+    "title": "MiNa의 게시글에 들어가 Like하기",
+    "content": "MiNa의 게시글에 들어가 좋아요를 10회 누르세요.",
+    "status": "AVAILABLE",
+    "requiredProgress": 10,
+    "objectives": null,
+    "rewardReputation": 1,
+    "penaltyReputation": 0,
+    "spentTime": 15,
+    "nextQuestId": null,
+    "relatedEventId": null
+  },
+
+  {
+    "id": "t2",
+    "issuer": "COMPANY",
+    "title": "MiNa의 게시글에 들어가 Comment하기",
+    "content": "MiNa의 게시글에 들어가 우호적인인 Comment를 3회 남기세요.",
+    "status": "AVAILABLE",
+    "requiredProgress": 3,
+    "objectives": null,
+    "rewardReputation": 1,
+    "penaltyReputation": 0,
+    "spentTime": 45,
+    "nextQuestId": null, 
+    "relatedEventId": null
+  },
+
+  {
+    "id": "t3",
+    "issuer": "COMPANY",
+    "title": "MiNa의 게시글을 작성하고 Comment 8개 이상 받기",
+    "content": "(가능하면 다른 사용자들의 반응을 이끌어낼만한 글을 작성하되, 다른 아이디로 로그인해서 댓글을 남기는 것도 괜찮음.)",
+    "status": "AVAILABLE",
+    "objectives": 3,
+    "rewardReputation": 1,
+    "penaltyReputation": 0,
+    "spentTime": 45,
+    "nextQuestId": null,
+    "relatedEventId": null
   },
   {
-    "id": "quest3",
-    "origin": "SYSTEM",
-    "issuer": "SYSTEM",
-    "title": "튜토리얼: 게시글 신고하기",
-    "description": "악성 게시글을 찾아 신고하세요.",
-    "required": false,
+    "id": "b1",
+    "issuer": "COMPANY",
+    "title": "[공지] 학폭 논란 관련 방침 - 사실 확인 중[1]",
+    "content": "사실 확인을 위해 계속 노민아와 연락 중이나 연락 두절 상태. 일단은 가능한 악의적인 댓글을 신고하고 게시글에 대해서는 신속하게 내릴 수 있게 조치합니다. 조회수가 높은 게시글은 신고 한 번으로는 부족하니 다른 아이디도 동원하세요.",
     "status": "AVAILABLE",
+    "requiredProgress": 3,
+    "objectives": [
+      {"id": 101, "description": "초기 발단 게시글 신고하기(1)", "visible": true},
+      {"id": 102, "description": "초기 발단 게시글 신고하기(2)", "visible": true},
+      {"id": 103, "description": "악의적인 댓글 신고하기", "visible": true}
+    ],
+    "rewardReputation": 10,
+    "penaltyReputation": 0,
+    "spentTime": 15,
+    "nextQuestId": "b2",
+    "relatedEventId": "bullying_001"
+  },
+  {
+    "id": "b2",
+    "issuer": "COMPANY",
+    "title": "[공지] 학폭 논란 관련 방침 - 사실 확인 중[2]",
+    "content": ">>중립 기어<< 또는 옹호하는 댓글을 다세요",
+    "status": "AVAILABLE",
+    "requiredProgress": 2,
+    "objectives": [
+      {"id": 104, "description": "중립 기어 댓글 달기", "visible": true},
+      {"id": 105, "description": "옹호하는 댓글 달기", "visible": true}
+    ],
+    "rewardReputation": 1,
+    "penaltyReputation": 0,
+    "spentTime": 0,
+    "nextQuestId": null,
+    "relatedEventId": "bullying_001"
+  },
+
+  {
+    "id": "b3",
+    "issuer": "COMPANY",
+    "title": "[공지] 학폭 논란 관련 방침 - 사실 확인 결과[1]",
+    "content": "확인 결과 부분적으로 사실로 밝혀졌습니다. 다음 지침이 내려올 때까지 MiNa의 글이 묻힐 수 있도록 다른 화제의 게시글을 올려 여론을 돌려주세요.",
+    "status": "PENDING",
+    "requiredProgress": 5,
+    "objectives": [
+      {"id": 201, "description": "다른 화제(밈/잡담/타 연예인 등)로 게시글 5개 작성하기", "visible": true}
+    ],
+    "rewardReputation": 3,
+    "penaltyReputation": 0,
+    "spentTime": 60,
+    "nextQuestId": null,
+    "relatedEventId": "bullying_002"
+  },
+
+  {
+    "id": "b4",
+    "issuer": "COMPANY",
+    "title": "[공지] 학폭 논란 관련 방침 - 정정 기사 배포[1]",
+    "content": "회사에서 정정 기사를 냈습니다. \"~~는 아니라던데?\" 같은 뉘앙스로 정정 내용을 슬쩍 언급하며 댓글을 달아 여론을 중립 쪽으로 돌려보세요.",
+    "status": "PENDING",
+    "requiredProgress": 2,
+    "objectives": [
+      {"id": 202, "description": "\"~~는 아니라던데?\" 식으로 정정 기사 내용 암시하는 댓글 달기", "visible": true},
+      {"id": 203, "description": "정정 기사 링크나 캡처를 함께 남기기", "visible": true}
+    ],
+    "rewardReputation": 4,
+    "penaltyReputation": 0,
+    "spentTime": 30,
+    "nextQuestId": "b5",
+    "relatedEventId": "bullying_003"
+  },
+
+  {
+    "id": "b5",
+    "issuer": "COMPANY",
+    "title": "[공지] 학폭 논란 관련 방침 - 동창 인증 여론전",
+    "content": "회사에서 졸업장 사진을 쪽지로 첨부했습니다. 새로운 아이디로 로그인해 동창생인 척 하면서 MiNa를 좋게 기억하는 글을 올려 여론을 완화해 주세요.",
+    "status": "PENDING",
     "requiredProgress": 1,
-    "rewardReputation": 5,
-    "penaltyReputation": 0
+    "objectives": [
+      {"id": 204, "description": "새 계정으로 로그인해 동창 인증 느낌의 장문 글 1개 작성하기", "visible": true}
+    ],
+    "rewardReputation": 6,
+    "penaltyReputation": 0,
+    "spentTime": 45,
+    "nextQuestId": null,
+    "relatedEventId": "bullying_003"
   }
+
+
 ]
