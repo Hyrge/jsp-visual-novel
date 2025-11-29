@@ -130,6 +130,29 @@ a:hover, a:focus { color: #1e2b58; }
     background: #fff; border: 1px solid #ddd; border-radius: 8px;
     overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
+.status-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    background: #f9f9f9;
+}
+.status-header h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #333;
+}
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+.status-item .label {
+    color: #666;
+}
+.status-item .value {
+    font-weight: bold;
+    color: #ff4081;
+}
 .msg-header {
     padding: 15px; background: #1e2b58; color: #fff;
     display: flex; justify-content: space-between; align-items: center;
@@ -143,6 +166,14 @@ a:hover, a:focus { color: #1e2b58; }
 .msg-item {
     padding: 15px; border-bottom: 1px solid #eee; cursor: pointer;
     display: flex; gap: 10px; transition: background 0.2s;
+}
+.msg-item-empty {
+    cursor: default;
+    text-align: center;
+    padding: 20px;
+}
+.msg-empty-text {
+    color: #999;
 }
 .msg-item:hover { background: #f8f9fa; }
 .msg-item:last-child { border-bottom: none; }
@@ -159,7 +190,7 @@ a:hover, a:focus { color: #1e2b58; }
 .msg-date { display: block; font-size: 11px; color: #999; }
 
 /* Message Detail */
-.msg-detail { padding: 20px; min-height: 300px; }
+.msg-detail { padding: 20px; min-height: 300px; display: none; }
 .detail-header {
     display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
     padding-bottom: 15px; border-bottom: 1px solid #eee;
