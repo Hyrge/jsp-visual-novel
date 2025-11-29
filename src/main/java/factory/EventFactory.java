@@ -1,13 +1,14 @@
 package factory;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
+
 import model.entity.Event;
 import model.enums.EventCategory;
 import model.enums.EventStatus;
 import model.enums.EventType;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Map;
 
 public class EventFactory {
 
@@ -60,6 +61,13 @@ public class EventFactory {
         }
         if (eventConfig.containsKey("reputationEffect")) {
             event.setImmediateReputation(((Number) eventConfig.get("reputationEffect")).intValue());
+        }
+
+        // 후속 이벤트 ID 목록 처리
+        if (eventConfig.containsKey("subsequentEventIds") && eventConfig.get("subsequentEventIds") != null) {
+            @SuppressWarnings("unchecked")
+            List<String> subsequentIds = (List<String>) eventConfig.get("subsequentEventIds");
+            event.setSubsequentEventIds(subsequentIds);
         }
 
         event.setStatus(EventStatus.ACTIVE);

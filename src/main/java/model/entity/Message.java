@@ -2,6 +2,7 @@ package model.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 import model.enums.SenderType;
 
 public class Message {

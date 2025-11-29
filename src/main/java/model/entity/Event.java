@@ -2,6 +2,8 @@ package model.entity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+
 import model.enums.EventCategory;
 import model.enums.EventStatus;
 import model.enums.EventType;
@@ -17,6 +19,7 @@ public class Event {
     private LocalDate triggeredAt;
     private LocalTime triggeredTime;
     private int immediateReputation; // 발생 시 즉시 평판 변화
+    private List<String> subsequentEventIds; // 후속 이벤트 ID 목록
 
     public String getId() {
         return id;
@@ -96,5 +99,13 @@ public class Event {
 
     public void setImmediateReputation(int immediateReputation) {
         this.immediateReputation = immediateReputation;
+    }
+
+    public List<String> getSubsequentEventIds() {
+        return subsequentEventIds;
+    }
+
+    public void setSubsequentEventIds(List<String> subsequentEventIds) {
+        this.subsequentEventIds = subsequentEventIds;
     }
 }
