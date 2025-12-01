@@ -102,11 +102,19 @@ public class PostManager {
      * 게시판별 게시글 목록 조회 (JSON + DB 병합)
      */
     public List<Post> getPostsByBoardType(String boardType) {
+        return getPostsByBoardType(boardType, null);
+    }
+
+    /**
+     * 게시판별 게시글 목록 조회 (시간 필터링 포함)
+     */
+    public List<Post> getPostsByBoardType(String boardType, java.time.LocalDateTime currentTime) {
         Map<String, Post> resultMap = new HashMap<>();
 
         // 1. JSON 초기 데이터 먼저 추가
         long jsonCount = initialPosts.values().stream()
             .filter(p -> boardType.equals(p.getBoardType()))
+            .filter(p -> currentTime == null || !p.getCreatedAt().isAfter(currentTime)) // 시간 필터링
             .peek(p -> resultMap.put(p.getPostId(), p))
             .count();
         System.out.println("PostManager: Found " + jsonCount + " posts from JSON for board type: " + boardType);
@@ -117,9 +125,11 @@ public class PostManager {
             int dbCount = 0;
             for (Post dbPost : dbPosts) {
                 // JSON에 이미 있는 데이터는 건드리지 않음 (JSON이 완전한 데이터)
+                // 시간 필터링도 적용
                 if (!resultMap.containsKey(dbPost.getPostId())
                     && dbPost.getContent() != null
-                    && !dbPost.getContent().isEmpty()) {
+                    && !dbPost.getContent().isEmpty()
+                    && (currentTime == null || !dbPost.getCreatedAt().isAfter(currentTime))) {
                     resultMap.put(dbPost.getPostId(), dbPost);
                     dbCount++;
                 }
@@ -135,7 +145,7 @@ public class PostManager {
             .sorted((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()))
             .collect(Collectors.toList());
 
-        System.out.println("PostManager: Returning " + result.size() + " total posts");
+        System.out.println("PostManager: Returning " + result.size() + " total posts (time-filtered)");
         return result;
     }
 
@@ -227,7 +237,14 @@ public class PostManager {
      * 모든 게시글 조회 (talk 게시판용)
      */
     public List<Post> getAllPosts() {
-        return getPostsByBoardType("talk");
+        return getPostsByBoardType("talk", null);
+    }
+
+    /**
+     * 모든 게시글 조회 (시간 필터링 포함)
+     */
+    public List<Post> getAllPosts(java.time.LocalDateTime currentTime) {
+        return getPostsByBoardType("talk", currentTime);
     }
 
     /**

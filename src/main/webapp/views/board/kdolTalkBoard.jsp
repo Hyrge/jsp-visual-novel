@@ -52,13 +52,17 @@
                 <!-- 게시판 상단 -->
                 <div class="board-header">
                     <h2>케이돌 토크</h2>
+                    <%
+                        String currentCategory = request.getParameter("category");
+                        if (currentCategory == null) currentCategory = "all";
+                    %>
                     <div class="board-category">
-                        <a href="?category=all" class="active">전체</a>
-                        <a href="?category=chat">잡담</a>
-                        <a href="?category=square">스퀘어</a>
-                        <a href="?category=notice">알림/결과</a>
-                        <a href="?category=review">후기</a>
-                        <a href="?category=onair">onair</a>
+                        <a href="?category=all&page=1" class="<%= "all".equals(currentCategory) ? "active" : "" %>">전체</a>
+                        <a href="?category=잡담&page=1" class="<%= "잡담".equals(currentCategory) ? "active" : "" %>">잡담</a>
+                        <a href="?category=스퀘어&page=1" class="<%= "스퀘어".equals(currentCategory) ? "active" : "" %>">스퀘어</a>
+                        <a href="?category=알림/결과&page=1" class="<%= "알림/결과".equals(currentCategory) ? "active" : "" %>">알림/결과</a>
+                        <a href="?category=후기&page=1" class="<%= "후기".equals(currentCategory) ? "active" : "" %>">후기</a>
+                        <a href="?category=onair&page=1" class="<%= "onair".equals(currentCategory) ? "active" : "" %>">onair</a>
                     </div>
                 </div>
 
@@ -83,25 +87,51 @@
                         </thead>
                         <tbody>
                             <%
-                                // 실제 게시글 데이터 가져오기
-                                java.util.List<dto.Post> posts = gameContext.getPostManager().getAllPosts();
+                                // 현재 게임 시간 기준으로 게시글 가져오기
+                                java.time.LocalDateTime currentGameTime = gameContext.getGameState().getCurrentDateTime();
+                                java.util.List<dto.Post> allPosts = gameContext.getPostManager().getAllPosts(currentGameTime);
 
                                 // 카테고리 필터링
                                 String categoryParam = request.getParameter("category");
                                 if (categoryParam != null && !"all".equals(categoryParam)) {
-                                    posts = posts.stream()
+                                    allPosts = allPosts.stream()
                                         .filter(p -> categoryParam.equals(p.getCategory()))
                                         .collect(java.util.stream.Collectors.toList());
                                 }
 
                                 // 최신순 정렬
-                                posts.sort((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()));
+                                allPosts.sort((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()));
+
+                                // 페이지네이션 설정
+                                int pageSize = 10; // 페이지당 10개
+                                int currentPage = 1;
+                                String pageParam = request.getParameter("page");
+                                if (pageParam != null) {
+                                    try {
+                                        currentPage = Integer.parseInt(pageParam);
+                                        if (currentPage < 1) currentPage = 1;
+                                    } catch (NumberFormatException e) {
+                                        currentPage = 1;
+                                    }
+                                }
+
+                                int totalPosts = allPosts.size();
+                                int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+                                if (currentPage > totalPages && totalPages > 0) {
+                                    currentPage = totalPages;
+                                }
+
+                                // 현재 페이지에 해당하는 게시글만 추출
+                                int startIndex = (currentPage - 1) * pageSize;
+                                int endIndex = Math.min(startIndex + pageSize, totalPosts);
+                                java.util.List<dto.Post> posts = allPosts.subList(startIndex, endIndex);
 
                                 // 날짜 포맷터
                                 java.time.format.DateTimeFormatter dateFormatter =
                                     java.time.format.DateTimeFormatter.ofPattern("MM.dd HH:mm");
 
-                                int postNumber = posts.size();
+                                // 게시글 번호 (전체 기준)
+                                int postNumber = totalPosts - startIndex;
                                 for (dto.Post post : posts) {
                                     String formattedDate = post.getCreatedAt().format(dateFormatter);
 
@@ -147,6 +177,10 @@
                             </tr>
                             <%
                                 }
+
+                                // 페이지네이션을 위한 변수 설정
+                                request.setAttribute("currentPageNum", currentPage);
+                                request.setAttribute("totalPagesNum", totalPages);
                             %>
                         </tbody>
                     </table>
@@ -154,8 +188,8 @@
 
                 <!-- 페이지네이션 -->
                 <jsp:include page="../common/pagination.jsp">
-                    <jsp:param name="currentPage" value="4" />
-                    <jsp:param name="totalPages" value="100" />
+                    <jsp:param name="currentPage" value="<%= currentPage %>" />
+                    <jsp:param name="totalPages" value="<%= totalPages %>" />
                 </jsp:include>
 
                 <!-- 글쓰기 버튼 -->

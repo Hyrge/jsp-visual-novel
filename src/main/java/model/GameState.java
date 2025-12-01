@@ -78,4 +78,12 @@ public class GameState {
     public long getDaysUntilRelease() {
         return java.time.temporal.ChronoUnit.DAYS.between(currentDate, targetDate);
     }
+
+    /**
+     * 현재 게임 날짜와 시간을 LocalDateTime으로 반환
+     * @return 현재 게임 날짜시간
+     */
+    public java.time.LocalDateTime getCurrentDateTime() {
+        return java.time.LocalDateTime.of(currentDate, currentTime);
+    }
 }
