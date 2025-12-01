@@ -72,7 +72,7 @@
                                 <td class="col-no">150</td>
                                 <td class="col-category">잡담</td>
                                 <td class="col-title">
-                                    <a href="#">MiNa 신곡 너무 좋은데?</a>
+                                    <a href="${pageContext.request.contextPath}/views/board/postView.jsp?id=150">MiNa 신곡 너무 좋은데?</a>
                                     <span class="comment-count">[12]</span>
                                 </td>
                                 <td class="col-author">user123</td>
@@ -85,7 +85,7 @@
                                 <td class="col-no">149</td>
                                 <td class="col-category">후기</td>
                                 <td class="col-title">
-                                    <a href="#">어제 팬미팅 다녀왔어요 후기</a>
+                                    <a href="${pageContext.request.contextPath}/views/board/postView.jsp?id=149">어제 팬미팅 다녀왔어요 후기</a>
                                     <span class="comment-count">[45]</span>
                                 </td>
                                 <td class="col-author">mina_fan</td>
@@ -98,7 +98,7 @@
                                 <td class="col-no">148</td>
                                 <td class="col-category">onair</td>
                                 <td class="col-title">
-                                    <a href="#">지금 인스타 라이브 중!</a>
+                                    <a href="${pageContext.request.contextPath}/views/board/postView.jsp?id=148">지금 인스타 라이브 중!</a>
                                     <span class="comment-count">[8]</span>
                                 </td>
                                 <td class="col-author">realtime_kr</td>
