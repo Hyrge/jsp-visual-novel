@@ -266,4 +266,62 @@ public class LLMManager {
     public List<Map<String, Object>> getAllNPCProfiles() {
         return npcProfiles;
     }
+
+    /**
+     * 게시글이 MiNa(노민아)에 관한 것인지 LLM으로 판단
+     * @param title 게시글 제목
+     * @param content 게시글 내용
+     * @return MiNa 관련 여부 (true/false)
+     */
+    public boolean isRelatedToMina(String title, String content) {
+        String prompt = buildMinaDetectionPrompt(title, content);
+        String result = geminiService.generateText(prompt);
+        
+        if (result == null) {
+            // LLM 호출 실패시 폴백: 기본 키워드 매칭
+            return fallbackMinaDetection(title, content);
+        }
+        
+        // 결과 파싱 (true/false 판단)
+        result = result.trim().toLowerCase();
+        return result.contains("true") || result.contains("yes") || result.contains("예") || result.contains("관련있");
+    }
+
+    /**
+     * MiNa 관련 여부 판단 프롬프트 작성
+     */
+    private String buildMinaDetectionPrompt(String title, String content) {
+        return String.join("\n",
+            "당신은 텍스트 분석 전문가입니다.",
+            "",
+            "### 판단 대상 인물:",
+            "아이돌 'MiNa' (노민아)를 지칭하는 다양한 표현들:",
+            "- 공식명: MiNa, 미나, Mina",
+            "- 본명: 노민아",
+            "- 별명/애칭: 노미남, 밍토끼, 민아, 송민아",
+            "- 기타 변형: 미나야, 민아야, 밍밍이 등",
+            "",
+            "### 분석할 게시글:",
+            "- 제목: " + (title != null ? title : "(없음)"),
+            "- 내용: " + (content != null ? content : "(없음)"),
+            "",
+            "### 지침:",
+            "1. 위 게시글이 MiNa(노민아)에 대해 언급하거나 관련된 내용인지 판단하세요",
+            "2. 직접적인 언급뿐 아니라 문맥상 MiNa를 지칭하는 경우도 포함합니다",
+            "3. 반드시 'true' 또는 'false'로만 답하세요",
+            "",
+            "답변:"
+        );
+    }
+
+    /**
+     * LLM 호출 실패시 폴백 키워드 매칭
+     */
+    private boolean fallbackMinaDetection(String title, String content) {
+        String combined = ((title != null ? title : "") + " " + (content != null ? content : "")).toLowerCase();
+        return combined.contains("mina") || combined.contains("미나") || 
+               combined.contains("민아") || combined.contains("노민아") || 
+               combined.contains("송민아") || combined.contains("노미남") || 
+               combined.contains("밍토끼");
+    }
 }
