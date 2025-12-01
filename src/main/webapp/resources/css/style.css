@@ -209,6 +209,75 @@ a:hover, a:focus { color: #1e2b58; }
 }
 .msg-date { display: block; font-size: 11px; color: #999; }
 
+/* 쪽지 보내기 폼 */
+.msg-send-form {
+    padding: 15px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+.msg-send-form h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.msg-send-form .form-group {
+    margin-bottom: 12px;
+}
+
+.msg-send-form label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.msg-send-form input[type="text"],
+.msg-send-form textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.msg-send-form input[type="text"]:focus,
+.msg-send-form textarea:focus {
+    border-color: #1e2b58;
+    outline: none;
+}
+
+.msg-send-form .char-count {
+    text-align: right;
+    font-size: 11px;
+    color: #999;
+    margin-top: 3px;
+}
+
+.btn-send-msg {
+    width: 100%;
+    padding: 10px;
+    background: #1e2b58;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-send-msg:hover {
+    background: #151e40;
+}
+
+.btn-send-msg:active {
+    transform: scale(0.98);
+}
+
 /* Message Detail */
 .msg-detail { padding: 20px; min-height: 300px; display: none; }
 .detail-header {
@@ -228,6 +297,108 @@ a:hover, a:focus { color: #1e2b58; }
     cursor: pointer; transition: all 0.3s;
 }
 .btn-complete:hover { background: #151e40; }
+
+/* Time Control Panel */
+.time-control-panel {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 15px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.time-display {
+    padding: 15px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+.current-date {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.date-label {
+    color: #666;
+    font-weight: normal;
+}
+
+.date-value {
+    color: #333;
+    font-weight: bold;
+}
+
+.d-day-counter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #1e2b58;
+    border-radius: 6px;
+}
+
+.d-day-label {
+    color: #fff;
+    font-size: 13px;
+}
+
+.d-day-value {
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.time-actions {
+    padding: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-time-skip,
+.btn-day-skip {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 12px;
+}
+
+.btn-time-skip:hover,
+.btn-day-skip:hover {
+    background: #f8f9fa;
+    border-color: #1e2b58;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.skip-icon {
+    font-size: 24px;
+    margin-bottom: 5px;
+    color: #1e2b58;
+}
+
+.skip-text {
+    color: #333;
+    font-weight: bold;
+}
+
+.btn-time-skip:active,
+.btn-day-skip:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 
 /* Login Page */
 .login-body {
