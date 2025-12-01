@@ -102,30 +102,35 @@ public class PostManager {
      * 게시판별 게시글 목록 조회 (JSON + DB 병합)
      */
     public List<Post> getPostsByBoardType(String boardType) {
-        return getPostsByBoardType(boardType, null);
+        return getPostsByBoardType(boardType, null, null);
     }
 
     /**
      * 게시판별 게시글 목록 조회 (시간 필터링 포함)
      */
     public List<Post> getPostsByBoardType(String boardType, java.time.LocalDateTime currentTime) {
+        return getPostsByBoardType(boardType, currentTime, null);
+    }
+
+    /**
+     * 게시판별 게시글 목록 조회 (시간 필터링 + 플레이어 필터링)
+     */
+    public List<Post> getPostsByBoardType(String boardType, java.time.LocalDateTime currentTime, String playerPid) {
         Map<String, Post> resultMap = new HashMap<>();
 
-        // 1. JSON 초기 데이터 먼저 추가
+        // 1. JSON 초기 데이터 먼저 추가 (모든 플레이어 공통)
         long jsonCount = initialPosts.values().stream()
             .filter(p -> boardType.equals(p.getBoardType()))
-            .filter(p -> currentTime == null || !p.getCreatedAt().isAfter(currentTime)) // 시간 필터링
+            .filter(p -> currentTime == null || !p.getCreatedAt().isAfter(currentTime))
             .peek(p -> resultMap.put(p.getPostId(), p))
             .count();
         System.out.println("PostManager: Found " + jsonCount + " posts from JSON for board type: " + boardType);
 
-        // 2. DB 동적 데이터 추가 (내용이 있고, JSON에 없는 것만 추가)
+        // 2. DB 동적 데이터 추가 (playerPid로 필터링, JSON에 없는 것만)
         try {
-            List<Post> dbPosts = postDAO.findByBoardType(boardType);
+            List<Post> dbPosts = postDAO.findByBoardType(boardType, playerPid);
             int dbCount = 0;
             for (Post dbPost : dbPosts) {
-                // JSON에 이미 있는 데이터는 건드리지 않음 (JSON이 완전한 데이터)
-                // 시간 필터링도 적용
                 if (!resultMap.containsKey(dbPost.getPostId())
                     && dbPost.getContent() != null
                     && !dbPost.getContent().isEmpty()
@@ -134,7 +139,7 @@ public class PostManager {
                     dbCount++;
                 }
             }
-            System.out.println("PostManager: Found " + dbCount + " NEW posts from DB for board type: " + boardType);
+            System.out.println("PostManager: Found " + dbCount + " NEW posts from DB for board type: " + boardType + " (playerPid: " + playerPid + ")");
         } catch (Exception e) {
             System.err.println("PostManager: Error loading DB posts: " + e.getMessage());
             e.printStackTrace();
@@ -145,7 +150,7 @@ public class PostManager {
             .sorted((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()))
             .collect(Collectors.toList());
 
-        System.out.println("PostManager: Returning " + result.size() + " total posts (time-filtered)");
+        System.out.println("PostManager: Returning " + result.size() + " total posts");
         return result;
     }
 
@@ -153,19 +158,35 @@ public class PostManager {
      * 댓글 목록 조회 (JSON + DB 병합)
      */
     public List<Comment> getComments(String postId) {
-        List<Comment> result = new ArrayList<>();
+        return getComments(postId, null);
+    }
 
-        // JSON 초기 데이터
+    /**
+     * 댓글 목록 조회 (JSON + DB 병합, 플레이어 필터링)
+     */
+    public List<Comment> getComments(String postId, String playerPid) {
+        Map<Integer, Comment> resultMap = new HashMap<>();
+
+        // 1. JSON 초기 데이터 먼저 추가 (모든 플레이어 공통)
         List<Comment> jsonComments = initialComments.get(postId);
         if (jsonComments != null) {
-            result.addAll(jsonComments);
+            for (Comment c : jsonComments) {
+                resultMap.put(c.getCommentId(), c);
+            }
         }
 
-        // DB 동적 데이터
-        List<Comment> dbComments = commentDAO.findByPostId(postId);
-        result.addAll(dbComments);
+        // 2. DB 동적 데이터 추가 (playerPid로 필터링, JSON에 없는 것만)
+        List<Comment> dbComments = commentDAO.findByPostId(postId, playerPid);
+        for (Comment c : dbComments) {
+            if (!resultMap.containsKey(c.getCommentId()) 
+                && c.getContent() != null 
+                && !c.getContent().isEmpty()) {
+                resultMap.put(c.getCommentId(), c);
+            }
+        }
 
-        // 정렬 (comment_seq, created_at)
+        // 3. 정렬 (comment_seq, created_at)
+        List<Comment> result = new ArrayList<>(resultMap.values());
         result.sort((c1, c2) -> {
             int seqCompare = Integer.compare(c1.getCommentSeq(), c2.getCommentSeq());
             if (seqCompare != 0) return seqCompare;
@@ -244,13 +265,27 @@ public class PostManager {
      * 모든 게시글 조회 (시간 필터링 포함)
      */
     public List<Post> getAllPosts(java.time.LocalDateTime currentTime) {
-        return getPostsByBoardType("talk", currentTime);
+        return getPostsByBoardType("talk", currentTime, null);
+    }
+
+    /**
+     * 모든 게시글 조회 (시간 필터링 + 플레이어 필터링)
+     */
+    public List<Post> getAllPosts(java.time.LocalDateTime currentTime, String playerPid) {
+        return getPostsByBoardType("talk", currentTime, playerPid);
     }
 
     /**
      * 특정 게시글의 댓글 목록 조회 (별칭)
      */
     public List<Comment> getCommentsByPostId(String postId) {
-        return getComments(postId);
+        return getComments(postId, null);
+    }
+
+    /**
+     * 특정 게시글의 댓글 목록 조회 (플레이어 필터링)
+     */
+    public List<Comment> getCommentsByPostId(String postId, String playerPid) {
+        return getComments(postId, playerPid);
     }
 }

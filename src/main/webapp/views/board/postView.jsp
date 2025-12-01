@@ -101,8 +101,12 @@
         return;
     }
 
-    // 댓글 목록 가져오기
-    List<Comment> commentList = postManager.getComments(postId);
+    // 현재 플레이어 pid 가져오기
+    GameContext gameCtx = (GameContext) session.getAttribute("gameContext");
+    String playerPid = (gameCtx != null) ? gameCtx.getPid() : null;
+
+    // 댓글 목록 가져오기 (playerPid로 필터링)
+    List<Comment> commentList = postManager.getComments(postId, playerPid);
 
     // JSP에서 사용할 데이터 변환
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -217,7 +221,7 @@
 
                     <!-- 댓글 작성 폼 -->
                     <div class="comment-write-section">
-                        <form id="commentForm" method="post" action="${pageContext.request.contextPath}/board/addComment" onsubmit="return validateComment()">
+                        <form id="commentForm" method="post" action="${pageContext.request.contextPath}/views/board/postView.jsp" onsubmit="return validateComment()">
                             <input type="hidden" name="postId" value="${post.id}">
                             <textarea name="commentContent" id="commentContent" placeholder="댓글을 입력하세요..." rows="3" maxlength="500"></textarea>
                             <div class="comment-write-bottom">
@@ -252,7 +256,7 @@
 
                             <!-- 답글 작성 폼 (닉네임 클릭 시 나타남) -->
                             <div class="reply-form-section" id="replyForm-${comment.id}" style="display: none;">
-                                <form method="post" action="${pageContext.request.contextPath}/board/addComment" onsubmit="return validateReply('${comment.id}')">
+                                <form method="post" action="${pageContext.request.contextPath}/views/board/postView.jsp" onsubmit="return validateReply('${comment.id}')">
                                     <input type="hidden" name="postId" value="${post.id}">
                                     <textarea name="replyContent" id="replyContent-${comment.id}" placeholder="답글을 입력하세요..." rows="2" maxlength="500"></textarea>
                                     <div class="reply-write-bottom">

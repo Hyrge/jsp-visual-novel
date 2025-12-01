@@ -87,9 +87,10 @@
                         </thead>
                         <tbody>
                             <%
-                                // 현재 게임 시간 기준으로 게시글 가져오기
+                                // 현재 게임 시간 기준으로 게시글 가져오기 (playerPid로 필터링)
                                 java.time.LocalDateTime currentGameTime = gameContext.getGameState().getCurrentDateTime();
-                                java.util.List<dto.Post> allPosts = gameContext.getPostManager().getAllPosts(currentGameTime);
+                                String playerPid = gameContext.getPid();
+                                java.util.List<dto.Post> allPosts = gameContext.getPostManager().getAllPosts(currentGameTime, playerPid);
 
                                 // 카테고리 필터링
                                 String categoryParam = request.getParameter("category");
