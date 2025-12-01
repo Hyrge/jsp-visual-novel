@@ -1,62 +1,138 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="manager.PostManager" %>
+<%@ page import="dto.Post" %>
+<%@ page import="dto.Comment" %>
+<%@ page import="model.GameContext" %>
+<%@ page import="java.time.LocalDateTime" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="java.util.*" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page import="java.util.*, java.text.SimpleDateFormat" %>
+
 <%
-    // 게시글 ID 파라미터 받기
+    request.setCharacterEncoding("UTF-8");
+
+    // 댓글 작성 처리 (POST 요청)
+    if ("POST".equalsIgnoreCase(request.getMethod())) {
+        try {
+            // 쿠키에서 pid 가져오기
+            String pid = null;
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("pid".equals(cookie.getName())) {
+                        pid = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+
+            if (pid == null) {
+                response.sendRedirect(request.getContextPath() + "/index.jsp");
+                return;
+            }
+
+            String postId = request.getParameter("postId");
+            String commentContent = request.getParameter("commentContent");
+            String replyContent = request.getParameter("replyContent");
+
+            String content = (commentContent != null && !commentContent.trim().isEmpty())
+                           ? commentContent.trim()
+                           : (replyContent != null ? replyContent.trim() : null);
+
+            if (postId == null || content == null || content.isEmpty()) {
+                out.println("<script>alert('댓글 내용을 입력해주세요.'); history.back();</script>");
+                return;
+            }
+
+            // GameContext에서 현재 게임 시간 가져오기
+            GameContext gameContext = (GameContext) session.getAttribute("gameContext");
+            LocalDateTime currentDateTime = null;
+            if (gameContext != null) {
+                currentDateTime = gameContext.getGameState().getCurrentDateTime();
+            } else {
+                currentDateTime = LocalDateTime.now();
+            }
+
+            // Comment 객체 생성
+            Comment comment = new Comment();
+            comment.setPostId(postId);
+            comment.setAuthorPid(pid);
+            comment.setContent(content);
+            comment.setCreatedAt(currentDateTime);
+            comment.setParentCommentId(null); // 답글 기능은 추후 구현
+
+            // PostManager를 통해 DB에 저장
+            PostManager postManager = PostManager.getInstance();
+            boolean success = postManager.createComment(comment);
+
+            if (success) {
+                // 게임 시간 1분 진행
+                if (gameContext != null) {
+                    gameContext.getGameState().advanceTime(1);
+                }
+
+                // 같은 게시글 페이지로 리다이렉트
+                response.sendRedirect(request.getContextPath() + "/views/board/postView.jsp?id=" + postId);
+                return;
+            } else {
+                out.println("<script>alert('댓글 저장에 실패했습니다.'); history.back();</script>");
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            out.println("<script>alert('오류가 발생했습니다: " + e.getMessage() + "'); history.back();</script>");
+            return;
+        }
+    }
+
+    // GET 요청 처리 (게시글 조회)
     String postId = request.getParameter("id");
+    if (postId == null || postId.trim().isEmpty()) {
+        response.sendRedirect(request.getContextPath() + "/views/board/kdolTalkBoard.jsp");
+        return;
+    }
 
-    // TODO: 실제로는 DB나 JSON에서 게시글 데이터 가져오기
-    // 현재는 예시 데이터 사용
+    // PostManager에서 게시글 데이터 가져오기
+    PostManager postManager = PostManager.getInstance();
+    Post post = postManager.getPost(postId);
 
-    // 게시글 데이터 (임시)
-    Map<String, String> post = new HashMap<>();
-    post.put("id", postId != null ? postId : "150");
-    post.put("category", "잡담");
-    post.put("title", "MiNa 신곡 너무 좋은데?");
-    post.put("author", "user123");
-    post.put("date", "2025-11-27 11:23");
-    post.put("views", "345");
-    post.put("likes", "28");
-    post.put("dislikes", "3");
-    post.put("content", "어제 공개된 MiNa 신곡 들어봤는데 진짜 대박이에요!<br><br>" +
-                       "특히 후렴구 부분이 너무 중독적이고, 뮤직비디오 퀄리티도 장난 아님ㅋㅋ<br><br>" +
-                       "이번에는 진짜 음원차트 1위 가능할 것 같은데 다들 어떻게 생각하시나요?<br><br>" +
-                       "댓글로 의견 남겨주세요!");
+    if (post == null) {
+        out.println("<script>alert('게시글을 찾을 수 없습니다.'); location.href='" + request.getContextPath() + "/views/board/kdolTalkBoard.jsp';</script>");
+        return;
+    }
 
-    request.setAttribute("post", post);
+    // 댓글 목록 가져오기
+    List<Comment> commentList = postManager.getComments(postId);
 
-    // 댓글 데이터 (임시)
-    List<Map<String, String>> comments = new ArrayList<>();
+    // JSP에서 사용할 데이터 변환
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    Map<String, String> comment1 = new HashMap<>();
-    comment1.put("id", "1");
-    comment1.put("author", "mina_lover");
-    comment1.put("date", "2025-11-27 11:30");
-    comment1.put("content", "인정요!! 저도 계속 반복재생 중ㅋㅋ");
-    comment1.put("likes", "5");
-    comment1.put("dislikes", "0");
-    comments.add(comment1);
+    Map<String, Object> postData = new HashMap<>();
+    postData.put("id", post.getPostId());
+    postData.put("category", post.getCategory());
+    postData.put("title", post.getTitle());
+    postData.put("author", post.getAuthorNickname() != null ? post.getAuthorNickname() : "익명");
+    postData.put("date", post.getCreatedAt().format(dateFormatter));
+    postData.put("views", "0"); // TODO: 조회수 기능 추가
+    postData.put("likes", String.valueOf(post.getLikeCount()));
+    postData.put("dislikes", String.valueOf(post.getDislikeCount()));
+    postData.put("content", post.getContent().replace("\n", "<br>"));
 
-    Map<String, String> comment2 = new HashMap<>();
-    comment2.put("id", "2");
-    comment2.put("author", "kdol_fan");
-    comment2.put("date", "2025-11-27 11:45");
-    comment2.put("content", "뮤비 진짜 예술이더라... 이번에는 대박날듯");
-    comment2.put("likes", "8");
-    comment2.put("dislikes", "1");
-    comments.add(comment2);
+    request.setAttribute("post", postData);
 
-    Map<String, String> comment3 = new HashMap<>();
-    comment3.put("id", "3");
-    comment3.put("author", "hater123");
-    comment3.put("date", "2025-11-27 12:10");
-    comment3.put("content", "별로인데? 과대평가ㅋㅋ");
-    comment3.put("likes", "2");
-    comment3.put("dislikes", "15");
-    comments.add(comment3);
+    // 댓글 데이터 변환
+    List<Map<String, String>> commentsData = new ArrayList<>();
+    for (Comment c : commentList) {
+        Map<String, String> commentMap = new HashMap<>();
+        commentMap.put("id", String.valueOf(c.getCommentId()));
+        commentMap.put("author", c.getAuthorNickname() != null ? c.getAuthorNickname() : "익명");
+        commentMap.put("date", c.getCreatedAt().format(dateFormatter));
+        commentMap.put("content", c.getContent().replace("\n", "<br>"));
+        commentsData.add(commentMap);
+    }
 
-    request.setAttribute("comments", comments);
-    request.setAttribute("commentCount", comments.size());
+    request.setAttribute("comments", commentsData);
+    request.setAttribute("commentCount", commentsData.size());
 %>
 <!DOCTYPE html>
 <html>
