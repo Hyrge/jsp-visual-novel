@@ -96,3 +96,6 @@ saves/
 .antigravity/
 run_server.ps1
 CLAUDE.md
+
+src/main/resources/db.properties
+src/main/resources/gemini.properties
