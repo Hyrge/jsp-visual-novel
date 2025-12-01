@@ -3,12 +3,11 @@
 <%@ page import="manager.GameController" %>
 <%@ page import="manager.DataManager" %>
 <%@ page import="dao.PlayerDAO" %>
+<%@ page import="util.SavePathManager" %>
 
 <%
-    // GameController 초기화
     GameController.getInstance();
 
-    // 플레이어 식별자(PID) 확인 및 생성
     String pid = null;
     Cookie[] cookies = request.getCookies();
     if (cookies != null) {
@@ -20,31 +19,30 @@
         }
     }
 
-    // 새로운 플레이어 (쿠키 없음) - UUID 생성 및 쿠키 저장
     boolean isNewPlayer = false;
     if (pid == null) {
         pid = UUID.randomUUID().toString();
         Cookie pidCookie = new Cookie("pid", pid);
-        pidCookie.setMaxAge(60 * 60 * 24 * 10); // 10일
+        pidCookie.setMaxAge(60 * 60 * 24 * 10);
         pidCookie.setPath("/");
         response.addCookie(pidCookie);
         isNewPlayer = true;
     }
 
-    // DB에 플레이어 자동 회원가입
     PlayerDAO playerDAO = new PlayerDAO();
     if (isNewPlayer || !playerDAO.exists(pid)) {
-        // 저장 경로: saves/{pid}
         String savePath = "saves/" + pid;
         boolean created = playerDAO.createPlayer(pid, savePath);
 
         if (created) {
+            // saves/{pid} 폴더 생성
+            String basePath = application.getRealPath("/");
+            SavePathManager.createPlayerSaveFolder(basePath, pid);
             out.println("<!-- 플레이어 자동 가입 완료: " + pid + " -->");
         } else {
             out.println("<!-- 플레이어 가입 실패 -->");
         }
     } else {
-        // 기존 플레이어 - 마지막 접속 시간 업데이트
         playerDAO.updateLastAccess(pid);
         out.println("<!-- 기존 플레이어 접속: " + pid + " -->");
     }
