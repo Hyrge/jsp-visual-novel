@@ -56,10 +56,10 @@ public class EventFactory {
             event.setDescription((String) eventConfig.get("description"));
         }
 
-        if (eventConfig.containsKey("severity")) {
+        if (eventConfig.containsKey("severity") && eventConfig.get("severity") != null) {
             event.setSeverity(((Number) eventConfig.get("severity")).intValue());
         }
-        if (eventConfig.containsKey("reputationEffect")) {
+        if (eventConfig.containsKey("reputationEffect") && eventConfig.get("reputationEffect") != null) {
             event.setImmediateReputation(((Number) eventConfig.get("reputationEffect")).intValue());
         }
 

@@ -3,20 +3,26 @@ package dto;
 import java.time.LocalDateTime;
 
 public class Player {
-    private Long pid;
+    private String pid; // VARCHAR(50) - UUID 문자열
     private String savePath;
     private LocalDateTime lastAccess;
-    private String state;
-    private LocalDateTime createdAt;
+    private String state; // ENUM('PLAYING', 'CLEAR')
 
     public Player() {
     }
 
-    public Long getPid() {
+    public Player(String pid, String savePath) {
+        this.pid = pid;
+        this.savePath = savePath;
+        this.lastAccess = LocalDateTime.now();
+        this.state = "PLAYING";
+    }
+
+    public String getPid() {
         return pid;
     }
 
-    public void setPid(Long pid) {
+    public void setPid(String pid) {
         this.pid = pid;
     }
 
@@ -42,14 +48,6 @@ public class Player {
 
     public void setState(String state) {
         this.state = state;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }
 
