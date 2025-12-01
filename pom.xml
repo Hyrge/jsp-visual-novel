@@ -30,6 +30,13 @@
       <version>2.18.2</version>
     </dependency>
 
+    <!-- Jackson JSR310 (Java 8 Date/Time support) -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>2.18.2</version>
+    </dependency>
+
     <!-- Jakarta Servlet API -->
     <dependency>
       <groupId>jakarta.servlet</groupId>
