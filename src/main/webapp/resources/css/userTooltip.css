@@ -1,0 +1,75 @@
+@charset "utf-8";
+
+/* User Tooltip (닉네임 hover 시 나타나는 메뉴) */
+
+.user-tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.user-tooltip {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 5px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+    min-width: 140px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+}
+
+.user-tooltip-wrapper:hover .user-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-tooltip-item {
+    display: block;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #333;
+    text-decoration: none;
+    transition: background 0.2s ease;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+
+.user-tooltip-item:hover {
+    background: #f8f9fa;
+    color: #1e2b58;
+}
+
+.user-tooltip-item:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* 게시글 작성자 닉네임 스타일 */
+.post-author-link {
+    position: relative;
+    display: inline-block;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.post-author-link:hover {
+    color: #1e2b58;
+}
+
+/* 댓글 작성자 닉네임은 기존 스타일 유지하되 wrapper 추가 */
+.comment-author-wrapper {
+    position: relative;
+    display: inline-block;
+}

@@ -67,6 +67,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css?v=2">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/board.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/postView.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/userTooltip.css">
 </head>
 <body>
     <!-- 헤더 include -->
@@ -86,7 +87,13 @@
                     </div>
                     <h2 class="post-title">${post.title}</h2>
                     <div class="post-meta">
-                        <span class="author">${post.author}</span>
+                        <span class="user-tooltip-wrapper">
+                            <span class="author post-author-link">${post.author}</span>
+                            <div class="user-tooltip">
+                                <a href="javascript:void(0)" class="user-tooltip-item" onclick="viewUserInfo('${post.author}')">회원정보</a>
+                                <a href="javascript:void(0)" class="user-tooltip-item" onclick="sendMessage('${post.author}')">쪽지 보내기</a>
+                            </div>
+                        </span>
                         <span class="separator">|</span>
                         <span class="date">${post.date}</span>
                         <span class="separator">|</span>
@@ -150,7 +157,13 @@
                         <div class="comment-item" id="comment-${comment.id}">
                             <div class="comment-header-row">
                                 <div class="comment-author-info">
-                                    <span class="comment-author" onclick="toggleReplyForm('${comment.id}', '${comment.author}')" style="cursor: pointer;">${comment.author}</span>
+                                    <span class="user-tooltip-wrapper comment-author-wrapper">
+                                        <span class="comment-author" onclick="toggleReplyForm('${comment.id}', '${comment.author}')" style="cursor: pointer;">${comment.author}</span>
+                                        <div class="user-tooltip">
+                                            <a href="javascript:void(0)" class="user-tooltip-item" onclick="viewUserInfo('${comment.author}')">회원정보</a>
+                                            <a href="javascript:void(0)" class="user-tooltip-item" onclick="sendMessage('${comment.author}')">쪽지 보내기</a>
+                                        </div>
+                                    </span>
                                     <span class="comment-date">${comment.date}</span>
                                 </div>
                                 <button type="button" class="btn-comment-report" onclick="reportComment('${comment.id}')">
@@ -218,5 +231,6 @@
     <script src="${pageContext.request.contextPath}/resources/js/comment.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/post.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/charCounter.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/userTooltip.js"></script>
 </body>
 </html>
