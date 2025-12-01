@@ -159,5 +159,5 @@
     </div>
 </div>
 
-<script src="<%= request.getContextPath() %>/resources/js/charCounter.js"></script>
-<script src="<%= request.getContextPath() %>/resources/js/messageSidebar.js"></script>
+<script src="<%= request.getContextPath() %>/resources/js/charCounter.js?v=2"></script>
+<script src="<%= request.getContextPath() %>/resources/js/messageSidebar.js?v=2"></script>
