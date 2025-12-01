@@ -24,22 +24,36 @@ public class DataManager {
     private void loadAll() {
         System.out.println("DataManager: Loading data");
 
-        // 이벤트 설정 로드
-        this.eventConfig = JsonLoader.loadJSON("../resources/event_config.json");
+        try {
+            // 이벤트 설정 로드 (classpath에서 로드)
+            String eventPath = getClass().getClassLoader().getResource("event_config.json").getPath();
+            eventPath = java.net.URLDecoder.decode(eventPath, "UTF-8");
+            this.eventConfig = JsonLoader.loadJSON(eventPath);
 
-        if (this.eventConfig != null) {
-            System.out.println("DataManager: Loaded " + this.eventConfig.size() + " events.");
-        } else {
-            System.err.println("DataManager: Failed to load event_config.json");
+            if (this.eventConfig != null) {
+                System.out.println("DataManager: Loaded " + this.eventConfig.size() + " events.");
+            } else {
+                System.err.println("DataManager: Failed to load event_config.json");
+            }
+        } catch (Exception e) {
+            System.err.println("DataManager: Error loading event_config.json - " + e.getMessage());
+            e.printStackTrace();
         }
 
-        // 퀘스트 설정 로드
-        this.questConfig = JsonLoader.loadJSON("../resources/quest_config.json");
+        try {
+            // 퀘스트 설정 로드 (classpath에서 로드)
+            String questPath = getClass().getClassLoader().getResource("quest_config.json").getPath();
+            questPath = java.net.URLDecoder.decode(questPath, "UTF-8");
+            this.questConfig = JsonLoader.loadJSON(questPath);
 
-        if (this.questConfig != null) {
-            System.out.println("DataManager: Loaded " + this.questConfig.size() + " quests.");
-        } else {
-            System.err.println("DataManager: Failed to load quest_config.json");
+            if (this.questConfig != null) {
+                System.out.println("DataManager: Loaded " + this.questConfig.size() + " quests.");
+            } else {
+                System.err.println("DataManager: Failed to load quest_config.json");
+            }
+        } catch (Exception e) {
+            System.err.println("DataManager: Error loading quest_config.json - " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
