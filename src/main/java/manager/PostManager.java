@@ -153,19 +153,28 @@ public class PostManager {
      * 댓글 목록 조회 (JSON + DB 병합)
      */
     public List<Comment> getComments(String postId) {
-        List<Comment> result = new ArrayList<>();
+        Map<Integer, Comment> resultMap = new HashMap<>();
 
-        // JSON 초기 데이터
+        // 1. JSON 초기 데이터 먼저 추가 (완전한 데이터)
         List<Comment> jsonComments = initialComments.get(postId);
         if (jsonComments != null) {
-            result.addAll(jsonComments);
+            for (Comment c : jsonComments) {
+                resultMap.put(c.getCommentId(), c);
+            }
         }
 
-        // DB 동적 데이터
+        // 2. DB 동적 데이터 추가 (JSON에 없고, content가 있는 것만)
         List<Comment> dbComments = commentDAO.findByPostId(postId);
-        result.addAll(dbComments);
+        for (Comment c : dbComments) {
+            if (!resultMap.containsKey(c.getCommentId()) 
+                && c.getContent() != null 
+                && !c.getContent().isEmpty()) {
+                resultMap.put(c.getCommentId(), c);
+            }
+        }
 
-        // 정렬 (comment_seq, created_at)
+        // 3. 정렬 (comment_seq, created_at)
+        List<Comment> result = new ArrayList<>(resultMap.values());
         result.sort((c1, c2) -> {
             int seqCompare = Integer.compare(c1.getCommentSeq(), c2.getCommentSeq());
             if (seqCompare != 0) return seqCompare;

@@ -127,7 +127,7 @@
         commentMap.put("id", String.valueOf(c.getCommentId()));
         commentMap.put("author", c.getAuthorNickname() != null ? c.getAuthorNickname() : "익명");
         commentMap.put("date", c.getCreatedAt().format(dateFormatter));
-        commentMap.put("content", c.getContent().replace("\n", "<br>"));
+        commentMap.put("content", c.getContent() != null ? c.getContent().replace("\n", "<br>") : "");
         commentsData.add(commentMap);
     }
 
