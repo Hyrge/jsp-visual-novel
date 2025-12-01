@@ -55,4 +55,27 @@ public class GameState {
     public void setTargetDate(LocalDate targetDate) {
         this.targetDate = targetDate;
     }
+
+    /**
+     * 앨범 발매일까지 남은 일수 계산
+     * @return D-Day 텍스트 (예: "D-93", "D-Day", "D+7")
+     */
+    public String getDDayText() {
+        long daysUntilRelease = java.time.temporal.ChronoUnit.DAYS.between(currentDate, targetDate);
+        if (daysUntilRelease > 0) {
+            return "D-" + daysUntilRelease;
+        } else if (daysUntilRelease == 0) {
+            return "D-Day";
+        } else {
+            return "D+" + Math.abs(daysUntilRelease);
+        }
+    }
+
+    /**
+     * 앨범 발매일까지 남은 일수 반환
+     * @return 남은 일수 (음수일 경우 발매 이후)
+     */
+    public long getDaysUntilRelease() {
+        return java.time.temporal.ChronoUnit.DAYS.between(currentDate, targetDate);
+    }
 }
