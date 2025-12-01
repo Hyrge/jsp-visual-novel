@@ -73,6 +73,6 @@ function deleteComment(commentId) {
 function reportComment(commentId) {
     if (confirm('이 댓글을 신고하시겠습니까?')) {
         // TODO: 신고 처리
-        
+
     }
 }

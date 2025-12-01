@@ -118,7 +118,7 @@
 
                 <!-- 글쓰기 버튼 -->
                 <jsp:include page="../common/boardActions.jsp">
-                    <jsp:param name="href" value="${pageContext.request.contextPath}/board/write" />
+                    <jsp:param name="href" value="${pageContext.request.contextPath}/views/board/postWrite.jsp" />
                     <jsp:param name="buttonText" value="글쓰기" />
                 </jsp:include>
             </div>
