@@ -1,16 +1,22 @@
 package dao;
 
-import dto.Comment;
-import util.DBUtil;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+
+import dto.Comment;
+import util.DBUtil;
 
 public class CommentDAO {
 
     public boolean insert(Comment comment) {
-        String sql = "INSERT INTO comments (comment_seq, post_id, author_pid, content, " +
+        String sql = "INSERT INTO comments (comment_seq, post_id, player_pid, content, " +
                      "parent_comment_id, created_at) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBUtil.getConnection();
@@ -18,7 +24,7 @@ public class CommentDAO {
 
             pstmt.setInt(1, comment.getCommentSeq());
             pstmt.setString(2, comment.getPostId());
-            pstmt.setString(3, comment.getAuthorPid());
+            pstmt.setString(3, comment.getPlayerPid());
             pstmt.setString(4, comment.getContent());
 
             if (comment.getParentCommentId() != null) {
@@ -54,7 +60,7 @@ public class CommentDAO {
     public List<Comment> findByPostId(String postId, String playerPid) {
         String sql;
         if (playerPid != null) {
-            sql = "SELECT * FROM comments WHERE post_id = ? AND author_pid = ? ORDER BY comment_seq ASC, created_at ASC";
+            sql = "SELECT * FROM comments WHERE post_id = ? AND player_pid = ? ORDER BY comment_seq ASC, created_at ASC";
         } else {
             sql = "SELECT * FROM comments WHERE post_id = ? ORDER BY comment_seq ASC, created_at ASC";
         }
@@ -143,7 +149,7 @@ public class CommentDAO {
         comment.setCommentId(rs.getInt("comment_id"));
         comment.setCommentSeq(rs.getInt("comment_seq"));
         comment.setPostId(rs.getString("post_id"));
-        comment.setAuthorPid(rs.getString("author_pid"));
+        comment.setPlayerPid(rs.getString("player_pid"));
         comment.setContent(rs.getString("content"));
 
         int parentId = rs.getInt("parent_comment_id");

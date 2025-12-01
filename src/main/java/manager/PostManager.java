@@ -1,17 +1,22 @@
 package manager;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import dao.CommentDAO;
 import dao.PostDAO;
 import dto.Comment;
 import dto.Post;
 import model.NPCUser;
-
-import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 게시글/댓글 관리자 (싱글톤)
@@ -178,8 +183,8 @@ public class PostManager {
         // 2. DB 동적 데이터 추가 (playerPid로 필터링, JSON에 없는 것만)
         List<Comment> dbComments = commentDAO.findByPostId(postId, playerPid);
         for (Comment c : dbComments) {
-            if (!resultMap.containsKey(c.getCommentId()) 
-                && c.getContent() != null 
+            if (!resultMap.containsKey(c.getCommentId())
+                && c.getContent() != null
                 && !c.getContent().isEmpty()) {
                 resultMap.put(c.getCommentId(), c);
             }
@@ -189,7 +194,9 @@ public class PostManager {
         List<Comment> result = new ArrayList<>(resultMap.values());
         result.sort((c1, c2) -> {
             int seqCompare = Integer.compare(c1.getCommentSeq(), c2.getCommentSeq());
-            if (seqCompare != 0) return seqCompare;
+            if (seqCompare != 0) {
+				return seqCompare;
+			}
             return c1.getCreatedAt().compareTo(c2.getCreatedAt());
         });
 

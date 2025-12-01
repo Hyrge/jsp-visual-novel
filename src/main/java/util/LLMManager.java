@@ -52,7 +52,9 @@ public class LLMManager {
      * ID로 NPC 프로필 조회
      */
     public Map<String, Object> getNPCProfile(String npcId) {
-        if (npcProfiles == null) return null;
+        if (npcProfiles == null) {
+			return null;
+		}
 
         for (Map<String, Object> profile : npcProfiles) {
             if (profile.get("id").equals(npcId)) {
@@ -109,14 +111,18 @@ public class LLMManager {
         String titlePrompt = buildPostTitlePrompt(profile, topic, currentSentiment);
         String title = geminiService.generateText(titlePrompt);
 
-        if (title == null) return null;
+        if (title == null) {
+			return null;
+		}
         title = postProcessText(title);
 
         // 본문 생성 프롬프트
         String contentPrompt = buildPostContentPrompt(profile, topic, title, currentSentiment);
         String content = geminiService.generateText(contentPrompt);
 
-        if (content == null) return null;
+        if (content == null) {
+			return null;
+		}
         content = postProcessText(content);
 
         return Map.of("title", title, "content", content);
@@ -236,7 +242,9 @@ public class LLMManager {
      * 생성된 텍스트 후처리
      */
     private String postProcessText(String text) {
-        if (text == null) return null;
+        if (text == null) {
+			return null;
+		}
 
         // 앞뒤 공백 제거
         text = text.trim();
@@ -256,7 +264,9 @@ public class LLMManager {
      * 랜덤 NPC 프로필 가져오기
      */
     public Map<String, Object> getRandomNPCProfile() {
-        if (npcProfiles == null || npcProfiles.isEmpty()) return null;
+        if (npcProfiles == null || npcProfiles.isEmpty()) {
+			return null;
+		}
         return npcProfiles.get(random.nextInt(npcProfiles.size()));
     }
 
@@ -276,12 +286,12 @@ public class LLMManager {
     public boolean isRelatedToMina(String title, String content) {
         String prompt = buildMinaDetectionPrompt(title, content);
         String result = geminiService.generateText(prompt);
-        
+
         if (result == null) {
             // LLM 호출 실패시 폴백: 기본 키워드 매칭
             return fallbackMinaDetection(title, content);
         }
-        
+
         // 결과 파싱 (true/false 판단)
         result = result.trim().toLowerCase();
         return result.contains("true") || result.contains("yes") || result.contains("예") || result.contains("관련있");
@@ -319,9 +329,9 @@ public class LLMManager {
      */
     private boolean fallbackMinaDetection(String title, String content) {
         String combined = ((title != null ? title : "") + " " + (content != null ? content : "")).toLowerCase();
-        return combined.contains("mina") || combined.contains("미나") || 
-               combined.contains("민아") || combined.contains("노민아") || 
-               combined.contains("송민아") || combined.contains("노미남") || 
+        return combined.contains("mina") || combined.contains("미나") ||
+               combined.contains("민아") || combined.contains("노민아") ||
+               combined.contains("송민아") || combined.contains("노미남") ||
                combined.contains("밍토끼");
     }
 }

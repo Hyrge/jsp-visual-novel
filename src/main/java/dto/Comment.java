@@ -1,7 +1,8 @@
 package dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Comment {
     @JsonProperty("comment_id")
@@ -13,8 +14,8 @@ public class Comment {
     @JsonProperty("post_id")
     private String postId;
 
-    @JsonProperty("author_pid")
-    private String authorPid;
+    @JsonProperty("player_pid")
+    private String playerPid;
 
     private String content;
 
@@ -53,12 +54,12 @@ public class Comment {
         this.postId = postId;
     }
 
-    public String getAuthorPid() {
-        return authorPid;
+    public String getPlayerPid() {
+        return playerPid;
     }
 
-    public void setAuthorPid(String authorPid) {
-        this.authorPid = authorPid;
+    public void setPlayerPid(String playerPid) {
+        this.playerPid = playerPid;
     }
 
     public String getContent() {

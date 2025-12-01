@@ -1,14 +1,15 @@
 package dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Post {
     @JsonProperty("post_id")
     private String postId;
 
-    @JsonProperty("author_pid")
-    private String authorPid;
+    @JsonProperty("player_pid")
+    private String playerPid;
 
     private String title;
     private String content;
@@ -36,6 +37,9 @@ public class Post {
     @JsonProperty("author_nickname")
     private String authorNickname; // 작성자 닉네임 (NPC는 풀에서 선택)
 
+    @JsonProperty("image_file")
+    private String imageFile; // 이미지 파일명 (saves/{pid}/ 경로에 저장)
+
     public Post() {}
 
     public String getPostId() {
@@ -46,12 +50,12 @@ public class Post {
         this.postId = postId;
     }
 
-    public String getAuthorPid() {
-        return authorPid;
+    public String getPlayerPid() {
+        return playerPid;
     }
 
-    public void setAuthorPid(String authorPid) {
-        this.authorPid = authorPid;
+    public void setPlayerPid(String playerPid) {
+        this.playerPid = playerPid;
     }
 
     public String getTitle() {
@@ -132,5 +136,13 @@ public class Post {
 
     public void setAuthorNickname(String authorNickname) {
         this.authorNickname = authorNickname;
+    }
+
+    public String getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(String imageFile) {
+        this.imageFile = imageFile;
     }
 }

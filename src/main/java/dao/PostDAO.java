@@ -1,25 +1,28 @@
 package dao;
 
-import dto.Post;
-import util.DBUtil;
-
-import java.sql.*;
-import java.time.LocalDateTime;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+import dto.Post;
+import util.DBUtil;
 
 public class PostDAO {
 
     public boolean insert(Post post) {
-        String sql = "INSERT INTO posts (post_id, author_pid, title, content, board_type, category, " +
-                     "created_at, has_pictures, like_count, dislike_count, is_related_mina) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO posts (post_id, player_pid, title, content, board_type, category, " +
+                     "created_at, has_pictures, like_count, dislike_count, is_related_mina, image_file) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, post.getPostId());
-            pstmt.setString(2, post.getAuthorPid());
+            pstmt.setString(2, post.getPlayerPid());
             pstmt.setString(3, post.getTitle());
             pstmt.setString(4, post.getContent());
             pstmt.setString(5, post.getBoardType());
@@ -29,6 +32,7 @@ public class PostDAO {
             pstmt.setInt(9, post.getLikeCount());
             pstmt.setInt(10, post.getDislikeCount());
             pstmt.setBoolean(11, post.isRelatedMina());
+            pstmt.setString(12, post.getImageFile());
 
             return pstmt.executeUpdate() > 0;
 
@@ -66,7 +70,7 @@ public class PostDAO {
     public List<Post> findByBoardType(String boardType, String playerPid) {
         String sql;
         if (playerPid != null) {
-            sql = "SELECT * FROM posts WHERE board_type = ? AND author_pid = ? ORDER BY created_at DESC";
+            sql = "SELECT * FROM posts WHERE board_type = ? AND player_pid = ? ORDER BY created_at DESC";
         } else {
             sql = "SELECT * FROM posts WHERE board_type = ? ORDER BY created_at DESC";
         }
@@ -95,7 +99,7 @@ public class PostDAO {
 
     public boolean update(Post post) {
         String sql = "UPDATE posts SET title = ?, content = ?, category = ?, has_pictures = ?, " +
-                     "like_count = ?, dislike_count = ? WHERE post_id = ?";
+                     "like_count = ?, dislike_count = ?, image_file = ? WHERE post_id = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -106,7 +110,8 @@ public class PostDAO {
             pstmt.setBoolean(4, post.isHasPictures());
             pstmt.setInt(5, post.getLikeCount());
             pstmt.setInt(6, post.getDislikeCount());
-            pstmt.setString(7, post.getPostId());
+            pstmt.setString(7, post.getImageFile());
+            pstmt.setString(8, post.getPostId());
 
             return pstmt.executeUpdate() > 0;
 
@@ -134,7 +139,7 @@ public class PostDAO {
     private Post mapResultSetToPost(ResultSet rs) throws SQLException {
         Post post = new Post();
         post.setPostId(rs.getString("post_id"));
-        post.setAuthorPid(rs.getString("author_pid"));
+        post.setPlayerPid(rs.getString("player_pid"));
         post.setTitle(rs.getString("title"));
         post.setContent(rs.getString("content"));
         post.setBoardType(rs.getString("board_type"));
@@ -149,6 +154,7 @@ public class PostDAO {
         post.setLikeCount(rs.getInt("like_count"));
         post.setDislikeCount(rs.getInt("dislike_count"));
         post.setRelatedMina(rs.getBoolean("is_related_mina"));
+        post.setImageFile(rs.getString("image_file"));
 
         return post;
     }

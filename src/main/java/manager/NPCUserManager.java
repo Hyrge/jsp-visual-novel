@@ -1,9 +1,5 @@
 package manager;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import model.NPCUser;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
@@ -11,6 +7,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import model.NPCUser;
 
 /**
  * NPC 사용자 프로필을 관리하는 매니저 클래스

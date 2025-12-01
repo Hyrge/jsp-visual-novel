@@ -1,10 +1,10 @@
 package util;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
-
-import java.io.*;
-import java.util.Properties;
 
 /**
  * Gemini API 호출을 담당하는 서비스 클래스
