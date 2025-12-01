@@ -3,6 +3,7 @@ package model;
 import manager.DataManager;
 import manager.EventManager;
 import manager.MessageManager;
+import manager.PostManager;
 import manager.QuestManager;
 
 public class GameContext {
@@ -11,6 +12,7 @@ public class GameContext {
     private EventManager eventManager;
     private QuestManager questManager;
     private MessageManager messageManager;
+    private PostManager postManager;
 
     public GameContext() {
         // No-arg constructor for jsp:useBean
@@ -33,6 +35,7 @@ public class GameContext {
         this.eventManager = new EventManager(gameState);
         this.questManager = new QuestManager(gameState);
         this.messageManager = new MessageManager(gameState);
+        this.postManager = new PostManager();
 
         // 3. 초기 데이터 로드 (DataManager의 템플릿 활용)
         initializeFromData(dataManager);
@@ -74,5 +77,9 @@ public class GameContext {
 
     public MessageManager getMessageManager() {
         return messageManager;
+    }
+
+    public PostManager getPostManager() {
+        return postManager;
     }
 }
