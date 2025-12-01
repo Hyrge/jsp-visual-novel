@@ -1,0 +1,234 @@
+[
+    {
+        "comment_seq": 1,
+        "post_id": "p_0901",
+        "author_pid": "aa9e11",
+        "content": "ㄹㅇ 밖엘 못나가겠음 녹아내릴듯",
+        "parent_comment_id": null,
+        "created_at": "2025-08-02T14:05:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_0902",
+        "author_pid": "f812d3",
+        "content": "강원도 계곡 추천! 시원하고 좋음",
+        "parent_comment_id": null,
+        "created_at": "2025-08-08T10:35:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_0903",
+        "author_pid": "7bf1c3",
+        "content": "어머 맛있겠다~ 우리 애들도 해줘야겠네",
+        "parent_comment_id": null,
+        "created_at": "2025-08-15T15:05:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_0904",
+        "author_pid": "d1b0fe",
+        "content": "곤지암 안봤으면 봐라 기저귀 차고 봐야됨",
+        "parent_comment_id": null,
+        "created_at": "2025-08-22T23:05:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_0905",
+        "author_pid": "4f91ac",
+        "content": "나이 먹을수록 시간이 더 빨리 가는듯 ㅠㅠ",
+        "parent_comment_id": null,
+        "created_at": "2025-08-30T20:05:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1001",
+        "author_pid": "d1b0fe",
+        "content": "ㄹㅇ 인정.. 분위기 미쳤음",
+        "parent_comment_id": null,
+        "created_at": "2025-09-05T14:32:00"
+    },
+    {
+        "comment_seq": 2,
+        "post_id": "p_1001",
+        "author_pid": "aa9e11",
+        "content": "와 진짜 배우상이다",
+        "parent_comment_id": null,
+        "created_at": "2025-09-05T14:35:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1002",
+        "author_pid": "4f91ac",
+        "content": "난 후드티 샀는데 퀄 괜찮더라! 추천해",
+        "parent_comment_id": null,
+        "created_at": "2025-09-12T19:25:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1003",
+        "author_pid": "3bc9d0",
+        "content": "너무 달아지긴 했음.. 밖에서 뭐 사먹으면 다 설탕범벅",
+        "parent_comment_id": null,
+        "created_at": "2025-09-20T21:15:00"
+    },
+    {
+        "comment_seq": 2,
+        "post_id": "p_1003",
+        "author_pid": "f812d3",
+        "content": "맛있으면 된거 아님? ㅋㅋㅋ",
+        "parent_comment_id": null,
+        "created_at": "2025-09-20T21:20:00"
+    },
+    {
+        "comment_seq": 3,
+        "post_id": "p_1003",
+        "author_pid": "3bc9d0",
+        "content": "ㄴㄴ 건강 생각하면 좀 줄여야지",
+        "parent_comment_id": "5",
+        "created_at": "2025-09-20T21:22:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1004",
+        "author_pid": "7bf1c3",
+        "content": "어머 너무 귀엽다~ 종이 뭐에요?",
+        "parent_comment_id": null,
+        "created_at": "2025-10-01T10:10:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1005",
+        "author_pid": "a88ce2",
+        "content": "기초를 탄탄하게 해야됨. 토너 3번 바르고 크림 발라봐",
+        "parent_comment_id": null,
+        "created_at": "2025-10-15T10:00:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1008",
+        "author_pid": "91c2f5",
+        "content": "나도 오늘 롱패딩 꺼냄 ㅋㅋ 생존이 우선이다",
+        "parent_comment_id": null,
+        "created_at": "2025-11-20T08:35:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1010",
+        "author_pid": "d1b0fe",
+        "content": "너보단 나을듯 ㅋㅋ",
+        "parent_comment_id": null,
+        "created_at": "2025-12-09T22:20:00"
+    },
+    {
+        "comment_seq": 2,
+        "post_id": "p_1010",
+        "author_pid": "4f91ac",
+        "content": "어그로 끌지말고 가라",
+        "parent_comment_id": null,
+        "created_at": "2025-12-09T22:25:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1011",
+        "author_pid": "4f91ac",
+        "content": "난 그냥 후드티 입고 다님 ㅋㅋ 편한게 최고",
+        "parent_comment_id": null,
+        "created_at": "2025-09-08T10:05:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1012",
+        "author_pid": "d1b0fe",
+        "content": "와 컨셉 미쳤다... 지갑 열 준비 완료",
+        "parent_comment_id": null,
+        "created_at": "2025-09-15T18:35:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1013",
+        "author_pid": "a88ce2",
+        "content": "치킨이 진리 아님? 오늘 축구도 하는데",
+        "parent_comment_id": null,
+        "created_at": "2025-09-22T17:50:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1014",
+        "author_pid": "51efa7",
+        "content": "ㅇㅈ 볼게 없음... 유튜브나 보는게 나음",
+        "parent_comment_id": null,
+        "created_at": "2025-09-28T20:15:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1016",
+        "author_pid": "91c2f5",
+        "content": "민지는 춤선이 진짜 예쁨... 타고난듯",
+        "parent_comment_id": null,
+        "created_at": "2025-10-10T23:05:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1018",
+        "author_pid": "d1b0fe",
+        "content": "엘든링 ㄱㄱ 갓겜임",
+        "parent_comment_id": null,
+        "created_at": "2025-10-25T16:05:00"
+    },
+    {
+        "comment_seq": 2,
+        "post_id": "p_1018",
+        "author_pid": "aa9e11",
+        "content": "너무 어렵잖아 ㅋㅋㅋ 힐링겜 추천좀",
+        "parent_comment_id": null,
+        "created_at": "2025-10-25T16:10:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1020",
+        "author_pid": "f812d3",
+        "content": "국밥이 최고지 든든하고",
+        "parent_comment_id": null,
+        "created_at": "2025-11-08T12:15:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1022",
+        "author_pid": "7bf1c3",
+        "content": "어머 벌써 눈이 오네~ 다들 감기 조심해요",
+        "parent_comment_id": null,
+        "created_at": "2025-11-22T07:10:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1023",
+        "author_pid": "0de4aa",
+        "content": "너무 잘 그렸다~ 소질 있네요!",
+        "parent_comment_id": null,
+        "created_at": "2025-11-25T15:35:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1024",
+        "author_pid": "3bc9d0",
+        "content": "나도 방콕 예정... 이불 밖은 위험해",
+        "parent_comment_id": null,
+        "created_at": "2025-12-02T20:05:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1026",
+        "author_pid": "4f91ac",
+        "content": "부럽다 ㅠㅠ 나도 실물 보고싶어",
+        "parent_comment_id": null,
+        "created_at": "2025-12-06T23:35:00"
+    },
+    {
+        "comment_seq": 1,
+        "post_id": "p_1030",
+        "author_pid": "a88ce2",
+        "content": "부럽다... 난 31일까지 일하는데 ㅠㅠ",
+        "parent_comment_id": null,
+        "created_at": "2025-12-10T17:05:00"
+    }
+]
