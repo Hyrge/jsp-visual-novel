@@ -270,7 +270,7 @@
         <p>현재 설정된 API 키가 유효한지 확인하세요.</p>
         <hr style="margin: 15px 0;">
         <p><strong>사용 중인 SDK:</strong> Google Gen AI Java SDK 1.28.0 (공식 SDK)</p>
-        <p><strong>기본 모델:</strong> gemini-2.0-flash-exp</p>
+        <p><strong>기본 모델:</strong> gemini-2.5-flash-exp</p>
     </div>
 
     <a href="index.jsp" style="display:inline-block; margin-top:20px; color:#4CAF50;">← 메인으로 돌아가기</a>
