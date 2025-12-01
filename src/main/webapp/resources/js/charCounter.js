@@ -35,8 +35,23 @@ function initPostCharCounter() {
     }
 }
 
+// 쪽지 글자 수 카운터 초기화
+function initMessageCharCounter() {
+    var messageTextarea = document.getElementById('messageContent');
+    var msgCharCount = document.getElementById('msgCharCount');
+
+    if (messageTextarea && msgCharCount) {
+        messageTextarea.addEventListener('input', function() {
+            msgCharCount.textContent = this.value.length;
+        });
+        // 초기값 설정
+        msgCharCount.textContent = messageTextarea.value.length;
+    }
+}
+
 // 페이지 로드 시 자동 초기화
 document.addEventListener('DOMContentLoaded', function() {
     initCommentCharCounter();
     initPostCharCounter();
+    initMessageCharCounter();
 });

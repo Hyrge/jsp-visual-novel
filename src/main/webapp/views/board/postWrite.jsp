@@ -1,5 +1,103 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="manager.PostManager" %>
+<%@ page import="dto.Post" %>
+<%@ page import="util.RandomStringUtil" %>
+<%@ page import="model.GameContext" %>
+<%@ page import="java.time.LocalDateTime" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%
+    // POST 요청 처리 (게시글 저장)
+    if ("POST".equalsIgnoreCase(request.getMethod())) {
+        try {
+            request.setCharacterEncoding("UTF-8");
+
+            // 쿠키에서 pid 가져오기
+            String pid = null;
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("pid".equals(cookie.getName())) {
+                        pid = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+
+            if (pid == null) {
+                response.sendRedirect(request.getContextPath() + "/index.jsp");
+                return;
+            }
+
+            // 폼 데이터 가져오기
+            String category = request.getParameter("category");
+            String title = request.getParameter("title");
+            String content = request.getParameter("content");
+
+            // 유효성 검사
+            if (category == null || category.trim().isEmpty() ||
+                title == null || title.trim().isEmpty() ||
+                content == null || content.trim().isEmpty()) {
+                out.println("<script>alert('모든 필드를 입력해주세요.'); history.back();</script>");
+                return;
+            }
+
+            // GameContext에서 현재 게임 시간 가져오기
+            GameContext gameContext = (GameContext) session.getAttribute("gameContext");
+            LocalDateTime currentDateTime = null;
+            if (gameContext != null) {
+                currentDateTime = gameContext.getGameState().getCurrentDateTime();
+            } else {
+                currentDateTime = LocalDateTime.now(); // 게임 컨텍스트 없으면 현재 시간 사용
+            }
+
+            // Post 객체 생성
+            Post post = new Post();
+            post.setPostId(RandomStringUtil.generatePostId());
+            post.setAuthorPid(pid);
+            post.setTitle(title.trim());
+            post.setContent(content.trim());
+            post.setBoardType("kdol_talk"); // 케이돌 토크 고정
+            post.setCategory(category);
+            post.setCreatedAt(currentDateTime);
+            post.setHasPictures(false);
+            post.setLikeCount(0);
+            post.setDislikeCount(0);
+
+            // MiNa 관련 여부 판단 (제목이나 내용에 키워드 포함 시)
+            String lowerTitle = title.toLowerCase();
+            String lowerContent = content.toLowerCase();
+            boolean isRelatedMina = lowerTitle.contains("mina") || lowerTitle.contains("민아") ||
+                                    lowerTitle.contains("송민아") || lowerTitle.contains("노민아") ||
+                                    lowerContent.contains("mina") || lowerContent.contains("민아") ||
+                                    lowerContent.contains("송민아") || lowerContent.contains("노민아");
+            post.setRelatedMina(isRelatedMina);
+
+            // PostManager를 통해 DB에 저장
+            PostManager postManager = PostManager.getInstance();
+            boolean success = postManager.createPost(post);
+
+            if (success) {
+                // 게임 시간 1분 진행
+                if (gameContext != null) {
+                    gameContext.getGameState().advanceTime(1);
+                }
+
+                // 게시판 목록으로 리다이렉트
+                response.sendRedirect(request.getContextPath() + "/views/board/kdolTalkBoard.jsp");
+                return;
+            } else {
+                out.println("<script>alert('게시글 저장에 실패했습니다.'); history.back();</script>");
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            out.println("<script>alert('오류가 발생했습니다: " + e.getMessage() + "'); history.back();</script>");
+            return;
+        }
+    }
+%>
+
 <!DOCTYPE html>
 <html>
 <head>

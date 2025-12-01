@@ -1,5 +1,34 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.UUID" %>
+<%@ page import="manager.DataManager" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%-- GameContext 초기화 확인 --%>
+<jsp:useBean id="gameContext" class="model.GameContext" scope="session" />
+<%
+    // GameContext가 초기화되지 않았다면 초기화
+    if (gameContext.getGameState() == null) {
+        String pid = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("pid".equals(cookie.getName())) {
+                    pid = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        // pid가 없으면 index.jsp로 리다이렉트
+        if (pid == null) {
+            response.sendRedirect(request.getContextPath() + "/index.jsp");
+            return;
+        }
+
+        gameContext.init(pid, DataManager.getInstance());
+    }
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,13 +52,17 @@
                 <!-- 게시판 상단 -->
                 <div class="board-header">
                     <h2>케이돌 토크</h2>
+                    <%
+                        String currentCategory = request.getParameter("category");
+                        if (currentCategory == null) currentCategory = "all";
+                    %>
                     <div class="board-category">
-                        <a href="?category=all" class="active">전체</a>
-                        <a href="?category=chat">잡담</a>
-                        <a href="?category=square">스퀘어</a>
-                        <a href="?category=notice">알림/결과</a>
-                        <a href="?category=review">후기</a>
-                        <a href="?category=onair">onair</a>
+                        <a href="?category=all&page=1" class="<%= "all".equals(currentCategory) ? "active" : "" %>">전체</a>
+                        <a href="?category=잡담&page=1" class="<%= "잡담".equals(currentCategory) ? "active" : "" %>">잡담</a>
+                        <a href="?category=스퀘어&page=1" class="<%= "스퀘어".equals(currentCategory) ? "active" : "" %>">스퀘어</a>
+                        <a href="?category=알림/결과&page=1" class="<%= "알림/결과".equals(currentCategory) ? "active" : "" %>">알림/결과</a>
+                        <a href="?category=후기&page=1" class="<%= "후기".equals(currentCategory) ? "active" : "" %>">후기</a>
+                        <a href="?category=onair&page=1" class="<%= "onair".equals(currentCategory) ? "active" : "" %>">onair</a>
                     </div>
                 </div>
 
@@ -49,71 +82,115 @@
                                 <th class="col-title">제목</th>
                                 <th class="col-author">작성자</th>
                                 <th class="col-date">날짜</th>
-                                <th class="col-view">조회</th>
                                 <th class="col-like">추천</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- 공지사항 예시 -->
-                            <tr class="notice">
-                                <td class="col-no"><span class="badge-notice">공지</span></td>
-                                <td class="col-category">공지</td>
-                                <td class="col-title">
-                                    <a href="#">[필독] 케이돌 토크 게시판 이용 규칙</a>
-                                </td>
-                                <td class="col-author">운영자</td>
-                                <td class="col-date">2025.11.27</td>
-                                <td class="col-view">1,234</td>
-                                <td class="col-like">56</td>
-                            </tr>
+                            <%
+                                // 현재 게임 시간 기준으로 게시글 가져오기 (playerPid로 필터링)
+                                java.time.LocalDateTime currentGameTime = gameContext.getGameState().getCurrentDateTime();
+                                String playerPid = gameContext.getPid();
+                                java.util.List<dto.Post> allPosts = gameContext.getPostManager().getAllPosts(currentGameTime, playerPid);
 
-                            <!-- 일반 게시글 예시 -->
-                            <tr>
-                                <td class="col-no">150</td>
-                                <td class="col-category">잡담</td>
-                                <td class="col-title">
-                                    <a href="${pageContext.request.contextPath}/views/board/postView.jsp?id=150">MiNa 신곡 너무 좋은데?</a>
-                                    <span class="comment-count">[12]</span>
-                                </td>
-                                <td class="col-author">user123</td>
-                                <td class="col-date">11:23</td>
-                                <td class="col-view">345</td>
-                                <td class="col-like">28</td>
-                            </tr>
+                                // 카테고리 필터링
+                                String categoryParam = request.getParameter("category");
+                                if (categoryParam != null && !"all".equals(categoryParam)) {
+                                    allPosts = allPosts.stream()
+                                        .filter(p -> categoryParam.equals(p.getCategory()))
+                                        .collect(java.util.stream.Collectors.toList());
+                                }
 
-                            <tr>
-                                <td class="col-no">149</td>
-                                <td class="col-category">후기</td>
-                                <td class="col-title">
-                                    <a href="${pageContext.request.contextPath}/views/board/postView.jsp?id=149">어제 팬미팅 다녀왔어요 후기</a>
-                                    <span class="comment-count">[45]</span>
-                                </td>
-                                <td class="col-author">mina_fan</td>
-                                <td class="col-date">10:15</td>
-                                <td class="col-view">892</td>
-                                <td class="col-like">67</td>
-                            </tr>
+                                // 최신순 정렬
+                                allPosts.sort((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()));
 
+                                // 페이지네이션 설정
+                                int pageSize = 10; // 페이지당 10개
+                                int currentPage = 1;
+                                String pageParam = request.getParameter("page");
+                                if (pageParam != null) {
+                                    try {
+                                        currentPage = Integer.parseInt(pageParam);
+                                        if (currentPage < 1) currentPage = 1;
+                                    } catch (NumberFormatException e) {
+                                        currentPage = 1;
+                                    }
+                                }
+
+                                int totalPosts = allPosts.size();
+                                int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+                                if (currentPage > totalPages && totalPages > 0) {
+                                    currentPage = totalPages;
+                                }
+
+                                // 현재 페이지에 해당하는 게시글만 추출
+                                int startIndex = (currentPage - 1) * pageSize;
+                                int endIndex = Math.min(startIndex + pageSize, totalPosts);
+                                java.util.List<dto.Post> posts = allPosts.subList(startIndex, endIndex);
+
+                                // 날짜 포맷터
+                                java.time.format.DateTimeFormatter dateFormatter =
+                                    java.time.format.DateTimeFormatter.ofPattern("MM.dd HH:mm");
+
+                                // 게시글 번호 (전체 기준)
+                                int postNumber = totalPosts - startIndex;
+                                for (dto.Post post : posts) {
+                                    String formattedDate = post.getCreatedAt().format(dateFormatter);
+
+                                    // 댓글 개수 가져오기
+                                    int commentCount = gameContext.getPostManager().getCommentsByPostId(post.getPostId()).size();
+
+                                    // 닉네임 처리 (JSON에 없으면 NPC ID로부터 생성)
+                                    String nickname = post.getAuthorNickname();
+                                    if (nickname == null || nickname.isEmpty()) {
+                                        nickname = gameContext.getPostManager().assignNicknameForNPC(
+                                            post.getAuthorPid(),
+                                            post.getPostId()
+                                        );
+                                    }
+                            %>
                             <tr>
-                                <td class="col-no">148</td>
-                                <td class="col-category">onair</td>
+                                <td class="col-no"><%= postNumber-- %></td>
+                                <td class="col-category"><%= post.getCategory() != null ? post.getCategory() : "잡담" %></td>
                                 <td class="col-title">
-                                    <a href="${pageContext.request.contextPath}/views/board/postView.jsp?id=148">지금 인스타 라이브 중!</a>
-                                    <span class="comment-count">[8]</span>
+                                    <a href="${pageContext.request.contextPath}/views/board/postView.jsp?id=<%= post.getPostId() %>">
+                                        <%= post.getTitle() %>
+                                    </a>
+                                    <% if (commentCount > 0) { %>
+                                        <span class="comment-count">[<%= commentCount %>]</span>
+                                    <% } %>
+                                    <% if (post.isHasPictures()) { %>
+                                        <span class="icon-picture">📷</span>
+                                    <% } %>
                                 </td>
-                                <td class="col-author">realtime_kr</td>
-                                <td class="col-date">09:45</td>
-                                <td class="col-view">567</td>
-                                <td class="col-like">89</td>
+                                <td class="col-author"><%= nickname %></td>
+                                <td class="col-date"><%= formattedDate %></td>
+                                <td class="col-like"><%= post.getLikeCount() %></td>
                             </tr>
+                            <%
+                                }
+
+                                if (posts.isEmpty()) {
+                            %>
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 50px;">
+                                    게시글이 없습니다.
+                                </td>
+                            </tr>
+                            <%
+                                }
+
+                                // 페이지네이션을 위한 변수 설정
+                                request.setAttribute("currentPageNum", currentPage);
+                                request.setAttribute("totalPagesNum", totalPages);
+                            %>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- 페이지네이션 -->
                 <jsp:include page="../common/pagination.jsp">
-                    <jsp:param name="currentPage" value="4" />
-                    <jsp:param name="totalPages" value="100" />
+                    <jsp:param name="currentPage" value="<%= currentPage %>" />
+                    <jsp:param name="totalPages" value="<%= totalPages %>" />
                 </jsp:include>
 
                 <!-- 글쓰기 버튼 -->

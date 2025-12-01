@@ -7,29 +7,36 @@ import dao.CommentDAO;
 import dao.PostDAO;
 import dto.Comment;
 import dto.Post;
+import model.NPCUser;
 
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 게시글/댓글 관리자
+ * 게시글/댓글 관리자 (싱글톤)
  * - JSON 초기 데이터 로드 (post.json, mina_post.json, comment.json)
  * - DB 동적 데이터와 병합
  */
 public class PostManager {
+    private static final PostManager instance = new PostManager();
+
     private final PostDAO postDAO;
     private final CommentDAO commentDAO;
     private final Map<String, Post> initialPosts;
     private final Map<String, List<Comment>> initialComments;
 
-    public PostManager() {
+    private PostManager() {
         this.postDAO = new PostDAO();
         this.commentDAO = new CommentDAO();
         this.initialPosts = new HashMap<>();
         this.initialComments = new HashMap<>();
 
         loadInitialData();
+    }
+
+    public static PostManager getInstance() {
+        return instance;
     }
 
     private void loadInitialData() {
@@ -42,6 +49,9 @@ public class PostManager {
             if (postStream != null) {
                 List<Post> posts = mapper.readValue(postStream, new TypeReference<List<Post>>() {});
                 posts.forEach(p -> initialPosts.put(p.getPostId(), p));
+                System.out.println("PostManager: Loaded " + posts.size() + " posts from post.json");
+            } else {
+                System.err.println("PostManager: post.json not found!");
             }
 
             // mina_post.json 로드
@@ -49,6 +59,9 @@ public class PostManager {
             if (minaStream != null) {
                 List<Post> minaPosts = mapper.readValue(minaStream, new TypeReference<List<Post>>() {});
                 minaPosts.forEach(p -> initialPosts.put(p.getPostId(), p));
+                System.out.println("PostManager: Loaded " + minaPosts.size() + " posts from mina_post.json");
+            } else {
+                System.err.println("PostManager: mina_post.json not found!");
             }
 
             // comment.json 로드
@@ -58,9 +71,15 @@ public class PostManager {
                 for (Comment c : comments) {
                     initialComments.computeIfAbsent(c.getPostId(), k -> new ArrayList<>()).add(c);
                 }
+                System.out.println("PostManager: Loaded " + comments.size() + " comments from comment.json");
+            } else {
+                System.err.println("PostManager: comment.json not found!");
             }
 
+            System.out.println("PostManager: Total posts loaded: " + initialPosts.size());
+
         } catch (Exception e) {
+            System.err.println("PostManager: Error loading initial data");
             e.printStackTrace();
         }
     }
@@ -83,44 +102,91 @@ public class PostManager {
      * 게시판별 게시글 목록 조회 (JSON + DB 병합)
      */
     public List<Post> getPostsByBoardType(String boardType) {
+        return getPostsByBoardType(boardType, null, null);
+    }
+
+    /**
+     * 게시판별 게시글 목록 조회 (시간 필터링 포함)
+     */
+    public List<Post> getPostsByBoardType(String boardType, java.time.LocalDateTime currentTime) {
+        return getPostsByBoardType(boardType, currentTime, null);
+    }
+
+    /**
+     * 게시판별 게시글 목록 조회 (시간 필터링 + 플레이어 필터링)
+     */
+    public List<Post> getPostsByBoardType(String boardType, java.time.LocalDateTime currentTime, String playerPid) {
         Map<String, Post> resultMap = new HashMap<>();
 
-        // 1. JSON 초기 데이터 먼저 추가
-        initialPosts.values().stream()
+        // 1. JSON 초기 데이터 먼저 추가 (모든 플레이어 공통)
+        long jsonCount = initialPosts.values().stream()
             .filter(p -> boardType.equals(p.getBoardType()))
-            .forEach(p -> resultMap.put(p.getPostId(), p));
+            .filter(p -> currentTime == null || !p.getCreatedAt().isAfter(currentTime))
+            .peek(p -> resultMap.put(p.getPostId(), p))
+            .count();
+        System.out.println("PostManager: Found " + jsonCount + " posts from JSON for board type: " + boardType);
 
-        // 2. DB 동적 데이터 추가 (내용이 있는 것만)
-        List<Post> dbPosts = postDAO.findByBoardType(boardType);
-        for (Post dbPost : dbPosts) {
-            if (dbPost.getContent() != null && !dbPost.getContent().isEmpty()) {
-                resultMap.put(dbPost.getPostId(), dbPost);
+        // 2. DB 동적 데이터 추가 (playerPid로 필터링, JSON에 없는 것만)
+        try {
+            List<Post> dbPosts = postDAO.findByBoardType(boardType, playerPid);
+            int dbCount = 0;
+            for (Post dbPost : dbPosts) {
+                if (!resultMap.containsKey(dbPost.getPostId())
+                    && dbPost.getContent() != null
+                    && !dbPost.getContent().isEmpty()
+                    && (currentTime == null || !dbPost.getCreatedAt().isAfter(currentTime))) {
+                    resultMap.put(dbPost.getPostId(), dbPost);
+                    dbCount++;
+                }
             }
+            System.out.println("PostManager: Found " + dbCount + " NEW posts from DB for board type: " + boardType + " (playerPid: " + playerPid + ")");
+        } catch (Exception e) {
+            System.err.println("PostManager: Error loading DB posts: " + e.getMessage());
+            e.printStackTrace();
         }
 
         // 3. 정렬 (최신순)
-        return resultMap.values().stream()
+        List<Post> result = resultMap.values().stream()
             .sorted((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()))
             .collect(Collectors.toList());
+
+        System.out.println("PostManager: Returning " + result.size() + " total posts");
+        return result;
     }
 
     /**
      * 댓글 목록 조회 (JSON + DB 병합)
      */
     public List<Comment> getComments(String postId) {
-        List<Comment> result = new ArrayList<>();
+        return getComments(postId, null);
+    }
 
-        // JSON 초기 데이터
+    /**
+     * 댓글 목록 조회 (JSON + DB 병합, 플레이어 필터링)
+     */
+    public List<Comment> getComments(String postId, String playerPid) {
+        Map<Integer, Comment> resultMap = new HashMap<>();
+
+        // 1. JSON 초기 데이터 먼저 추가 (모든 플레이어 공통)
         List<Comment> jsonComments = initialComments.get(postId);
         if (jsonComments != null) {
-            result.addAll(jsonComments);
+            for (Comment c : jsonComments) {
+                resultMap.put(c.getCommentId(), c);
+            }
         }
 
-        // DB 동적 데이터
-        List<Comment> dbComments = commentDAO.findByPostId(postId);
-        result.addAll(dbComments);
+        // 2. DB 동적 데이터 추가 (playerPid로 필터링, JSON에 없는 것만)
+        List<Comment> dbComments = commentDAO.findByPostId(postId, playerPid);
+        for (Comment c : dbComments) {
+            if (!resultMap.containsKey(c.getCommentId()) 
+                && c.getContent() != null 
+                && !c.getContent().isEmpty()) {
+                resultMap.put(c.getCommentId(), c);
+            }
+        }
 
-        // 정렬 (comment_seq, created_at)
+        // 3. 정렬 (comment_seq, created_at)
+        List<Comment> result = new ArrayList<>(resultMap.values());
         result.sort((c1, c2) -> {
             int seqCompare = Integer.compare(c1.getCommentSeq(), c2.getCommentSeq());
             if (seqCompare != 0) return seqCompare;
@@ -169,5 +235,57 @@ public class PostManager {
      */
     public boolean deleteComment(int commentId) {
         return commentDAO.delete(commentId);
+    }
+
+    /**
+     * NPC ID로부터 랜덤 닉네임 선택
+     * (게시물별로 일관된 닉네임 사용하도록 postId 기반 시드 사용)
+     */
+    public String assignNicknameForNPC(String npcId, String postId) {
+        NPCUser npc = NPCUserManager.getInstance().getNPCById(npcId);
+        if (npc == null || npc.getNicknamePool() == null || npc.getNicknamePool().isEmpty()) {
+            return "익명" + npcId.substring(0, 4);
+        }
+
+        // postId와 npcId를 조합하여 시드 생성 (같은 게시물에서는 같은 닉네임)
+        int seed = (postId + npcId).hashCode();
+        Random random = new Random(seed);
+        List<String> pool = npc.getNicknamePool();
+        return pool.get(random.nextInt(pool.size()));
+    }
+
+    /**
+     * 모든 게시글 조회 (talk 게시판용)
+     */
+    public List<Post> getAllPosts() {
+        return getPostsByBoardType("talk", null);
+    }
+
+    /**
+     * 모든 게시글 조회 (시간 필터링 포함)
+     */
+    public List<Post> getAllPosts(java.time.LocalDateTime currentTime) {
+        return getPostsByBoardType("talk", currentTime, null);
+    }
+
+    /**
+     * 모든 게시글 조회 (시간 필터링 + 플레이어 필터링)
+     */
+    public List<Post> getAllPosts(java.time.LocalDateTime currentTime, String playerPid) {
+        return getPostsByBoardType("talk", currentTime, playerPid);
+    }
+
+    /**
+     * 특정 게시글의 댓글 목록 조회 (별칭)
+     */
+    public List<Comment> getCommentsByPostId(String postId) {
+        return getComments(postId, null);
+    }
+
+    /**
+     * 특정 게시글의 댓글 목록 조회 (플레이어 필터링)
+     */
+    public List<Comment> getCommentsByPostId(String postId, String playerPid) {
+        return getComments(postId, playerPid);
     }
 }

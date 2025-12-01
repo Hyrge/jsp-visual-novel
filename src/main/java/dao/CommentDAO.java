@@ -48,13 +48,25 @@ public class CommentDAO {
     }
 
     public List<Comment> findByPostId(String postId) {
-        String sql = "SELECT * FROM comments WHERE post_id = ? ORDER BY comment_seq ASC, created_at ASC";
+        return findByPostId(postId, null);
+    }
+
+    public List<Comment> findByPostId(String postId, String playerPid) {
+        String sql;
+        if (playerPid != null) {
+            sql = "SELECT * FROM comments WHERE post_id = ? AND author_pid = ? ORDER BY comment_seq ASC, created_at ASC";
+        } else {
+            sql = "SELECT * FROM comments WHERE post_id = ? ORDER BY comment_seq ASC, created_at ASC";
+        }
         List<Comment> comments = new ArrayList<>();
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, postId);
+            if (playerPid != null) {
+                pstmt.setString(2, playerPid);
+            }
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {

@@ -60,13 +60,25 @@ public class PostDAO {
     }
 
     public List<Post> findByBoardType(String boardType) {
-        String sql = "SELECT * FROM posts WHERE board_type = ? ORDER BY created_at DESC";
+        return findByBoardType(boardType, null);
+    }
+
+    public List<Post> findByBoardType(String boardType, String playerPid) {
+        String sql;
+        if (playerPid != null) {
+            sql = "SELECT * FROM posts WHERE board_type = ? AND author_pid = ? ORDER BY created_at DESC";
+        } else {
+            sql = "SELECT * FROM posts WHERE board_type = ? ORDER BY created_at DESC";
+        }
         List<Post> posts = new ArrayList<>();
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, boardType);
+            if (playerPid != null) {
+                pstmt.setString(2, playerPid);
+            }
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {

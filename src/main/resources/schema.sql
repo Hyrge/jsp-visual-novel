@@ -2,10 +2,10 @@
 -- 데이터베이스 초기화 스크립트
 -- ====================================
 
--- DROP TABLE IF EXISTS comments;
--- DROP TABLE IF EXISTS posts;
--- DROP TABLE IF EXISTS users;
--- DROP TABLE IF EXISTS player;
+DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS posts;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS player;
 
 -- 1. player 테이블 (기존 유지)
 CREATE TABLE IF NOT EXISTS player (
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS posts (
     like_count INT DEFAULT 0,
     dislike_count INT DEFAULT 0,
     is_related_mina BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (author_pid) REFERENCES users(pid) ON DELETE CASCADE
+    FOREIGN KEY (author_pid) REFERENCES player(pid) ON DELETE CASCADE
 );
 
 -- 4. comments 테이블 (댓글)
@@ -54,6 +54,6 @@ CREATE TABLE IF NOT EXISTS comments (
     parent_comment_id INT COMMENT '부모 댓글 ID (답글)',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '작성일',
     FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
-    FOREIGN KEY (author_pid) REFERENCES users(pid) ON DELETE CASCADE,
+    FOREIGN KEY (author_pid) REFERENCES player(pid) ON DELETE CASCADE,
     FOREIGN KEY (parent_comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE
 );

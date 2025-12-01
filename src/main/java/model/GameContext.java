@@ -31,11 +31,11 @@ public class GameContext {
         // 1. GameState 생성 (EventBus는 싱글톤 사용)
         this.gameState = new GameState();
 
-        // 2. Manager 생성
+        // 2. Manager 생성 (PostManager는 싱글톤 사용)
         this.eventManager = new EventManager(gameState);
         this.questManager = new QuestManager(gameState);
         this.messageManager = new MessageManager(gameState);
-        this.postManager = new PostManager();
+        this.postManager = PostManager.getInstance();
 
         // 3. 초기 데이터 로드 (DataManager의 템플릿 활용)
         initializeFromData(dataManager);

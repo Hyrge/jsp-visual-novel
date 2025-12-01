@@ -1,19 +1,40 @@
 package dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 public class Post {
+    @JsonProperty("post_id")
     private String postId;
+
+    @JsonProperty("author_pid")
     private String authorPid;
+
     private String title;
     private String content;
+
+    @JsonProperty("board_type")
     private String boardType;
+
     private String category;
+
+    @JsonProperty("created_at")
     private LocalDateTime createdAt;
+
+    @JsonProperty("has_pictures")
     private boolean hasPictures;
+
+    @JsonProperty("like_count")
     private int likeCount;
+
+    @JsonProperty("dislike_count")
     private int dislikeCount;
+
+    @JsonProperty("is_related_mina")
     private boolean isRelatedMina;
+
+    @JsonProperty("author_nickname")
+    private String authorNickname; // 작성자 닉네임 (NPC는 풀에서 선택)
 
     public Post() {}
 
@@ -103,5 +124,13 @@ public class Post {
 
     public void setRelatedMina(boolean relatedMina) {
         isRelatedMina = relatedMina;
+    }
+
+    public String getAuthorNickname() {
+        return authorNickname;
+    }
+
+    public void setAuthorNickname(String authorNickname) {
+        this.authorNickname = authorNickname;
     }
 }
