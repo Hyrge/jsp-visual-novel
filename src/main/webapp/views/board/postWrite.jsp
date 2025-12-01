@@ -116,7 +116,7 @@
             post.setPlayerPid(pid);
             post.setTitle(title.trim());
             post.setContent(content.trim());
-            post.setBoardType("kdol_talk"); // 케이돌 토크 고정
+            post.setBoardType("talk"); // 케이돌 토크 게시판
             post.setCategory(category);
             post.setCreatedAt(currentDateTime);
             post.setHasPictures(savedFileName != null); // 이미지가 있으면 true
@@ -140,7 +140,7 @@
             if (success) {
                 // 게임 시간 1분 진행
                 if (gameContext != null) {
-                    gameContext.getGameState().advanceTime(1);
+                    gameContext.getGameState().advanceTime(10); // 글 작성 시 10분 경과
                 }
 
                 // 게시판 목록으로 리다이렉트
@@ -189,10 +189,10 @@
                         <label for="postCategory" class="form-label">카테고리 <span class="required">*</span></label>
                         <select id="postCategory" name="category" class="form-select" required>
                             <option value="">카테고리를 선택하세요</option>
-                            <option value="chat">잡담</option>
-                            <option value="square">스퀘어</option>
-                            <option value="notice">알림/결과</option>
-                            <option value="review">후기</option>
+                            <option value="잡담">잡담</option>
+                            <option value="스퀘어">스퀘어</option>
+                            <option value="알림/결과과">알림/결과</option>
+                            <option value="후기">후기</option>
                             <option value="onair">onair</option>
                         </select>
                     </div>

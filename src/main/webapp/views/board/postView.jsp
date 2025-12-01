@@ -68,7 +68,7 @@
             if (success) {
                 // 게임 시간 1분 진행
                 if (gameContext != null) {
-                    gameContext.getGameState().advanceTime(1);
+                    gameContext.getGameState().advanceTime(3); // 댓글 작성 시 3분 경과
                 }
 
                 // 같은 게시글 페이지로 리다이렉트

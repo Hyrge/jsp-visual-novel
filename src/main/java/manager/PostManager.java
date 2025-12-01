@@ -251,7 +251,7 @@ public class PostManager {
     public String assignNicknameForNPC(String npcId, String postId) {
         NPCUser npc = NPCUserManager.getInstance().getNPCById(npcId);
         if (npc == null || npc.getNicknamePool() == null || npc.getNicknamePool().isEmpty()) {
-            return "익명" + npcId.substring(0, 4);
+            return "유저";
         }
 
         // postId와 npcId를 조합하여 시드 생성 (같은 게시물에서는 같은 닉네임)

@@ -160,7 +160,7 @@ public class NPCUser {
      */
     public String getRandomNickname() {
         if (nicknamePool == null || nicknamePool.isEmpty()) {
-            return "익명" + id.substring(0, 4);
+            return "유저";
         }
         int index = (int) (Math.random() * nicknamePool.size());
         return nicknamePool.get(index);
