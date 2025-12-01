@@ -1,8 +1,3 @@
-/**
- * comment.js
- * 댓글 및 답글 관련 기능
- */
-
 // 현재 열려있는 답글 폼 ID 저장
 var currentOpenReplyForm = null;
 
@@ -77,7 +72,7 @@ function deleteComment(commentId) {
 // 댓글 신고
 function reportComment(commentId) {
     if (confirm('이 댓글을 신고하시겠습니까?')) {
-        // TODO: 신고 페이지로 이동
-        location.href = contextPath + '/views/board/reportBoard.jsp?type=comment&id=' + commentId;
+        // TODO: 신고 처리
+        
     }
 }
