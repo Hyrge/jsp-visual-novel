@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- 3. posts 테이블 (게시글)
 CREATE TABLE IF NOT EXISTS posts (
     post_id VARCHAR(30) PRIMARY KEY,
-    author_pid VARCHAR(50) COMMENT '작성자 PID',
+    player_pid VARCHAR(50) COMMENT '작성자 PID',
     title VARCHAR(200) COMMENT '제목',
     content TEXT COMMENT '내용',
     board_type VARCHAR(20) COMMENT '게시판 종류 (talk, report)',
@@ -41,7 +41,8 @@ CREATE TABLE IF NOT EXISTS posts (
     like_count INT DEFAULT 0,
     dislike_count INT DEFAULT 0,
     is_related_mina BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (author_pid) REFERENCES player(pid) ON DELETE CASCADE
+    image_file VARCHAR(255) COMMENT '이미지 파일명 (saves/{pid}/ 경로에 저장)',
+    FOREIGN KEY (player_pid) REFERENCES player(pid) ON DELETE CASCADE
 );
 
 -- 4. comments 테이블 (댓글)
@@ -49,11 +50,11 @@ CREATE TABLE IF NOT EXISTS comments (
     comment_id INT PRIMARY KEY AUTO_INCREMENT,
     comment_seq INT,
     post_id VARCHAR(10) COMMENT '게시글 ID',
-    author_pid VARCHAR(50) COMMENT '작성자 PID',
+    player_pid VARCHAR(50) COMMENT '작성자 PID',
     content TEXT COMMENT '댓글 내용',
     parent_comment_id INT COMMENT '부모 댓글 ID (답글)',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '작성일',
     FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
-    FOREIGN KEY (author_pid) REFERENCES player(pid) ON DELETE CASCADE,
+    FOREIGN KEY (player_pid) REFERENCES player(pid) ON DELETE CASCADE,
     FOREIGN KEY (parent_comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE
 );

@@ -56,7 +56,7 @@
             // Comment 객체 생성
             Comment comment = new Comment();
             comment.setPostId(postId);
-            comment.setAuthorPid(pid);
+            comment.setPlayerPid(pid);
             comment.setContent(content);
             comment.setCreatedAt(currentDateTime);
             comment.setParentCommentId(null); // 답글 기능은 추후 구현
@@ -116,11 +116,14 @@
     postData.put("category", post.getCategory());
     postData.put("title", post.getTitle());
     postData.put("author", post.getAuthorNickname() != null ? post.getAuthorNickname() : "익명");
+    postData.put("playerPid", post.getPlayerPid()); // 이미지 경로용
     postData.put("date", post.getCreatedAt().format(dateFormatter));
     postData.put("views", "0"); // TODO: 조회수 기능 추가
     postData.put("likes", String.valueOf(post.getLikeCount()));
     postData.put("dislikes", String.valueOf(post.getDislikeCount()));
     postData.put("content", post.getContent().replace("\n", "<br>"));
+    postData.put("imageFile", post.getImageFile()); // 이미지 파일명
+    postData.put("hasPictures", post.isHasPictures()); // 이미지 유무
 
     request.setAttribute("post", postData);
 
@@ -183,6 +186,12 @@
 
                 <!-- 게시글 본문 -->
                 <div class="post-content">
+                    <!-- 이미지 표시 -->
+                    <c:if test="${post.hasPictures && post.imageFile != null}">
+                    <div class="post-image">
+                        <img src="${pageContext.request.contextPath}/saves/${post.playerPid}/${post.imageFile}" alt="첨부 이미지" onclick="openImageModal(this.src)">
+                    </div>
+                    </c:if>
                     ${post.content}
                 </div>
 
@@ -299,6 +308,12 @@
         </div>
     </div>
 
+    <!-- 이미지 모달 -->
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <span class="modal-close">&times;</span>
+        <img id="modalImage" class="modal-content">
+    </div>
+
     <!-- 푸터 include -->
     <jsp:include page="../common/footer.jsp" />
 
@@ -306,6 +321,27 @@
     <script>
         // contextPath를 전역 변수로 설정 (외부 JS 파일에서 사용)
         var contextPath = '${pageContext.request.contextPath}';
+        
+        // 이미지 모달 열기
+        function openImageModal(src) {
+            var modal = document.getElementById('imageModal');
+            var modalImg = document.getElementById('modalImage');
+            modal.style.display = 'flex';
+            modalImg.src = src;
+        }
+        
+        // 이미지 모달 닫기
+        function closeImageModal() {
+            var modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+        }
+        
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeImageModal();
+            }
+        });
     </script>
     <script src="${pageContext.request.contextPath}/resources/js/validation.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/comment.js"></script>

@@ -170,6 +170,101 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* File Upload Styles */
+.file-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #f8f9fa;
+    border: 2px dashed #1e2b58;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    color: #1e2b58;
+}
+
+.file-upload-btn:hover {
+    background: #e9ecef;
+    border-color: #151e40;
+}
+
+.upload-icon {
+    font-size: 18px;
+}
+
+.upload-text {
+    font-weight: 500;
+}
+
+.file-name {
+    font-size: 13px;
+    color: #666;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 300px;
+}
+
+.file-info {
+    font-size: 12px;
+    color: #999;
+    margin-top: 8px;
+}
+
+/* Image Preview */
+.image-preview-container {
+    position: relative;
+    margin-top: 15px;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.image-preview-container img {
+    max-width: 400px;
+    max-height: 300px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    object-fit: contain;
+}
+
+.btn-remove-image {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 28px;
+    height: 28px;
+    background: #ff6b6b;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-remove-image:hover {
+    background: #e55555;
+    transform: scale(1.1);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .write-area {
@@ -192,5 +287,18 @@
     .btn-submit {
         width: 100%;
         padding: 14px;
+    }
+
+    .file-upload-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .file-name {
+        max-width: 100%;
+    }
+
+    .image-preview-container img {
+        max-width: 100%;
     }
 }

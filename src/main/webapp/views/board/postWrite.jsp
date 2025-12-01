@@ -4,6 +4,13 @@
 <%@ page import="util.RandomStringUtil" %>
 <%@ page import="model.GameContext" %>
 <%@ page import="java.time.LocalDateTime" %>
+<%@ page import="org.apache.commons.fileupload2.core.DiskFileItemFactory" %>
+<%@ page import="org.apache.commons.fileupload2.core.FileItem" %>
+<%@ page import="org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload" %>
+<%@ page import="java.io.*" %>
+<%@ page import="java.util.*" %>
+<%@ page import="java.nio.file.*" %>
+<%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
@@ -29,10 +36,62 @@
                 return;
             }
 
-            // 폼 데이터 가져오기
-            String category = request.getParameter("category");
-            String title = request.getParameter("title");
-            String content = request.getParameter("content");
+            // 파일 저장 경로 설정 (saves/{pid}/)
+            String savePath = application.getRealPath("/") + "saves" + File.separator + pid;
+            File saveDir = new File(savePath);
+            if (!saveDir.exists()) {
+                saveDir.mkdirs();
+            }
+
+            // multipart/form-data 처리 (Commons FileUpload 2.x API)
+            DiskFileItemFactory factory = DiskFileItemFactory.builder()
+                .setBufferSize(4096)
+                .setPath(saveDir.toPath())
+                .get();
+            
+            JakartaServletFileUpload upload = new JakartaServletFileUpload(factory);
+            upload.setSizeMax(10 * 1024 * 1024); // 최대 10MB
+            
+            List<FileItem> items = upload.parseRequest(request);
+            
+            // 폼 데이터 변수
+            String category = null;
+            String title = null;
+            String content = null;
+            String savedFileName = null;
+            
+            for (FileItem item : items) {
+                if (item.isFormField()) {
+                    // 일반 폼 필드
+                    String fieldName = item.getFieldName();
+                    String fieldValue = item.getString(StandardCharsets.UTF_8);
+                    
+                    if ("category".equals(fieldName)) {
+                        category = fieldValue;
+                    } else if ("title".equals(fieldName)) {
+                        title = fieldValue;
+                    } else if ("content".equals(fieldName)) {
+                        content = fieldValue;
+                    }
+                } else {
+                    // 파일 필드
+                    String fileName = item.getName();
+                    if (fileName != null && !fileName.trim().isEmpty() && item.getSize() > 0) {
+                        // 파일명에서 경로 제거 (브라우저에 따라 전체 경로가 올 수 있음)
+                        fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
+                        fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+                        
+                        // 파일 확장자 검사 (이미지만 허용)
+                        String ext = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                        if ("jpg".equals(ext) || "jpeg".equals(ext) || "png".equals(ext) || "gif".equals(ext) || "webp".equals(ext)) {
+                            // 고유한 파일명 생성 (타임스탬프 + 원본 파일명)
+                            savedFileName = System.currentTimeMillis() + "_" + fileName;
+                            Path filePath = Paths.get(savePath, savedFileName);
+                            item.write(filePath);
+                        }
+                    }
+                }
+            }
 
             // 유효성 검사
             if (category == null || category.trim().isEmpty() ||
@@ -54,15 +113,16 @@
             // Post 객체 생성
             Post post = new Post();
             post.setPostId(RandomStringUtil.generatePostId());
-            post.setAuthorPid(pid);
+            post.setPlayerPid(pid);
             post.setTitle(title.trim());
             post.setContent(content.trim());
             post.setBoardType("kdol_talk"); // 케이돌 토크 고정
             post.setCategory(category);
             post.setCreatedAt(currentDateTime);
-            post.setHasPictures(false);
+            post.setHasPictures(savedFileName != null); // 이미지가 있으면 true
             post.setLikeCount(0);
             post.setDislikeCount(0);
+            post.setImageFile(savedFileName); // 이미지 파일명 설정
 
             // MiNa 관련 여부 판단 (제목이나 내용에 키워드 포함 시)
             String lowerTitle = title.toLowerCase();
@@ -123,7 +183,7 @@
                     <h2>게시글 작성</h2>
                 </div>
 
-                <form name="postForm" action="${pageContext.request.contextPath}/views/board/postWrite.jsp" method="post" onsubmit="return validatePost()">
+                <form name="postForm" action="${pageContext.request.contextPath}/views/board/postWrite.jsp" method="post" enctype="multipart/form-data" onsubmit="return validatePost()">
                     <!-- 카테고리 선택 -->
                     <div class="form-group">
                         <label for="postCategory" class="form-label">카테고리 <span class="required">*</span></label>
@@ -155,6 +215,25 @@
                         </div>
                     </div>
 
+                    <!-- 이미지 업로드 -->
+                    <div class="form-group">
+                        <label for="imageFile" class="form-label">이미지 첨부</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="imageFile" name="imageFile" class="file-input" accept="image/jpeg,image/png,image/gif,image/webp" onchange="previewImage(this)">
+                            <label for="imageFile" class="file-upload-btn">
+                                <span class="upload-icon">📷</span>
+                                <span class="upload-text">이미지 선택</span>
+                            </label>
+                            <span class="file-name" id="fileName">선택된 파일 없음</span>
+                        </div>
+                        <div class="file-info">JPG, PNG, GIF, WEBP 형식 / 최대 10MB</div>
+                        <!-- 이미지 미리보기 -->
+                        <div class="image-preview-container" id="imagePreviewContainer" style="display: none;">
+                            <img id="imagePreview" src="" alt="미리보기">
+                            <button type="button" class="btn-remove-image" onclick="removeImage()">✕</button>
+                        </div>
+                    </div>
+
                     <!-- 버튼 그룹 -->
                     <div class="button-group">
                         <button type="button" class="btn-cancel" onclick="history.back()">취소</button>
@@ -181,5 +260,51 @@
     <!-- JavaScript -->
     <script src="${pageContext.request.contextPath}/resources/js/validation.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/charCounter.js"></script>
+    <script>
+        // 이미지 미리보기
+        function previewImage(input) {
+            const fileName = document.getElementById('fileName');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const preview = document.getElementById('imagePreview');
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // 파일 크기 검사 (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('파일 크기는 10MB 이하만 가능합니다.');
+                    input.value = '';
+                    fileName.textContent = '선택된 파일 없음';
+                    previewContainer.style.display = 'none';
+                    return;
+                }
+                
+                // 파일명 표시
+                fileName.textContent = file.name;
+                
+                // 미리보기 표시
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                fileName.textContent = '선택된 파일 없음';
+                previewContainer.style.display = 'none';
+            }
+        }
+        
+        // 이미지 제거
+        function removeImage() {
+            const input = document.getElementById('imageFile');
+            const fileName = document.getElementById('fileName');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            
+            input.value = '';
+            fileName.textContent = '선택된 파일 없음';
+            previewContainer.style.display = 'none';
+        }
+    </script>
 </body>
 </html>

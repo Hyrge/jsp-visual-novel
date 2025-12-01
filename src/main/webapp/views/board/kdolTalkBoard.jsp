@@ -143,7 +143,7 @@
                                     String nickname = post.getAuthorNickname();
                                     if (nickname == null || nickname.isEmpty()) {
                                         nickname = gameContext.getPostManager().assignNicknameForNPC(
-                                            post.getAuthorPid(),
+                                            post.getPlayerPid(),
                                             post.getPostId()
                                         );
                                     }
