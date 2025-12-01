@@ -86,15 +86,4 @@ public class GameState {
     public java.time.LocalDateTime getCurrentDateTime() {
         return java.time.LocalDateTime.of(currentDate, currentTime);
     }
-
-    /**
-     * 게임 시간을 분 단위로 진행
-     * @param minutes 진행할 분
-     */
-    public void advanceTime(int minutes) {
-        java.time.LocalDateTime current = getCurrentDateTime();
-        java.time.LocalDateTime advanced = current.plusMinutes(minutes);
-        this.currentDate = advanced.toLocalDate();
-        this.currentTime = advanced.toLocalTime();
-    }
 }

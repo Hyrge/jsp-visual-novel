@@ -28,10 +28,18 @@ function completeQuest(btn, questId) {
 
 // 쪽지함 사이드바 토글 함수
 function toggleMessageSidebar() {
-    var sidebar = document.querySelector('.sidebar-area');
-    if (sidebar) {
-        sidebar.classList.toggle('hidden');
-    }
+    // 현재 URL의 파라미터 확인
+    var urlParams = new URLSearchParams(window.location.search);
+    var showMessages = urlParams.get('showMessages');
+
+    // 현재 상태 반전
+    var newState = (showMessages === 'true') ? 'false' : 'true';
+
+    // 파라미터 업데이트
+    urlParams.set('showMessages', newState);
+
+    // 페이지 리로드 (파라미터 포함)
+    window.location.search = urlParams.toString();
 }
 
 // 다음 이벤트로 시간 스킵

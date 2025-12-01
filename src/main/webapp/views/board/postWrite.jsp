@@ -2,7 +2,6 @@
 <%@ page import="manager.PostManager" %>
 <%@ page import="dto.Post" %>
 <%@ page import="util.RandomStringUtil" %>
-<%@ page import="util.LLMManager" %>
 <%@ page import="model.GameContext" %>
 <%@ page import="java.time.LocalDateTime" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -65,9 +64,13 @@
             post.setLikeCount(0);
             post.setDislikeCount(0);
 
-            // MiNa 관련 여부 판단 (LLM을 통한 판단)
-            LLMManager llmManager = LLMManager.getInstance();
-            boolean isRelatedMina = llmManager.isRelatedToMina(title.trim(), content.trim());
+            // MiNa 관련 여부 판단 (제목이나 내용에 키워드 포함 시)
+            String lowerTitle = title.toLowerCase();
+            String lowerContent = content.toLowerCase();
+            boolean isRelatedMina = lowerTitle.contains("mina") || lowerTitle.contains("민아") ||
+                                    lowerTitle.contains("송민아") || lowerTitle.contains("노민아") ||
+                                    lowerContent.contains("mina") || lowerContent.contains("민아") ||
+                                    lowerContent.contains("송민아") || lowerContent.contains("노민아");
             post.setRelatedMina(isRelatedMina);
 
             // PostManager를 통해 DB에 저장
