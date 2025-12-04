@@ -7,17 +7,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class EventBus {
-    private static EventBus instance;
     private Map<String, List<Consumer<Object>>> listeners = new HashMap<>();
 
     private EventBus() {
-    }
-
-    public static synchronized EventBus getInstance() {
-        if (instance == null) {
-            instance = new EventBus();
-        }
-        return instance;
     }
 
     public void subscribe(String eventName, Consumer<Object> listener) {
