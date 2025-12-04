@@ -1,16 +1,11 @@
 package manager;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import dao.CommentDAO;
 import dao.PostDAO;
@@ -19,74 +14,18 @@ import dto.Post;
 import model.NPCUser;
 
 /**
- * 게시글/댓글 관리자 (싱글톤)
- * - JSON 초기 데이터 로드 (post.json, mina_post.json, comment.json)
- * - DB 동적 데이터와 병합
+ * 게시글/댓글 관리자
+ * - JSON 초기 데이터와 DB 동적 데이터 병합
  */
 public class PostManager {
-    private static final PostManager instance = new PostManager();
-
     private final PostDAO postDAO;
     private final CommentDAO commentDAO;
-    private final Map<String, Post> initialPosts;
-    private final Map<String, List<Comment>> initialComments;
+    private final DataManager dataManager;
 
-    private PostManager() {
+    public PostManager() {
+        this.dataManager = DataManager.getInstance();
         this.postDAO = new PostDAO();
         this.commentDAO = new CommentDAO();
-        this.initialPosts = new HashMap<>();
-        this.initialComments = new HashMap<>();
-
-        loadInitialData();
-    }
-
-    public static PostManager getInstance() {
-        return instance;
-    }
-
-    private void loadInitialData() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-
-        try {
-            // post.json 로드
-            InputStream postStream = getClass().getClassLoader().getResourceAsStream("post.json");
-            if (postStream != null) {
-                List<Post> posts = mapper.readValue(postStream, new TypeReference<List<Post>>() {});
-                posts.forEach(p -> initialPosts.put(p.getPostId(), p));
-                System.out.println("PostManager: Loaded " + posts.size() + " posts from post.json");
-            } else {
-                System.err.println("PostManager: post.json not found!");
-            }
-
-            // mina_post.json 로드
-            InputStream minaStream = getClass().getClassLoader().getResourceAsStream("mina_post.json");
-            if (minaStream != null) {
-                List<Post> minaPosts = mapper.readValue(minaStream, new TypeReference<List<Post>>() {});
-                minaPosts.forEach(p -> initialPosts.put(p.getPostId(), p));
-                System.out.println("PostManager: Loaded " + minaPosts.size() + " posts from mina_post.json");
-            } else {
-                System.err.println("PostManager: mina_post.json not found!");
-            }
-
-            // comment.json 로드
-            InputStream commentStream = getClass().getClassLoader().getResourceAsStream("comment.json");
-            if (commentStream != null) {
-                List<Comment> comments = mapper.readValue(commentStream, new TypeReference<List<Comment>>() {});
-                for (Comment c : comments) {
-                    initialComments.computeIfAbsent(c.getPostId(), k -> new ArrayList<>()).add(c);
-                }
-                System.out.println("PostManager: Loaded " + comments.size() + " comments from comment.json");
-            } else {
-                System.err.println("PostManager: comment.json not found!");
-            }
-
-            System.out.println("PostManager: Total posts loaded: " + initialPosts.size());
-
-        } catch (Exception e) {
-            System.err.println("PostManager: Error loading initial data");
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -94,7 +33,7 @@ public class PostManager {
      */
     public Post getPost(String postId) {
         // JSON에서 먼저 조회 (초기 데이터)
-        Post jsonPost = initialPosts.get(postId);
+        Post jsonPost = dataManager.getInitialPosts().get(postId);
         if (jsonPost != null) {
             return jsonPost;
         }
@@ -124,7 +63,7 @@ public class PostManager {
         Map<String, Post> resultMap = new HashMap<>();
 
         // 1. JSON 초기 데이터 먼저 추가 (모든 플레이어 공통)
-        long jsonCount = initialPosts.values().stream()
+        long jsonCount = dataManager.getInitialPosts().values().stream()
             .filter(p -> boardType.equals(p.getBoardType()))
             .filter(p -> currentTime == null || !p.getCreatedAt().isAfter(currentTime))
             .peek(p -> resultMap.put(p.getPostId(), p))
@@ -173,7 +112,7 @@ public class PostManager {
         Map<Integer, Comment> resultMap = new HashMap<>();
 
         // 1. JSON 초기 데이터 먼저 추가 (모든 플레이어 공통)
-        List<Comment> jsonComments = initialComments.get(postId);
+        List<Comment> jsonComments = dataManager.getInitialComments().get(postId);
         if (jsonComments != null) {
             for (Comment c : jsonComments) {
                 resultMap.put(c.getCommentId(), c);
