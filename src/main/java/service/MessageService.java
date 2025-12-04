@@ -1,4 +1,4 @@
-package manager;
+package service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,13 +7,9 @@ import model.EventBus;
 import model.GameState;
 import model.entity.Message;
 
-public class MessageManager {
+public class MessageService {
     private List<Message> messages = new ArrayList<>();
     private GameState gameState;
-
-    public MessageManager(GameState gameState) {
-        this.gameState = gameState;
-    }
 
     public void sendMessage(Message message) {
         messages.add(message);
@@ -24,3 +20,4 @@ public class MessageManager {
         return messages;
     }
 }
+

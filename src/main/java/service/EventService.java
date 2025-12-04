@@ -1,4 +1,4 @@
-package manager;
+package service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -8,21 +8,24 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import factory.EventFactory;
+import manager.DataManager;
 import model.EventBus;
 import model.GameState;
 import model.entity.Event;
 import model.enums.EventStatus;
 import model.enums.EventType;
 
-public class EventManager {
+public class EventService {
     private List<Map<String, Object>> eventConfig;
-    private GameState gameState;
     private Map<String, Event> activeEvents = new HashMap<>();
     private Map<String, Event> scheduledEvents = new HashMap<>();
     private List<Map<String, Object>> randomEventConfigs = new ArrayList<>();
 
-    public EventManager(GameState gameState) {
-        this.gameState = gameState;
+    public EventService(DataManager dataManager) {
+        if (dataManager == null) {
+            throw new IllegalArgumentException("dataManager는 필수입니다.");
+        }
+        this.eventConfig = dataManager.getEventConfig();
     }
 
     public void setEventConfig(List<Map<String, Object>> eventConfig) {
@@ -95,7 +98,7 @@ public class EventManager {
             // scheduledEvents에 추가
             scheduledEvents.put(subsequentEvent.getId(), subsequentEvent);
 
-            System.out.println("EventManager: Scheduled subsequent event " + subsequentId + " for " + scheduledDate);
+            System.out.println("EventService: Scheduled subsequent event " + subsequentId + " for " + scheduledDate);
 
             dayOffset++; // 다음 후속 이벤트는 하루 더 뒤에
         }
@@ -131,3 +134,4 @@ public class EventManager {
                 .collect(Collectors.toList());
     }
 }
+

@@ -1,4 +1,4 @@
-package manager;
+package service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,19 +11,24 @@ import dao.CommentDAO;
 import dao.PostDAO;
 import dto.Comment;
 import dto.Post;
+import manager.DataManager;
+import manager.NPCUserManager;
 import model.NPCUser;
 
 /**
- * 게시글/댓글 관리자
+ * 게시글/댓글 서비스
  * - JSON 초기 데이터와 DB 동적 데이터 병합
  */
-public class PostManager {
+public class PostService {
     private final PostDAO postDAO;
     private final CommentDAO commentDAO;
     private final DataManager dataManager;
 
-    public PostManager() {
-        this.dataManager = DataManager.getInstance();
+    public PostService(DataManager dataManager) {
+        if (dataManager == null) {
+            throw new IllegalArgumentException("dataManager는 필수입니다.");
+        }
+        this.dataManager = dataManager;
         this.postDAO = new PostDAO();
         this.commentDAO = new CommentDAO();
     }
@@ -68,7 +73,7 @@ public class PostManager {
             .filter(p -> currentTime == null || !p.getCreatedAt().isAfter(currentTime))
             .peek(p -> resultMap.put(p.getPostId(), p))
             .count();
-        System.out.println("PostManager: Found " + jsonCount + " posts from JSON for board type: " + boardType);
+        System.out.println("PostService: Found " + jsonCount + " posts from JSON for board type: " + boardType);
 
         // 2. DB 동적 데이터 추가 (playerPid로 필터링, JSON에 없는 것만)
         try {
@@ -83,9 +88,9 @@ public class PostManager {
                     dbCount++;
                 }
             }
-            System.out.println("PostManager: Found " + dbCount + " NEW posts from DB for board type: " + boardType + " (playerPid: " + playerPid + ")");
+            System.out.println("PostService: Found " + dbCount + " NEW posts from DB for board type: " + boardType + " (playerPid: " + playerPid + ")");
         } catch (Exception e) {
-            System.err.println("PostManager: Error loading DB posts: " + e.getMessage());
+            System.err.println("PostService: Error loading DB posts: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -94,7 +99,7 @@ public class PostManager {
             .sorted((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()))
             .collect(Collectors.toList());
 
-        System.out.println("PostManager: Returning " + result.size() + " total posts");
+        System.out.println("PostService: Returning " + result.size() + " total posts");
         return result;
     }
 
@@ -235,3 +240,4 @@ public class PostManager {
         return getComments(postId, playerPid);
     }
 }
+

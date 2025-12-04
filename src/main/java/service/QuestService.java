@@ -1,4 +1,4 @@
-package manager;
+package service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,11 +9,11 @@ import model.GameState;
 import model.entity.Quest;
 import model.enums.QuestStatus;
 
-public class QuestManager {
+public class QuestService {
     private List<Quest> quests = new ArrayList<>();
     private GameState gameState;
 
-    public QuestManager(GameState gameState) {
+    public QuestService(GameState gameState) {
         this.gameState = gameState;
     }
 
@@ -51,3 +51,4 @@ public class QuestManager {
     }
 
 }
+
