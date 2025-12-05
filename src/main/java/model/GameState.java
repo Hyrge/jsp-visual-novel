@@ -8,12 +8,14 @@ import java.util.PriorityQueue;
 import model.enums.BusEvent;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import dto.User;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameState {
     @JsonIgnore
     private transient EventBus eventBus;
     private int reputation = 20;
+    private User user;
 
     // 게임 내 현재 날짜 (초기값: 2025-09-01)
     private LocalDate currentDate = LocalDate.of(2025, 9, 1);
@@ -131,6 +133,7 @@ public class GameState {
      */
     public void addEventTime(LocalDateTime time) {
         eventTimes.add(time);
+        System.out.println("[GameState] 이벤트 시간 추가: " + time + " (총 " + eventTimes.size() + "개)");
     }
 
     /**
@@ -146,7 +149,12 @@ public class GameState {
      * @return 다음 이벤트가 있으면 true
      */
     public boolean hasNextEvent() {
-        return !eventTimes.isEmpty();
+        boolean hasEvent = !eventTimes.isEmpty();
+        System.out.println("[GameState] hasNextEvent 체크: " + hasEvent + " (큐 크기: " + eventTimes.size() + ")");
+        if (hasEvent) {
+            System.out.println("[GameState] 다음 이벤트 시간: " + eventTimes.peek());
+        }
+        return hasEvent;
     }
 
     /**
@@ -158,5 +166,13 @@ public class GameState {
             this.currentDate = next.toLocalDate();
             this.currentTime = next.toLocalTime();
         }
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

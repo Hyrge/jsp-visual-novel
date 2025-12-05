@@ -54,24 +54,46 @@ public class CommentDAO {
     }
 
     public List<Comment> findByPostId(String postId) {
-        return findByPostId(postId, null);
+        return findByPostId(postId, null, null);
     }
 
     public List<Comment> findByPostId(String postId, String playerPid) {
-        String sql;
+        return findByPostId(postId, playerPid, null);
+    }
+
+    /**
+     * 게시글의 댓글 조회 (게임 시간 필터링 포함)
+     * @param postId 게시글 ID
+     * @param playerPid 플레이어 PID (null이면 전체 조회)
+     * @param currentGameTime 현재 게임 시간 (null이면 필터링 안 함)
+     */
+    public List<Comment> findByPostId(String postId, String playerPid, java.time.LocalDateTime currentGameTime) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM comments WHERE post_id = ?");
+
         if (playerPid != null) {
-            sql = "SELECT * FROM comments WHERE post_id = ? AND player_pid = ? ORDER BY comment_seq ASC, created_at ASC";
-        } else {
-            sql = "SELECT * FROM comments WHERE post_id = ? ORDER BY comment_seq ASC, created_at ASC";
+            sql.append(" AND player_pid = ?");
         }
+
+        if (currentGameTime != null) {
+            sql.append(" AND created_at <= ?");
+        }
+
+        sql.append(" ORDER BY comment_seq ASC, created_at ASC");
+
         List<Comment> comments = new ArrayList<>();
 
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
 
-            pstmt.setString(1, postId);
+            int paramIndex = 1;
+            pstmt.setString(paramIndex++, postId);
+
             if (playerPid != null) {
-                pstmt.setString(2, playerPid);
+                pstmt.setString(paramIndex++, playerPid);
+            }
+
+            if (currentGameTime != null) {
+                pstmt.setTimestamp(paramIndex++, Timestamp.valueOf(currentGameTime));
             }
 
             try (ResultSet rs = pstmt.executeQuery()) {

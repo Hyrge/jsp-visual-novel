@@ -5,6 +5,8 @@
 <%@ page import="manager.GameController" %>
 <%@ page import="java.util.UUID" %>
 <%@ page import="dao.PlayerDAO" %>
+<%@ page import="dao.UserDAO" %>
+<%@ page import="dto.User" %>
 <%
    
 	GameContext gameContext = (GameContext) session.getAttribute("gameContext");
@@ -32,7 +34,7 @@
 
     // 1. 관리자 계정 체크 (하드코딩)
     if ("admin".equals(userId) && "1234".equals(password)) {
-        session.setAttribute("userID", userId);
+        session.setAttribute("user", new User(pid, userId, password, "회사가기싫당"));
         response.sendRedirect(request.getContextPath() + "/views/board/kdolTalkBoard.jsp");
         return;
     }
@@ -42,9 +44,7 @@
     User user = userDAO.login(userId, password);
 
     if (user != null) {
-        session.setAttribute("userID", user.getUserId());
-        session.setAttribute("userPid", user.getPid());
-        session.setAttribute("userNickname", user.getNickname());
+        session.setAttribute("user", user);
         response.sendRedirect(request.getContextPath() + "/views/board/kdolTalkBoard.jsp");
     } else {
 %>

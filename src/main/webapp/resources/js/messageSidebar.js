@@ -34,27 +34,6 @@ function toggleMessageSidebar() {
     }
 }
 
-// 다음 이벤트로 시간 스킵
-function skipToNextEvent() {
-    // TODO: 이벤트 큐의 다음 이벤트 시간으로 이동
-    // 서버에 AJAX 요청을 보내서 시간을 스킵하고 발생한 이벤트를 처리
-    if (confirm('다음 이벤트 시간으로 이동하시겠습니까?')) {
-        // AJAX 요청 구현 예정
-        alert('다음 이벤트 스킵 기능은 구현 중입니다.');
-        // location.href = contextPath + '/timeSkip.jsp?type=event';
-    }
-}
-
-// 다음날로 스킵
-function skipToNextDay() {
-    // TODO: 하루 전체를 스킵하고 일일 정산 실행
-    if (confirm('하루를 스킵하시겠습니까?\n스킵하는 동안 발생한 이벤트가 자동으로 처리됩니다.')) {
-        // AJAX 요청 구현 예정
-        alert('다음날 스킵 기능은 구현 중입니다.');
-        // location.href = contextPath + '/timeSkip.jsp?type=day';
-    }
-}
-
 // 쪽지 보내기
 function sendMessage(event) {
     event.preventDefault();

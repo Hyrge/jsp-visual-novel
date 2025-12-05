@@ -6,6 +6,9 @@
 
 <jsp:useBean id="gameContext" class="model.GameContext" scope="session" />
 
+<%-- 시간 스킵 처리 로직 --%>
+<jsp:include page="timeSkipHandler.jsp" />
+
 <div class="message-box">
     <!-- Status Section -->
     <div class="status-header">
@@ -125,39 +128,8 @@
     %>
 </div>
 
-<!-- 시간 스킵 컨트롤 패널 -->
-<div class="time-control-panel">
-    <div class="time-display">
-        <%
-            // 날짜 포맷팅 (예: 2025년 9월 1일 (월))
-            java.time.format.DateTimeFormatter dateFormatter = java.time.format.DateTimeFormatter.ofPattern("yyyy년 M월 d일 (E)", java.util.Locale.KOREAN);
-            String formattedDate = gameContext.getGameState().getCurrentDate().format(dateFormatter);
-
-            // 시간 포맷팅 (예: 09:00)
-            java.time.format.DateTimeFormatter timeFormatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
-            String formattedTime = gameContext.getGameState().getCurrentTime().format(timeFormatter);
-        %>
-        <div class="current-date">
-            <span class="date-label">현재:</span>
-            <span class="date-value"><%= formattedDate %> <%= formattedTime %></span>
-        </div>
-        <div class="d-day-counter">
-            <span class="d-day-label">앨범 발매</span>
-            <span class="d-day-value"><%= gameContext.getGameState().getDDayText() %></span>
-        </div>
-    </div>
-
-    <div class="time-actions">
-        <button class="btn-time-skip" onclick="skipToNextEvent()">
-            <span class="skip-icon">▶</span>
-            <span class="skip-text">다음 이벤트</span>
-        </button>
-        <button class="btn-day-skip" onclick="skipToNextDay()">
-            <span class="skip-icon">⏩</span>
-            <span class="skip-text">다음날</span>
-        </button>
-    </div>
-</div>
+<%-- 시간 스킵 컨트롤 패널 --%>
+<jsp:include page="timeControlPanel.jsp" />
 
 <script src="<%= request.getContextPath() %>/resources/js/charCounter.js?v=2"></script>
 <script src="<%= request.getContextPath() %>/resources/js/messageSidebar.js?v=2"></script>

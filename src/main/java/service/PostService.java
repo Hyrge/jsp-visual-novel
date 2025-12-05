@@ -114,12 +114,11 @@ public class PostService {
         }
 
         // 2. DB 동적 데이터 추가 (playerPid + 시간 필터링)
-        List<Comment> dbComments = commentDAO.findByPostId(postId, playerPid);
+        List<Comment> dbComments = commentDAO.findByPostId(postId, playerPid, currentTime);
         for (Comment c : dbComments) {
             if (!resultMap.containsKey(c.getCommentId())
                 && c.getContent() != null
-                && !c.getContent().isEmpty()
-                && (currentTime == null || !c.getCreatedAt().isAfter(currentTime))) {
+                && !c.getContent().isEmpty()) {
                 resultMap.put(c.getCommentId(), c);
             }
         }

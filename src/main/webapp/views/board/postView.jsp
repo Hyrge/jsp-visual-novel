@@ -82,7 +82,7 @@
     }
 
     // 댓글 목록 가져오기 (playerPid로 필터링)
-    List<Comment> commentList = postService.getComments(postId, pid);
+    List<Comment> commentList = postService.getComments(postId, pid, gameContext.getGameState().getCurrentDateTime());
 
     // JSP에서 사용할 데이터 변환
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

@@ -56,62 +56,53 @@ public class TimeService {
             return;
         }
 
-        LocalDateTime before = gameState.getCurrentDateTime();
-        LocalDate beforeDate = before.toLocalDate();
-
-        // 시간 점프
-        gameState.setCurrentDate(nextEventTime.toLocalDate());
-        gameState.setCurrentTime(nextEventTime.toLocalTime());
-
-        System.out.println("[TimeService] 시간 점프: " + before + " → " + nextEventTime);
-
-        // 시간 경과 이벤트 발행
-        long minutesSkipped = java.time.Duration.between(before, nextEventTime).toMinutes();
-        eventBus.emit(BusEvent.TIME_ADVANCED, Map.of(
-            "minutes", minutesSkipped,
-            "before", before,
-            "after", nextEventTime,
-            "skipped", true
-        ));
-
-        // 날짜 변경 체크
-        if (!beforeDate.equals(nextEventTime.toLocalDate())) {
-            emitDayChanged(beforeDate, nextEventTime.toLocalDate());
-        }
+        System.out.println("[TimeService] 다음 이벤트로 시간 점프");
+        jumpToTime(nextEventTime, false);
     }
 
     /**
      * ⏩ 버튼: 다음 날로 스킵
      */
     public void skipToNextDay() {
+        LocalDate nextDay = gameState.getCurrentDate().plusDays(1);
+        LocalDateTime nextDayStart = LocalDateTime.of(nextDay, LocalTime.of(9, 0));
+
+        System.out.println("[TimeService] 다음날로 스킵: " + nextDay);
+        jumpToTime(nextDayStart, true);
+    }
+
+    /**
+     * 특정 시간으로 점프 (내부 헬퍼 메서드)
+     */
+    private void jumpToTime(LocalDateTime targetTime, boolean isDaySkip) {
         LocalDateTime before = gameState.getCurrentDateTime();
         LocalDate beforeDate = before.toLocalDate();
-        LocalDate nextDay = beforeDate.plusDays(1);
-        LocalDateTime nextDayStart = LocalDateTime.of(nextDay, LocalTime.of(9, 0)); // 다음날 오전 9시
 
         // 시간 점프
-        gameState.setCurrentDate(nextDay);
-        gameState.setCurrentTime(LocalTime.of(9, 0));
-
-        System.out.println("[TimeService] 날짜 스킵: " + beforeDate + " → " + nextDay);
+        gameState.setCurrentDate(targetTime.toLocalDate());
+        gameState.setCurrentTime(targetTime.toLocalTime());
 
         // 시간 경과 이벤트 발행
-        long minutesSkipped = java.time.Duration.between(before, nextDayStart).toMinutes();
-        eventBus.emit(BusEvent.TIME_ADVANCED, Map.of(
-            "minutes", minutesSkipped,
-            "before", before,
-            "after", nextDayStart,
-            "skipped", true,
-            "daySkip", true
-        ));
+        long minutesSkipped = java.time.Duration.between(before, targetTime).toMinutes();
+        Map<String, Object> eventData = new java.util.HashMap<>();
+        eventData.put("minutes", minutesSkipped);
+        eventData.put("before", before);
+        eventData.put("after", targetTime);
+        eventData.put("skipped", true);
+        if (isDaySkip) {
+            eventData.put("daySkip", true);
+        }
+        eventBus.emit(BusEvent.TIME_ADVANCED, eventData);
 
-        // 날짜 변경 이벤트
-        emitDayChanged(beforeDate, nextDay);
+        // 날짜 변경 체크
+        if (!beforeDate.equals(targetTime.toLocalDate())) {
+            emitDayChanged(beforeDate, targetTime.toLocalDate());
+        }
 
-        // 일일 정산 이벤트
-        eventBus.emit(BusEvent.DAILY_SETTLEMENT, Map.of(
-            "date", nextDay
-        ));
+        // 날짜 스킵인 경우 일일 정산 이벤트
+        if (isDaySkip) {
+            eventBus.emit(BusEvent.DAILY_SETTLEMENT, Map.of("date", targetTime.toLocalDate()));
+        }
     }
 
     /**
