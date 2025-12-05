@@ -5,9 +5,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
 import java.util.PriorityQueue;
-
+import model.enums.BusEvent;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameState {
     @JsonIgnore
     private transient EventBus eventBus;
@@ -36,7 +38,7 @@ public class GameState {
     public void addReputation(int value) {
         int before = this.reputation;
         this.reputation = Math.max(0, Math.min(100, reputation + value));
-        eventBus.emit("REPUTATION_CHANGED", Map.of(
+        eventBus.emit(BusEvent.REPUTATION_CHANGED, Map.of(
                 "before", before,
                 "after", reputation,
                 "delta", value));
