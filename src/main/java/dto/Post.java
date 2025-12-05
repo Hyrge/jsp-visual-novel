@@ -34,13 +34,14 @@ public class Post {
     @JsonProperty("is_related_mina")
     private boolean isRelatedMina;
 
-    @JsonProperty("author_nickname")
-    private String authorNickname; // 작성자 닉네임 (NPC는 풀에서 선택)
+    @JsonProperty("nickname")
+    private String nickname; // 작성자 닉네임 (NPC는 풀에서 선택)
 
     @JsonProperty("image_file")
     private String imageFile; // 이미지 파일명 (saves/{pid}/ 경로에 저장)
 
-    public Post() {}
+    public Post() {
+    }
 
     public String getPostId() {
         return postId;

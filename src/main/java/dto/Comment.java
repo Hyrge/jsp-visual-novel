@@ -25,10 +25,11 @@ public class Comment {
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
-    @JsonProperty("author_nickname")
-    private String authorNickname; // 작성자 닉네임 (NPC는 풀에서 선택)
+    @JsonProperty("nickname")
+    private String nickname;
 
-    public Comment() {}
+    public Comment() {
+    }
 
     public int getCommentId() {
         return commentId;

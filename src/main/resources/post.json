@@ -10,7 +10,8 @@
         "has_pictures": false,
         "like_count": 50,
         "dislike_count": 1,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "카페작업"
     },
     {
         "post_id": "p_0902",
@@ -23,7 +24,8 @@
         "has_pictures": false,
         "like_count": 20,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "학식먹음"
     },
     {
         "post_id": "p_0903",
@@ -36,7 +38,8 @@
         "has_pictures": true,
         "like_count": 80,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "애기엄마"
     },
     {
         "post_id": "p_0904",
@@ -49,7 +52,8 @@
         "has_pictures": false,
         "like_count": 30,
         "dislike_count": 2,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "백수아님"
     },
     {
         "post_id": "p_0905",
@@ -62,7 +66,8 @@
         "has_pictures": false,
         "like_count": 45,
         "dislike_count": 1,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "10년차덕후"
     },
     {
         "post_id": "p_1001",
@@ -75,7 +80,8 @@
         "has_pictures": true,
         "like_count": 120,
         "dislike_count": 5,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "케이팝러버"
     },
     {
         "post_id": "p_1002",
@@ -88,7 +94,8 @@
         "has_pictures": false,
         "like_count": 15,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "ㅇㅇ"
     },
     {
         "post_id": "p_1003",
@@ -101,7 +108,8 @@
         "has_pictures": false,
         "like_count": 342,
         "dislike_count": 89,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "직장인A"
     },
     {
         "post_id": "p_1004",
@@ -114,7 +122,8 @@
         "has_pictures": true,
         "like_count": 56,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "애기엄마"
     },
     {
         "post_id": "p_1005",
@@ -127,7 +136,8 @@
         "has_pictures": false,
         "like_count": 8,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "학식먹음"
     },
     {
         "post_id": "p_1006",
@@ -140,7 +150,8 @@
         "has_pictures": true,
         "like_count": 88,
         "dislike_count": 12,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "백수아님"
     },
     {
         "post_id": "p_1007",
@@ -153,7 +164,8 @@
         "has_pictures": false,
         "like_count": 45,
         "dislike_count": 1,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "10년차덕후"
     },
     {
         "post_id": "p_1008",
@@ -166,7 +178,8 @@
         "has_pictures": false,
         "like_count": 230,
         "dislike_count": 2,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "카페작업"
     },
     {
         "post_id": "p_1009",
@@ -179,7 +192,8 @@
         "has_pictures": false,
         "like_count": 12,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "수다쟁이"
     },
     {
         "post_id": "p_1010",
@@ -192,7 +206,8 @@
         "has_pictures": false,
         "like_count": 5,
         "dislike_count": 150,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "진실전파자"
     },
     {
         "post_id": "p_1011",
@@ -205,7 +220,8 @@
         "has_pictures": false,
         "like_count": 25,
         "dislike_count": 1,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "학식먹음"
     },
     {
         "post_id": "p_1012",
@@ -218,7 +234,8 @@
         "has_pictures": true,
         "like_count": 210,
         "dislike_count": 3,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "카페작업"
     },
     {
         "post_id": "p_1013",
@@ -231,7 +248,8 @@
         "has_pictures": false,
         "like_count": 10,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "애기엄마"
     },
     {
         "post_id": "p_1014",
@@ -244,7 +262,8 @@
         "has_pictures": false,
         "like_count": 150,
         "dislike_count": 20,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "백수아님"
     },
     {
         "post_id": "p_1015",
@@ -257,7 +276,8 @@
         "has_pictures": false,
         "like_count": 60,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "10년차덕후"
     },
     {
         "post_id": "p_1016",
@@ -270,7 +290,8 @@
         "has_pictures": true,
         "like_count": 300,
         "dislike_count": 10,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "케이팝러버"
     },
     {
         "post_id": "p_1017",
@@ -283,7 +304,8 @@
         "has_pictures": false,
         "like_count": 40,
         "dislike_count": 5,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "수다쟁이"
     },
     {
         "post_id": "p_1018",
@@ -296,7 +318,8 @@
         "has_pictures": false,
         "like_count": 12,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "ㅇㅇ"
     },
     {
         "post_id": "p_1019",
@@ -309,7 +332,8 @@
         "has_pictures": false,
         "like_count": 80,
         "dislike_count": 100,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "진실전파자"
     },
     {
         "post_id": "p_1020",
@@ -322,7 +346,8 @@
         "has_pictures": false,
         "like_count": 20,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "직장인A"
     },
     {
         "post_id": "p_1021",
@@ -335,7 +360,8 @@
         "has_pictures": false,
         "like_count": 35,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "학식먹음"
     },
     {
         "post_id": "p_1022",
@@ -348,7 +374,8 @@
         "has_pictures": true,
         "like_count": 180,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "카페작업"
     },
     {
         "post_id": "p_1023",
@@ -361,7 +388,8 @@
         "has_pictures": true,
         "like_count": 90,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "애기엄마"
     },
     {
         "post_id": "p_1024",
@@ -374,7 +402,8 @@
         "has_pictures": false,
         "like_count": 200,
         "dislike_count": 15,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "백수아님"
     },
     {
         "post_id": "p_1025",
@@ -387,7 +416,8 @@
         "has_pictures": false,
         "like_count": 75,
         "dislike_count": 2,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "10년차덕후"
     },
     {
         "post_id": "p_1026",
@@ -400,7 +430,8 @@
         "has_pictures": false,
         "like_count": 400,
         "dislike_count": 20,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "케이팝러버"
     },
     {
         "post_id": "p_1027",
@@ -413,7 +444,8 @@
         "has_pictures": false,
         "like_count": 50,
         "dislike_count": 0,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "수다쟁이"
     },
     {
         "post_id": "p_1028",
@@ -426,7 +458,8 @@
         "has_pictures": false,
         "like_count": 30,
         "dislike_count": 5,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "ㅇㅇ"
     },
     {
         "post_id": "p_1029",
@@ -439,7 +472,8 @@
         "has_pictures": false,
         "like_count": 10,
         "dislike_count": 120,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "진실전파자"
     },
     {
         "post_id": "p_1030",
@@ -452,6 +486,7 @@
         "has_pictures": false,
         "like_count": 100,
         "dislike_count": 50,
-        "is_related_mina": false
+        "is_related_mina": false,
+        "nickname": "직장인A"
     }
 ]
