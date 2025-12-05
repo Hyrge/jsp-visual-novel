@@ -6,6 +6,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import dto.Comment;
 import manager.DataManager;
 import service.PostService;
@@ -13,6 +15,8 @@ import util.NPCReactionManager;
 import util.NPCReactionManager.NPCReactionResult;
 
 public class GameState {
+    @JsonIgnore
+    private transient EventBus eventBus;
     private int reputation = 20;
 
     // 게임 내 현재 날짜 (초기값: 2025-09-01)
@@ -24,13 +28,18 @@ public class GameState {
     // 게임의 목표 날짜 (고정값: 2025-12-03)
     private LocalDate targetDate = LocalDate.of(2025, 12, 3);
 
+    // Jackson 역직렬화용 기본 생성자
     public GameState() {
+    }
+
+    public GameState(EventBus eventBus) {
+        this.eventBus = eventBus;
     }
 
     public void addReputation(int value) {
         int before = this.reputation;
         this.reputation = Math.max(0, Math.min(100, reputation + value));
-        EventBus.getInstance().emit("REPUTATION_CHANGED", Map.of(
+        eventBus.emit("REPUTATION_CHANGED", Map.of(
                 "before", before,
                 "after", reputation,
                 "delta", value));
