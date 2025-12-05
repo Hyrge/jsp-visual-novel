@@ -107,7 +107,7 @@ public class SavePathManager {
     /**
      * Quest 리스트를 JSON 파일로 저장
      */
-    public static boolean saveQuests(String basePath, String pid, List<Quest> quests) {
+    public static boolean saveQuests(String pid, List<Quest> quests) {
         try {
             String filePath = getJsonFilePath(pid, "quests.json");
             objectMapper.writerWithDefaultPrettyPrinter()
@@ -122,7 +122,7 @@ public class SavePathManager {
     /**
      * Quest 리스트를 JSON 파일에서 로드
      */
-    public static List<Quest> loadQuests(String basePath, String pid) {
+    public static List<Quest> loadQuests(String pid) {
         try {
             String filePath = getJsonFilePath(pid, "quests.json");
             File file = new File(filePath);
@@ -139,7 +139,7 @@ public class SavePathManager {
     /**
      * Events 리스트를 JSON 파일로 저장
      */
-    public static boolean saveEvents(String basePath, String pid, List<?> events) {
+    public static boolean saveEvents(String pid, List<?> events) {
         try {
             String filePath = getJsonFilePath(pid, "events.json");
             objectMapper.writerWithDefaultPrettyPrinter()
@@ -154,7 +154,7 @@ public class SavePathManager {
     /**
      * Events 리스트를 JSON 파일에서 로드
      */
-    public static <T> List<T> loadEvents(String basePath, String pid, Class<T> eventType) {
+    public static <T> List<T> loadEvents(String pid, Class<T> eventType) {
         try {
             String filePath = getJsonFilePath(pid, "events.json");
             File file = new File(filePath);
@@ -172,7 +172,7 @@ public class SavePathManager {
     /**
      * Messages 리스트를 JSON 파일로 저장
      */
-    public static boolean saveMessages(String basePath, String pid, List<?> messages) {
+    public static boolean saveMessages(String pid, List<?> messages) {
         try {
             String filePath = getJsonFilePath(pid, "messages.json");
             objectMapper.writerWithDefaultPrettyPrinter()
@@ -187,7 +187,7 @@ public class SavePathManager {
     /**
      * Messages 리스트를 JSON 파일에서 로드
      */
-    public static <T> List<T> loadMessages(String basePath, String pid, Class<T> messageType) {
+    public static <T> List<T> loadMessages(String pid, Class<T> messageType) {
         try {
             String filePath = getJsonFilePath(pid, "messages.json");
             File file = new File(filePath);
