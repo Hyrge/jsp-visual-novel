@@ -147,12 +147,6 @@ public class PostService {
      * 새 댓글 작성 (DB에 저장)
      */
     public boolean createComment(Comment comment) {
-        // comment_seq 자동 설정
-        if (comment.getCommentSeq() == 0) {
-            int nextSeq = commentDAO.getNextCommentSeq(comment.getPostId());
-            comment.setCommentSeq(nextSeq);
-        }
-
         return commentDAO.insert(comment);
     }
 

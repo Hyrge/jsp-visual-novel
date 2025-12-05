@@ -16,38 +16,30 @@ import util.DBUtil;
 public class CommentDAO {
 
     public boolean insert(Comment comment) {
-        String sql = "INSERT INTO comments (comment_seq, post_id, player_pid, content, " +
-                     "parent_comment_id, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO comments (post_id, player_pid, content, " +
+                     "parent_comment_id, created_at, nickname) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            pstmt.setInt(1, comment.getCommentSeq());
-            pstmt.setString(2, comment.getPostId());
-            pstmt.setString(3, comment.getPlayerPid());
-            pstmt.setString(4, comment.getContent());
+            pstmt.setString(1, comment.getPostId());
+            pstmt.setString(2, comment.getPlayerPid());
+            pstmt.setString(3, comment.getContent());
 
             if (comment.getParentCommentId() != null) {
-                pstmt.setInt(5, comment.getParentCommentId());
+                pstmt.setInt(4, comment.getParentCommentId());
             } else {
-                pstmt.setNull(5, Types.INTEGER);
+                pstmt.setNull(4, Types.INTEGER);
             }
 
-            pstmt.setTimestamp(6, Timestamp.valueOf(comment.getCreatedAt()));
+            pstmt.setTimestamp(5, Timestamp.valueOf(comment.getCreatedAt()));
+            pstmt.setString(6, comment.getNickname());
 
             int rows = pstmt.executeUpdate();
 
-            if (rows > 0) {
-                try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        comment.setCommentId(rs.getInt(1));
-                    }
-                }
-                return true;
-            }
-
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("[CommentDAO] " + e.getMessage());
         }
 
         return false;
@@ -104,6 +96,7 @@ public class CommentDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("[CommentDAO] " + e.getMessage());
         }
 
         return comments;
@@ -125,30 +118,10 @@ public class CommentDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("[CommentDAO] " + e.getMessage());
         }
 
         return null;
-    }
-
-    public int getNextCommentSeq(String postId) {
-        String sql = "SELECT COALESCE(MAX(comment_seq), 0) + 1 FROM comments WHERE post_id = ?";
-
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, postId);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 1;
     }
 
     public boolean delete(int commentId) {
@@ -162,6 +135,7 @@ public class CommentDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("[CommentDAO] " + e.getMessage());
             return false;
         }
     }

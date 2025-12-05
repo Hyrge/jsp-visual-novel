@@ -87,11 +87,11 @@ public class Comment {
         this.createdAt = createdAt;
     }
 
-    public String getAuthorNickname() {
-        return authorNickname;
+    public String getNickname() {
+        return this.nickname;
     }
 
-    public void setAuthorNickname(String authorNickname) {
-        this.authorNickname = authorNickname;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

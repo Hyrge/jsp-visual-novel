@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS posts (
     post_id VARCHAR(30) PRIMARY KEY,
     player_pid VARCHAR(50) COMMENT '작성자 PID',
+    nickname VARCHAR(50) COMMENT '작성자 닉네임',
     title VARCHAR(200) COMMENT '제목',
     content TEXT COMMENT '내용',
     board_type VARCHAR(20) COMMENT '게시판 종류 (talk, report)',
@@ -50,6 +51,7 @@ CREATE TABLE IF NOT EXISTS comments (
     comment_seq INT,
     post_id VARCHAR(10) COMMENT '게시글 ID',
     player_pid VARCHAR(50) COMMENT '작성자 PID',
+    nickname VARCHAR(50) COMMENT '작성자 닉네임',
     content TEXT COMMENT '댓글 내용',
     parent_comment_id INT COMMENT '부모 댓글 ID (답글)',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '작성일',
