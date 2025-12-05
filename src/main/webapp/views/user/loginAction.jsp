@@ -1,6 +1,30 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="dao.UserDAO" %>
 <%@ page import="dto.User" %>
+<%@ page import="model.GameContext" %>
+<%@ page import="manager.GameController" %>
+<%@ page import="java.util.UUID" %>
+<%@ page import="dao.PlayerDAO" %>
+<%
+   
+	GameContext gameContext = (GameContext) session.getAttribute("gameContext");
+	String pid = null;
+	
+    if (gameContext == null || gameContext.getPid() == null) {
+        pid = UUID.randomUUID().toString();
+        Cookie pidCookie = new Cookie("pid", pid);
+        pidCookie.setMaxAge(60 * 60 * 24 * 15);
+        pidCookie.setPath("/");
+        response.addCookie(pidCookie);
+        gameContext = new GameContext(pid);
+        GameController.getInstance().createPlayer(pid);
+        session.setAttribute("gameContext", gameContext);
+    }else {
+    		pid = gameContext.getPid();
+    }
+    PlayerDAO playerDAO = new PlayerDAO();
+    playerDAO.updateLastAccess(pid);
+%>
 <%
     request.setCharacterEncoding("UTF-8");
     String userId = request.getParameter("id");

@@ -21,11 +21,18 @@ import model.entity.Quest;
  * saves/{pid}/ - gamestate.json, events.json, messages.json, quests.json, images/
  */
 public class SavePathManager {
-    private static String basePath = System.getProperty("user.dir");
+    private static String basePath;
     private static final String BASE_SAVE_DIR = "saves";
     private static final ObjectMapper objectMapper;
-    
+
     static {
+        String classPath = SavePathManager.class.getClassLoader().getResource("").getPath();
+        File classPathFile = new File(classPath);
+        File projectRoot = classPathFile.getParentFile().getParentFile(); 
+
+        basePath = projectRoot.getAbsolutePath();
+        System.out.println("[SavePathManager] 프로젝트 루트 경로로 설정: " + basePath);
+
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
     }
@@ -39,9 +46,13 @@ public class SavePathManager {
         try {
             Path playerDir = Paths.get(basePath, BASE_SAVE_DIR, pid);
 
-            // 이미 존재하면 삭제함
-            if (Files.exists(playerDir)) {
+            System.out.println("[SavePathManager] basePath: " + basePath);
+            System.out.println("[SavePathManager] 생성할 경로: " + playerDir.toAbsolutePath());
 
+            // 이미 존재하면 스킵
+            if (Files.exists(playerDir)) {
+                System.out.println("[SavePathManager] 폴더 이미 존재: " + playerDir);
+                return true;
             }
 
             Files.createDirectories(playerDir);
@@ -56,10 +67,12 @@ public class SavePathManager {
             Files.writeString(playerDir.resolve("messages.json"), "[]");
             Files.writeString(playerDir.resolve("quests.json"), "[]");
 
+            System.out.println("[SavePathManager] 플레이어 폴더 생성 완료: " + playerDir.toAbsolutePath());
             return true;
 
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("createPlayerSaveFolder 실패: " + e.getMessage());
             return false;
         }
     }

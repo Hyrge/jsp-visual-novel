@@ -17,6 +17,17 @@ public class GameContext {
     private final PostService postService;
     private final DataManager dataManager;
 
+    public GameContext() {
+        this.pid = null;
+        this.eventBus = null;
+        this.dataManager = null;
+        this.gameState = null;
+        this.eventService = null;
+        this.questService = null;
+        this.messageService = null;
+        this.postService = null;
+    }
+
     public GameContext(String pid) {
         this.pid = pid;
         this.eventBus = new EventBus();
