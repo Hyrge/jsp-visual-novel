@@ -106,14 +106,21 @@ public class GameState {
     }
 
     /**
-     * 게임 시간을 분 단위로 진행 (시계만 이동)
+     * 게임 시간을 분 단위로 진행
      * @param minutes 진행할 분
      */
     public void advanceTime(int minutes) {
         LocalDateTime current = getCurrentDateTime();
-        LocalDateTime advanced = current.plusMinutes(minutes);
-        this.currentDate = advanced.toLocalDate();
-        this.currentTime = advanced.toLocalTime();
+        LocalDateTime target = current.plusMinutes(minutes);
+
+        // 시간을 이동하면서 지나간 이벤트 시간들을 큐에서 제거
+        while (!eventTimes.isEmpty() && !eventTimes.peek().isAfter(target)) {
+            eventTimes.poll(); // 지나간 이벤트는 큐에서 제거
+        }
+
+        // 시간 이동
+        this.currentDate = target.toLocalDate();
+        this.currentTime = target.toLocalTime();
     }
 
     /**

@@ -3,65 +3,78 @@ package util;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
 import java.util.HashMap;
 
 import dto.Comment;
 import manager.DataManager;
+import model.EventBus;
+import model.GameState;
 import service.PostService;
 
 /**
- * NPC 반응 큐 시스템 관리
- * 플레이어 행동에 대한 NPC의 시간차 반응을 처리
+ * NPC 댓글 생성 관리자
+ * EventBus를 구독하여 POST_CREATED 이벤트 발생 시 NPC 댓글을 즉시 생성하고 DB에 저장
  */
 public class NPCReactionManager {
-    private static NPCReactionManager instance;
     private LLMManager llmManager;
     private Random random;
+    private EventBus eventBus;
+    private GameState gameState;
+    private PostService postService;
+    private String playerPid;
 
-    // 반응 큐: 예정 시각과 반응 이벤트를 저장
-    private PriorityQueue<NPCReaction> reactionQueue;
-
-    private NPCReactionManager() {
+    /**
+     * 생성자 - EventBus를 주입받아 POST_CREATED 이벤트 구독
+     */
+    public NPCReactionManager(EventBus eventBus, GameState gameState, PostService postService, String playerPid) {
         this.llmManager = LLMManager.getInstance();
         this.random = new Random();
-        // 시간순으로 정렬되는 우선순위 큐
-        this.reactionQueue = new PriorityQueue<>(Comparator.comparing(NPCReaction::getScheduledTime));
-    }
+        this.eventBus = eventBus;
+        this.gameState = gameState;
+        this.postService = postService;
+        this.playerPid = playerPid;
 
-    public static NPCReactionManager getInstance() {
-        if (instance == null) {
-            synchronized (NPCReactionManager.class) {
-                if (instance == null) {
-                    instance = new NPCReactionManager();
-                }
-            }
-        }
-        return instance;
+        // POST_CREATED 이벤트 구독
+        eventBus.subscribe("POST_CREATED", this::onPostCreated);
     }
 
     /**
-     * 플레이어의 게시글에 대한 NPC 댓글 반응 예약
-     * @param postId 게시글 ID
-     * @param postTitle 게시글 제목
-     * @param postContent 게시글 내용
-     * @param currentTime 현재 게임 시간
-     * @param currentSentiment 현재 여론
+     * POST_CREATED 이벤트 핸들러
+     * 게시글이 생성되면 즉시 NPC 댓글을 생성하고 DB에 저장
      */
-    public void scheduleCommentReactions(String postId, String postTitle, String postContent,
-                                         LocalDateTime currentTime, int currentSentiment) {
+    private void onPostCreated(Object data) {
+        Map<String, Object> postData = (Map<String, Object>) data;
+        String postId = (String) postData.get("postId");
+        String postTitle = (String) postData.get("title");
+        String postContent = (String) postData.get("content");
+        boolean isRelatedMina = (Boolean) postData.getOrDefault("isRelatedMina", false);
+
+        LocalDateTime currentTime = gameState.getCurrentDateTime();
+        int currentSentiment = gameState.getReputation();
+
+        System.out.println("[NPCReactionManager] POST_CREATED 이벤트 수신: " + postTitle);
+
+        // NPC 댓글 즉시 생성 및 DB 저장
+        generateAndSaveComments(postId, postTitle, postContent, currentTime, currentSentiment, isRelatedMina);
+    }
+
+    /**
+     * NPC 댓글을 즉시 생성하고 DB에 저장 (미래 시간으로)
+     */
+    private void generateAndSaveComments(String postId, String postTitle, String postContent,
+                                         LocalDateTime currentTime, int currentSentiment, boolean isRelatedMina) {
         // 랜덤하게 1~3명의 NPC가 반응
         int numReactions = 1 + random.nextInt(3);
         List<Map<String, Object>> allProfiles = llmManager.getAllNPCProfiles();
+        int savedCount = 0;
 
         if (allProfiles == null || allProfiles.isEmpty()) {
-            System.err.println("NPCReactionManager: NPC 프로필이 없습니다");
+            System.err.println("[NPCReactionManager] NPC 프로필이 없습니다");
             return;
         }
 
@@ -78,66 +91,78 @@ public class NPCReactionManager {
             // 온라인/오프라인 상태 확인
             boolean isOnline = isNPCOnline(profile, currentTime);
 
-            // 반응 시간 계산
-            LocalDateTime scheduledTime = calculateReactionTime(currentTime, isOnline);
-
             // 반응 확률 체크
             double reactionProbability = isOnline ? 0.7 : 0.5;
             if (random.nextDouble() > reactionProbability) {
                 continue; // 이번엔 반응 안 함
             }
 
-            // 반응 큐에 추가
-            NPCReaction reaction = new NPCReaction(
-                npcId,
-                NPCReactionType.COMMENT,
-                scheduledTime,
-                Map.of(
+            // 댓글이 작성될 시간 계산
+            LocalDateTime commentTime = calculateReactionTime(currentTime, isOnline);
+
+            // 즉시 LLM 호출하여 댓글 생성
+            String commentText = llmManager.generateComment(npcId, postTitle, postContent, currentSentiment, isRelatedMina);
+
+            if (commentText == null) {
+                System.err.println("[NPCReactionManager] LLM 댓글 생성 실패: " + npcId);
+                continue;
+            }
+
+            // DB에 저장 (미래 시간으로)
+            Comment comment = new Comment();
+            comment.setPostId(postId);
+            comment.setPlayerPid(playerPid);
+            comment.setContent(commentText);
+            comment.setCreatedAt(commentTime);
+
+            // NPC 닉네임 설정
+            String npcNickname = postService.assignNicknameForNPC(npcId, postId);
+            comment.setAuthorNickname(npcNickname);
+
+            if (postService.createComment(comment)) {
+                savedCount++;
+
+                // GameState에 이벤트 시간 추가
+                gameState.addEventTime(commentTime);
+
+                System.out.println("[NPCReactionManager] NPC 댓글 생성 및 저장: " + npcNickname + " at " + commentTime);
+
+                // NPC_COMMENT_CREATED 이벤트 발행
+                eventBus.emit("NPC_COMMENT_CREATED", Map.of(
+                    "npcId", npcId,
                     "postId", postId,
-                    "postTitle", postTitle,
-                    "postContent", postContent,
-                    "sentiment", currentSentiment
-                )
-            );
-
-            reactionQueue.offer(reaction);
-            System.out.println("NPCReactionManager: NPC 댓글 반응 예약 - " + npcId + " at " + scheduledTime);
-        }
-    }
-
-    /**
-     * 이슈에 대한 NPC 게시글 반응 예약
-     * @param topic 이슈 주제
-     * @param currentTime 현재 게임 시간
-     * @param currentSentiment 현재 여론
-     */
-    public void schedulePostReaction(String topic, LocalDateTime currentTime, int currentSentiment) {
-        // 랜덤 NPC 선택
-        Map<String, Object> profile = llmManager.getRandomNPCProfile();
-        if (profile == null) {
-            System.err.println("NPCReactionManager: NPC 프로필을 가져올 수 없습니다");
-            return;
+                    "commentTime", commentTime
+                ));
+            }
         }
 
-        String npcId = (String) profile.get("id");
-        boolean isOnline = isNPCOnline(profile, currentTime);
+        // 최소 1개는 반드시 생성
+        if (savedCount == 0) {
+            Map<String, Object> profile = allProfiles.get(random.nextInt(allProfiles.size()));
+            String npcId = (String) profile.get("id");
+            boolean isOnline = isNPCOnline(profile, currentTime);
+            LocalDateTime commentTime = calculateReactionTime(currentTime, isOnline);
 
-        // 게시글 작성은 더 오래 걸림
-        LocalDateTime scheduledTime = calculatePostCreationTime(currentTime, isOnline);
+            String commentText = llmManager.generateComment(npcId, postTitle, postContent, currentSentiment, isRelatedMina);
 
-        NPCReaction reaction = new NPCReaction(
-            npcId,
-            NPCReactionType.POST,
-            scheduledTime,
-            Map.of(
-                "topic", topic,
-                "sentiment", currentSentiment
-            )
-        );
+            if (commentText != null) {
+                Comment comment = new Comment();
+                comment.setPostId(postId);
+                comment.setPlayerPid(playerPid);
+                comment.setContent(commentText);
+                comment.setCreatedAt(commentTime);
+                comment.setAuthorNickname(postService.assignNicknameForNPC(npcId, postId));
 
-        reactionQueue.offer(reaction);
-        System.out.println("NPCReactionManager: NPC 게시글 반응 예약 - " + npcId + " at " + scheduledTime);
+                if (postService.createComment(comment)) {
+                    gameState.addEventTime(commentTime);
+                    System.out.println("[NPCReactionManager] 최소 1개 NPC 댓글 강제 생성: " + comment.getAuthorNickname());
+                }
+            }
+        }
+
+        System.out.println("[NPCReactionManager] 총 " + savedCount + "개의 NPC 댓글 생성됨");
     }
+
 
     /**
      * NPC가 현재 온라인 상태인지 확인
@@ -174,186 +199,4 @@ public class NPCReactionManager {
         }
     }
 
-    /**
-     * 게시글 작성 시간 계산
-     */
-    private LocalDateTime calculatePostCreationTime(LocalDateTime currentTime, boolean isOnline) {
-        if (isOnline) {
-            // 온라인: 5~15분 후
-            int minutes = 5 + random.nextInt(11);
-            return currentTime.plusMinutes(minutes);
-        } else {
-            // 오프라인: 2~8시간 후
-            int hours = 2 + random.nextInt(7);
-            return currentTime.plusHours(hours);
-        }
-    }
-
-    /**
-     * 예정된 반응들 중 현재 시간 이전의 것들을 처리
-     * @param currentTime 현재 게임 시간
-     * @return 처리된 반응 목록
-     */
-    public List<NPCReactionResult> processReactions(LocalDateTime currentTime) {
-        List<NPCReactionResult> results = new ArrayList<>();
-
-        while (!reactionQueue.isEmpty() && !reactionQueue.peek().getScheduledTime().isAfter(currentTime)) {
-            NPCReaction reaction = reactionQueue.poll();
-            NPCReactionResult result = executeReaction(reaction);
-            if (result != null) {
-                results.add(result);
-            }
-        }
-
-        return results;
-    }
-
-    /**
-     * 반응 실행
-     */
-    private NPCReactionResult executeReaction(NPCReaction reaction) {
-        String npcId = reaction.getNpcId();
-        Map<String, Object> params = reaction.getParameters();
-
-        try {
-            if (reaction.getType() == NPCReactionType.COMMENT) {
-                // 댓글 생성
-                String postTitle = (String) params.get("postTitle");
-                String postContent = (String) params.get("postContent");
-                int sentiment = (Integer) params.get("sentiment");
-
-                String comment = llmManager.generateComment(npcId, postTitle, postContent, sentiment);
-
-                if (comment != null) {
-                    return new NPCReactionResult(
-                        npcId,
-                        NPCReactionType.COMMENT,
-                        reaction.getScheduledTime(),
-                        comment,
-                        params
-                    );
-                }
-            } else if (reaction.getType() == NPCReactionType.POST) {
-                // 게시글 생성
-                String topic = (String) params.get("topic");
-                int sentiment = (Integer) params.get("sentiment");
-
-                Map<String, String> post = llmManager.generatePost(npcId, topic, sentiment);
-
-                if (post != null) {
-                    return new NPCReactionResult(
-                        npcId,
-                        NPCReactionType.POST,
-                        reaction.getScheduledTime(),
-                        post.get("title") + "\n---\n" + post.get("content"),
-                        params
-                    );
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("NPCReactionManager: 반응 실행 중 오류 - " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    /**
-     * 다음 반응 예정 시각 조회
-     */
-    public LocalDateTime getNextReactionTime() {
-        if (reactionQueue.isEmpty()) {
-            return null;
-        }
-        return reactionQueue.peek().getScheduledTime();
-    }
-
-    /**
-     * 반응 큐 크기 조회
-     */
-    public int getQueueSize() {
-        return reactionQueue.size();
-    }
-
-    /**
-     * 반응 큐 초기화 (새 게임 시작 시)
-     */
-    public void clearQueue() {
-        reactionQueue.clear();
-    }
-
-    // 내부 클래스: NPC 반응 데이터
-    private static class NPCReaction {
-        private String npcId;
-        private NPCReactionType type;
-        private LocalDateTime scheduledTime;
-        private Map<String, Object> parameters;
-
-        public NPCReaction(String npcId, NPCReactionType type, LocalDateTime scheduledTime, Map<String, Object> parameters) {
-            this.npcId = npcId;
-            this.type = type;
-            this.scheduledTime = scheduledTime;
-            this.parameters = parameters;
-        }
-
-        public String getNpcId() {
-            return npcId;
-        }
-
-        public NPCReactionType getType() {
-            return type;
-        }
-
-        public LocalDateTime getScheduledTime() {
-            return scheduledTime;
-        }
-
-        public Map<String, Object> getParameters() {
-            return parameters;
-        }
-    }
-
-    // 반응 타입 enum
-    public enum NPCReactionType {
-        COMMENT,    // 댓글
-        POST        // 게시글
-    }
-
-    // 반응 결과 클래스
-    public static class NPCReactionResult {
-        private String npcId;
-        private NPCReactionType type;
-        private LocalDateTime executedTime;
-        private String generatedText;
-        private Map<String, Object> originalParameters;
-
-        public NPCReactionResult(String npcId, NPCReactionType type, LocalDateTime executedTime,
-                                String generatedText, Map<String, Object> originalParameters) {
-            this.npcId = npcId;
-            this.type = type;
-            this.executedTime = executedTime;
-            this.generatedText = generatedText;
-            this.originalParameters = originalParameters;
-        }
-
-        public String getNpcId() {
-            return npcId;
-        }
-
-        public NPCReactionType getType() {
-            return type;
-        }
-
-        public LocalDateTime getExecutedTime() {
-            return executedTime;
-        }
-
-        public String getGeneratedText() {
-            return generatedText;
-        }
-
-        public Map<String, Object> getOriginalParameters() {
-            return originalParameters;
-        }
-    }
 }

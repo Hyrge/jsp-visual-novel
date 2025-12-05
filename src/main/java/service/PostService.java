@@ -48,23 +48,16 @@ public class PostService {
     }
 
     /**
-     * 게시판별 게시글 목록 조회 (JSON + DB 병합)
-     */
-    public List<Post> getPostsByBoardType(String boardType) {
-        return getPostsByBoardType(boardType, null, null);
-    }
-
-    /**
-     * 게시판별 게시글 목록 조회 (시간 필터링 포함)
-     */
-    public List<Post> getPostsByBoardType(String boardType, java.time.LocalDateTime currentTime) {
-        return getPostsByBoardType(boardType, currentTime, null);
-    }
-
-    /**
-     * 게시판별 게시글 목록 조회 (시간 필터링 + 플레이어 필터링)
+     * 게시판별 게시글 목록 조회 (시간 필터링 + 플레이어 필터링 필수)
      */
     public List<Post> getPostsByBoardType(String boardType, java.time.LocalDateTime currentTime, String playerPid) {
+        if (currentTime == null) {
+            throw new IllegalArgumentException("currentTime은 필수입니다");
+        }
+        if (playerPid == null) {
+            throw new IllegalArgumentException("playerPid는 필수입니다");
+        }
+
         Map<String, Post> resultMap = new HashMap<>();
 
         // 1. JSON 초기 데이터 먼저 추가 (모든 플레이어 공통)
@@ -104,9 +97,10 @@ public class PostService {
     }
 
     /**
-     * 댓글 목록 조회 (JSON + DB 병합, 플레이어 + 시간 필터링)
+     * 댓글 목록 조회 (JSON + DB 병합, 플레이어 + 시간 필터링 필수)
      */
     public List<Comment> getComments(String postId, String playerPid, java.time.LocalDateTime currentTime) {
+
         Map<Integer, Comment> resultMap = new HashMap<>();
 
         // 1. JSON 초기 데이터 먼저 추가 (시간 필터링)
@@ -209,38 +203,17 @@ public class PostService {
     }
 
     /**
-     * 모든 게시글 조회 (talk 게시판용)
-     */
-    public List<Post> getAllPosts() {
-        return getPostsByBoardType("talk", null);
-    }
-
-    /**
-     * 모든 게시글 조회 (시간 필터링 포함)
-     */
-    public List<Post> getAllPosts(java.time.LocalDateTime currentTime) {
-        return getPostsByBoardType("talk", currentTime, null);
-    }
-
-    /**
-     * 모든 게시글 조회 (시간 필터링 + 플레이어 필터링)
+     * 모든 게시글 조회 (talk 게시판용, currentTime + playerPid 필수)
      */
     public List<Post> getAllPosts(java.time.LocalDateTime currentTime, String playerPid) {
         return getPostsByBoardType("talk", currentTime, playerPid);
     }
 
     /**
-     * 특정 게시글의 댓글 목록 조회 (별칭)
+     * 특정 게시글의 댓글 목록 조회 (currentTime + playerPid 필수)
      */
-    public List<Comment> getCommentsByPostId(String postId) {
-        return getComments(postId, null);
-    }
-
-    /**
-     * 특정 게시글의 댓글 목록 조회 (플레이어 필터링)
-     */
-    public List<Comment> getCommentsByPostId(String postId, String playerPid) {
-        return getComments(postId, playerPid);
+    public List<Comment> getCommentsByPostId(String postId, String playerPid, java.time.LocalDateTime currentTime) {
+        return getComments(postId, playerPid, currentTime);
     }
 }
 

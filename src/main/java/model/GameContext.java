@@ -6,6 +6,7 @@ import service.MessageService;
 import service.PostService;
 import service.QuestService;
 import service.TimeService;
+import util.NPCReactionManager;
 import util.SavePathManager;
 
 public class GameContext {
@@ -18,6 +19,7 @@ public class GameContext {
     private final PostService postService;
     private final TimeService timeService;
     private final DataManager dataManager;
+    private final NPCReactionManager npcReactionManager;
 
     public GameContext() {
         this.pid = null;
@@ -29,6 +31,7 @@ public class GameContext {
         this.messageService = null;
         this.postService = null;
         this.timeService = null;
+        this.npcReactionManager = null;
     }
 
     public GameContext(String pid) {
@@ -41,6 +44,9 @@ public class GameContext {
         this.messageService = new MessageService(eventBus);
         this.postService = new PostService(dataManager);
         this.timeService = new TimeService(gameState, eventBus);
+
+        // NPCReactionManager 초기화 (EventBus 구독)
+        this.npcReactionManager = new NPCReactionManager(eventBus, gameState, postService, pid);
     }
 
     // Getters
@@ -74,6 +80,10 @@ public class GameContext {
 
     public TimeService getTimeService() {
         return timeService;
+    }
+
+    public NPCReactionManager getNpcReactionManager() {
+        return npcReactionManager;
     }
 
 }
