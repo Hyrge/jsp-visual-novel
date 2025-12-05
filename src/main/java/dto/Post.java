@@ -131,12 +131,12 @@ public class Post {
         isRelatedMina = relatedMina;
     }
 
-    public String getAuthorNickname() {
-        return authorNickname;
+    public String getNickname() {
+        return nickname;
     }
 
-    public void setAuthorNickname(String authorNickname) {
-        this.authorNickname = authorNickname;
+    public void setNickName(String nickname) {
+        this.nickname = nickname;
     }
 
     public String getImageFile() {

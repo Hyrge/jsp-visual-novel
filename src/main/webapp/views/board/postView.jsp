@@ -91,7 +91,7 @@
     postData.put("id", post.getPostId());
     postData.put("category", post.getCategory());
     postData.put("title", post.getTitle());
-    postData.put("author", post.getAuthorNickname() != null ? post.getAuthorNickname() : "익명");
+    postData.put("author", post.getNickname() != null ? post.getNickname() : "유저");
     postData.put("playerPid", post.getPlayerPid()); // 이미지 경로용
     postData.put("date", post.getCreatedAt().format(dateFormatter));
     postData.put("views", "0"); // TODO: 조회수 기능 추가
@@ -108,7 +108,7 @@
     for (Comment c : commentList) {
         Map<String, String> commentMap = new HashMap<>();
         commentMap.put("id", String.valueOf(c.getCommentId()));
-        commentMap.put("author", c.getAuthorNickname() != null ? c.getAuthorNickname() : "익명");
+        commentMap.put("author", c.getNickname() != null ? c.getNickname() : "유저");
         commentMap.put("date", c.getCreatedAt().format(dateFormatter));
         commentMap.put("content", c.getContent() != null ? c.getContent().replace("\n", "<br>") : "");
         commentsData.add(commentMap);

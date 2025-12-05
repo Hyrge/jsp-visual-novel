@@ -118,7 +118,7 @@ public class NPCReactionManager {
 
             // NPC 닉네임 설정
             String npcNickname = postService.assignNicknameForNPC(npcId, postId);
-            comment.setAuthorNickname(npcNickname);
+            comment.setNickname(npcNickname);
 
             if (postService.createComment(comment)) {
                 savedCount++;
@@ -134,30 +134,6 @@ public class NPCReactionManager {
                     "postId", postId,
                     "commentTime", commentTime
                 ));
-            }
-        }
-
-        // 최소 1개는 반드시 생성
-        if (savedCount == 0) {
-            Map<String, Object> profile = allProfiles.get(random.nextInt(allProfiles.size()));
-            String npcId = (String) profile.get("id");
-            boolean isOnline = isNPCOnline(profile, currentTime);
-            LocalDateTime commentTime = calculateReactionTime(currentTime, isOnline);
-
-            String commentText = llmManager.generateComment(npcId, postTitle, postContent, currentSentiment, isRelatedMina);
-
-            if (commentText != null) {
-                Comment comment = new Comment();
-                comment.setPostId(postId);
-                comment.setPlayerPid(playerPid);
-                comment.setContent(commentText);
-                comment.setCreatedAt(commentTime);
-                comment.setAuthorNickname(postService.assignNicknameForNPC(npcId, postId));
-
-                if (postService.createComment(comment)) {
-                    gameState.addEventTime(commentTime);
-                    System.out.println("[NPCReactionManager] 최소 1개 NPC 댓글 강제 생성: " + comment.getAuthorNickname());
-                }
             }
         }
 

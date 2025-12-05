@@ -10,7 +10,8 @@
         "has_pictures": true,
         "like_count": 350,
         "dislike_count": 2,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "케이팝러버"
     },
     {
         "post_id": "m_2002",
@@ -23,7 +24,8 @@
         "has_pictures": false,
         "like_count": 85,
         "dislike_count": 0,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "묵묵히응원"
     },
     {
         "post_id": "m_2003",
@@ -36,7 +38,8 @@
         "has_pictures": false,
         "like_count": 15,
         "dislike_count": 200,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "깨어있는시민"
     },
     {
         "post_id": "m_2004",
@@ -49,7 +52,8 @@
         "has_pictures": true,
         "like_count": 520,
         "dislike_count": 5,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "학식먹음"
     },
     {
         "post_id": "m_2005",
@@ -62,7 +66,8 @@
         "has_pictures": false,
         "like_count": 45,
         "dislike_count": 1,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "ㅇㅇ"
     },
     {
         "post_id": "m_2006",
@@ -75,7 +80,8 @@
         "has_pictures": false,
         "like_count": 20,
         "dislike_count": 80,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "백수아님"
     },
     {
         "post_id": "m_2007",
@@ -88,7 +94,8 @@
         "has_pictures": true,
         "like_count": 150,
         "dislike_count": 3,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "자유로운영혼"
     },
     {
         "post_id": "m_2008",
@@ -101,7 +108,8 @@
         "has_pictures": false,
         "like_count": 60,
         "dislike_count": 0,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "동네아줌마"
     },
     {
         "post_id": "m_2009",
@@ -114,7 +122,8 @@
         "has_pictures": true,
         "like_count": 400,
         "dislike_count": 10,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "케이팝러버"
     },
     {
         "post_id": "m_2010",
@@ -127,7 +136,8 @@
         "has_pictures": false,
         "like_count": 5,
         "dislike_count": 150,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "깨어있는시민"
     },
     {
         "post_id": "m_2011",
@@ -140,7 +150,8 @@
         "has_pictures": false,
         "like_count": 90,
         "dislike_count": 0,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "월급루팡"
     },
     {
         "post_id": "m_2012",
@@ -153,7 +164,8 @@
         "has_pictures": true,
         "like_count": 280,
         "dislike_count": 1,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "학식먹음"
     },
     {
         "post_id": "m_2013",
@@ -166,7 +178,8 @@
         "has_pictures": false,
         "like_count": 55,
         "dislike_count": 0,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "묵묵히응원"
     },
     {
         "post_id": "m_2014",
@@ -179,7 +192,8 @@
         "has_pictures": true,
         "like_count": 10,
         "dislike_count": 120,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "백수아님"
     },
     {
         "post_id": "m_2015",
@@ -192,7 +206,8 @@
         "has_pictures": false,
         "like_count": 180,
         "dislike_count": 2,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "집순이"
     },
     {
         "post_id": "m_2016",
@@ -205,7 +220,8 @@
         "has_pictures": true,
         "like_count": 220,
         "dislike_count": 15,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "ㅇㅇ"
     },
     {
         "post_id": "m_2017",
@@ -218,7 +234,8 @@
         "has_pictures": false,
         "like_count": 70,
         "dislike_count": 0,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "케이팝러버"
     },
     {
         "post_id": "m_2018",
@@ -231,7 +248,8 @@
         "has_pictures": false,
         "like_count": 25,
         "dislike_count": 180,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "깨어있는시민"
     },
     {
         "post_id": "m_2019",
@@ -244,7 +262,8 @@
         "has_pictures": false,
         "like_count": 310,
         "dislike_count": 5,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "학식먹음"
     },
     {
         "post_id": "m_2020",
@@ -257,6 +276,7 @@
         "has_pictures": false,
         "like_count": 130,
         "dislike_count": 0,
-        "is_related_mina": true
+        "is_related_mina": true,
+        "nickname": "묵묵히응원"
     }
 ]

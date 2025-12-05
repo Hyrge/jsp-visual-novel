@@ -127,7 +127,7 @@
                                     		currentGameTime).size();
 
                                     // 닉네임 처리 (JSON에 없으면 NPC ID로부터 생성)
-                                    String nickname = post.getAuthorNickname();
+                                    String nickname = post.getNickname();
                                     if (nickname == null || nickname.isEmpty()) {
                                         nickname = gameContext.getPostService().assignNicknameForNPC(
                                             post.getPlayerPid(),
