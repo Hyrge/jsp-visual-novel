@@ -90,7 +90,7 @@
                                 // 현재 게임 시간 기준으로 게시글 가져오기 (playerPid로 필터링)
                                 java.time.LocalDateTime currentGameTime = gameContext.getGameState().getCurrentDateTime();
                                 String playerPid = gameContext.getPid();
-                                java.util.List<dto.Post> allPosts = gameContext.getPostManager().getAllPosts(currentGameTime, playerPid);
+                                java.util.List<dto.Post> allPosts = gameContext.getPostService().getAllPosts(currentGameTime, playerPid);
 
                                 // 카테고리 필터링
                                 String categoryParam = request.getParameter("category");
@@ -137,12 +137,12 @@
                                     String formattedDate = post.getCreatedAt().format(dateFormatter);
 
                                     // 댓글 개수 가져오기
-                                    int commentCount = gameContext.getPostManager().getCommentsByPostId(post.getPostId()).size();
+                                    int commentCount = gameContext.getPostService().getCommentsByPostId(post.getPostId()).size();
 
                                     // 닉네임 처리 (JSON에 없으면 NPC ID로부터 생성)
                                     String nickname = post.getAuthorNickname();
                                     if (nickname == null || nickname.isEmpty()) {
-                                        nickname = gameContext.getPostManager().assignNicknameForNPC(
+                                        nickname = gameContext.getPostService().assignNicknameForNPC(
                                             post.getPlayerPid(),
                                             post.getPostId()
                                         );

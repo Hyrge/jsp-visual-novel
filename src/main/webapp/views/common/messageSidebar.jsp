@@ -13,7 +13,7 @@
         <div class="status-item">
             <span class="label">평판:</span>
             <span class="value">
-                <%= gameContext.getGameState() != null ? gameContext.getGameState().getReputation() : 0 %>
+                <%= gameContext.getGameState().getReputation() %>
             </span>
         </div>
     </div>
@@ -21,7 +21,7 @@
     <div class="msg-header">
         <h3>쪽지함</h3>
         <%
-            List<Message> messages = gameContext.getMessageManager().getMessages();
+            List<Message> messages = gameContext.getMessageService().getMessages();
             long unreadCount = messages.stream()
                     .filter(m -> !m.isRead())
                     .count();
