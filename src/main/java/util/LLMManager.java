@@ -73,14 +73,32 @@ public class LLMManager {
      * @return 생성된 댓글 텍스트
      */
     public String generateComment(String npcId, String postTitle, String postContent, int currentSentiment) {
+        return generateComment(npcId, postTitle, postContent, currentSentiment, false);
+    }
+
+    /**
+     * NPC 댓글 생성 (MiNa 관련 여부 지정)
+     * @param npcId NPC 프로필 ID
+     * @param postTitle 게시글 제목
+     * @param postContent 게시글 내용
+     * @param currentSentiment 현재 여론 (0~100)
+     * @param isRelatedMina MiNa 관련 글인지 여부
+     * @return 생성된 댓글 텍스트
+     */
+    public String generateComment(String npcId, String postTitle, String postContent, int currentSentiment, boolean isRelatedMina) {
         Map<String, Object> profile = getNPCProfile(npcId);
         if (profile == null) {
             System.err.println("LLMManager: NPC 프로필을 찾을 수 없음 - " + npcId);
             return null;
         }
 
-        // 프롬프트 생성
-        String prompt = buildCommentPrompt(profile, postTitle, postContent, currentSentiment);
+        // 미나 관련 글이면 미나 프롬프트, 아니면 일반 프롬프트
+        String prompt;
+        if (isRelatedMina) {
+            prompt = buildMinaCommentPrompt(profile, postTitle, postContent, currentSentiment);
+        } else {
+            prompt = buildCommentPrompt(profile, postTitle, postContent, currentSentiment);
+        }
 
         // Gemini API 호출
         String generatedText = geminiService.generateText(prompt);
@@ -129,9 +147,37 @@ public class LLMManager {
     }
 
     /**
-     * 댓글 생성 프롬프트 작성
+     * 일반 댓글 생성 프롬프트 (미나 관련 아닐 때)
      */
     private String buildCommentPrompt(Map<String, Object> profile, String postTitle, String postContent, int sentiment) {
+        StringBuilder prompt = new StringBuilder();
+
+        prompt.append("당신은 한국 아이돌 팬 커뮤니티 '더꾸'의 회원입니다.\n\n");
+        prompt.append("### 당신의 프로필:\n");
+        prompt.append("- 유형: ").append(profile.get("npcType")).append("\n");
+        prompt.append("- 말투: ").append(profile.get("speechStyle")).append("\n");
+        prompt.append("- 성격: ").append(profile.get("personalityDesc")).append("\n\n");
+
+        prompt.append("### 게시글:\n");
+        prompt.append("제목: ").append(postTitle).append("\n");
+        prompt.append("내용: ").append(postContent).append("\n\n");
+
+        prompt.append("### 규칙:\n");
+        prompt.append("1. 게시글 내용에 맞는 자연스러운 댓글을 작성하세요\n");
+        prompt.append("2. 당신의 말투와 성격을 반영하세요\n");
+        prompt.append("3. 1~2문장으로 짧게 작성하세요 (50자 이내)\n");
+        prompt.append("4. 따옴표나 설명 없이 댓글만 출력하세요\n");
+        prompt.append("5. 게시글과 관련 없는 내용은 언급하지 마세요\n\n");
+
+        prompt.append("댓글:");
+
+        return prompt.toString();
+    }
+
+    /**
+     * MiNa 관련 댓글 생성 프롬프트 (미나 관련 글일 때)
+     */
+    private String buildMinaCommentPrompt(Map<String, Object> profile, String postTitle, String postContent, int sentiment) {
         StringBuilder prompt = new StringBuilder();
 
         prompt.append("당신은 커뮤니티 사이트 '더꾸'의 회원입니다.\n\n");
