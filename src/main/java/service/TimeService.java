@@ -7,7 +7,7 @@ import java.util.Map;
 
 import model.EventBus;
 import model.GameState;
-
+import model.enums.BusEvent;
 /**
  * 게임 시간 진행 관리 서비스
  * - 시간만 진행, 데이터는 시간 필터링으로 조회
@@ -33,7 +33,7 @@ public class TimeService {
         System.out.println("[TimeService] 시간 진행: " + before + " → " + after + " (+" + minutes + "분)");
 
         // 시간 경과 이벤트 발행
-        eventBus.emit("TIME_ADVANCED", Map.of(
+        eventBus.emit(BusEvent.TIME_ADVANCED, Map.of(
             "minutes", minutes,
             "before", before,
             "after", after
@@ -67,7 +67,7 @@ public class TimeService {
 
         // 시간 경과 이벤트 발행
         long minutesSkipped = java.time.Duration.between(before, nextEventTime).toMinutes();
-        eventBus.emit("TIME_ADVANCED", Map.of(
+        eventBus.emit(BusEvent.TIME_ADVANCED, Map.of(
             "minutes", minutesSkipped,
             "before", before,
             "after", nextEventTime,
@@ -97,7 +97,7 @@ public class TimeService {
 
         // 시간 경과 이벤트 발행
         long minutesSkipped = java.time.Duration.between(before, nextDayStart).toMinutes();
-        eventBus.emit("TIME_ADVANCED", Map.of(
+        eventBus.emit(BusEvent.TIME_ADVANCED, Map.of(
             "minutes", minutesSkipped,
             "before", before,
             "after", nextDayStart,
@@ -109,7 +109,7 @@ public class TimeService {
         emitDayChanged(beforeDate, nextDay);
 
         // 일일 정산 이벤트
-        eventBus.emit("DAILY_SETTLEMENT", Map.of(
+        eventBus.emit(BusEvent.DAILY_SETTLEMENT, Map.of(
             "date", nextDay
         ));
     }
@@ -145,7 +145,7 @@ public class TimeService {
      * 날짜 변경 이벤트 발행 (private helper)
      */
     private void emitDayChanged(LocalDate beforeDate, LocalDate afterDate) {
-        eventBus.emit("DAY_CHANGED", Map.of(
+        eventBus.emit(BusEvent.DAY_CHANGED, Map.of(
             "previousDate", beforeDate,
             "currentDate", afterDate,
             "dDay", gameState.getDDayText()
