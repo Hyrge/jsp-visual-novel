@@ -90,7 +90,7 @@ public class QuestFactory {
             quest.setPenaltyReputation(((Number) config.get("penaltyReputation")).intValue());
         }
 
-        // 예상 소요 시간
+        // 퀘스트 완료 후 소요 시간
         if (config.containsKey("spentTime") && config.get("spentTime") != null) {
             quest.setSpentTime(((Number) config.get("spentTime")).intValue());
         }

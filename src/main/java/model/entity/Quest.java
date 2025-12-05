@@ -24,7 +24,7 @@ public class Quest {
     private int rewardReputation;
     private int penaltyReputation;
 
-    // 예상 소요 시간 (분)
+    // 퀘스트 완료 후 소요 시간 (분)
     private int spentTime;
 
     // 체이닝
