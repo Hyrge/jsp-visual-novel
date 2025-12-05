@@ -17,17 +17,15 @@ public class PlayerDAO {
     /**
      * 플레이어 생성 (자동 회원가입)
      * @param pid UUID 문자열
-     * @param savePath 저장 폴더 경로 (예: "saves/uuid")
      * @return 생성 성공 여부
      */
-    public boolean createPlayer(String pid, String savePath) {
-        String sql = "INSERT INTO player (pid, save_path, last_access, state) VALUES (?, ?, NOW(), 'PLAYING')";
+    public boolean createPlayer(String pid) {
+        String sql = "INSERT INTO player (pid, last_access, state) VALUES (?, NOW(), 'PLAYING')";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, pid);
-            pstmt.setString(2, savePath);
 
             int rows = pstmt.executeUpdate();
             return rows > 0;
@@ -42,7 +40,7 @@ public class PlayerDAO {
      * PID로 플레이어 조회
      */
     public Player findById(String pid) {
-        String sql = "SELECT pid, save_path, last_access, state FROM player WHERE pid = ?";
+        String sql = "SELECT pid, last_access, state FROM player WHERE pid = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -53,7 +51,6 @@ public class PlayerDAO {
                 if (rs.next()) {
                     Player player = new Player();
                     player.setPid(rs.getString("pid"));
-                    player.setSavePath(rs.getString("save_path"));
 
                     Timestamp timestamp = rs.getTimestamp("last_access");
                     if (timestamp != null) {
@@ -62,30 +59,6 @@ public class PlayerDAO {
 
                     player.setState(rs.getString("state"));
                     return player;
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    /**
-     * 저장 경로 조회
-     */
-    public String getSavePath(String pid) {
-        String sql = "SELECT save_path FROM player WHERE pid = ?";
-
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, pid);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("save_path");
                 }
             }
 

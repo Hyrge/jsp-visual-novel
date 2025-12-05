@@ -1,8 +1,16 @@
 package model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Map;
+
+import dto.Comment;
+import manager.DataManager;
+import service.PostService;
+import util.NPCReactionManager;
+import util.NPCReactionManager.NPCReactionResult;
 
 public class GameState {
     private int reputation = 20;

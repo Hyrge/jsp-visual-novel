@@ -10,7 +10,6 @@ DROP TABLE IF EXISTS player;
 -- 1. player 테이블 (기존 유지)
 CREATE TABLE IF NOT EXISTS player (
     pid VARCHAR(50) PRIMARY KEY,
-    save_path VARCHAR(100) NOT NULL COMMENT '저장 폴더 경로 (saves/1)',
     last_access DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     state ENUM('PLAYING', 'CLEAR') NOT NULL DEFAULT 'PLAYING'
 );

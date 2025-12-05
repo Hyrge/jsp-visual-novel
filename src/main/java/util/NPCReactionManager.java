@@ -10,6 +10,11 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
+import java.util.HashMap;
+
+import dto.Comment;
+import manager.DataManager;
+import service.PostService;
 
 /**
  * NPC 반응 큐 시스템 관리

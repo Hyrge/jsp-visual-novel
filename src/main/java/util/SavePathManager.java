@@ -22,9 +22,9 @@ public class SavePathManager {
         try {
             Path playerDir = Paths.get(basePath, BASE_SAVE_DIR, pid);
 
-            // 이미 존재하면 다시 만들지 않음
+            // 이미 존재하면 삭제함
             if (Files.exists(playerDir)) {
-                return true;
+                
             }
 
             Files.createDirectories(playerDir);

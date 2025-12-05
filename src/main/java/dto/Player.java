@@ -4,16 +4,14 @@ import java.time.LocalDateTime;
 
 public class Player {
     private String pid; // VARCHAR(50) - UUID 문자열
-    private String savePath;
     private LocalDateTime lastAccess;
     private String state; // ENUM('PLAYING', 'CLEAR')
 
     public Player() {
     }
 
-    public Player(String pid, String savePath) {
+    public Player(String pid) {
         this.pid = pid;
-        this.savePath = savePath;
         this.lastAccess = LocalDateTime.now();
         this.state = "PLAYING";
     }
@@ -24,14 +22,6 @@ public class Player {
 
     public void setPid(String pid) {
         this.pid = pid;
-    }
-
-    public String getSavePath() {
-        return savePath;
-    }
-
-    public void setSavePath(String savePath) {
-        this.savePath = savePath;
     }
 
     public LocalDateTime getLastAccess() {
