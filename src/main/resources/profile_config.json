@@ -7,7 +7,7 @@
 		"baseSentiment": 2,  
         "signupDate": "2023-08-15",  
 		"activeTimeStart": "16:00",  
-		"activeTimeEnd": "24:00",  
+		"activeTimeEnd": "23:59",  
 		"avgSessionMinutes": 120,  
 		"responseSpeed": 1,  
 		"speechStyle": "~해요, ㅋㅋ, ㄹㅇ, 헐 등 10대 말투",  
