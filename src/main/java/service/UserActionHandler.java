@@ -1,13 +1,15 @@
 package service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
+import model.EventBus;
 import model.GameContext;
 import model.GameState;
 import model.entity.UserAction;
 import model.enums.ActionType;
+import model.enums.BusEvent;
 import util.LLMManager;
-import util.NPCReactionManager;
 
 /**
  * 플레이어 행동에 대한 시스템 반응을 처리하는 핸들러
@@ -19,12 +21,10 @@ import util.NPCReactionManager;
  */
 public class UserActionHandler {
     private final GameContext gameContext;
-    private final NPCReactionManager npcReactionManager;
     private final LLMManager llmManager;
 
     public UserActionHandler(GameContext gameContext) {
         this.gameContext = gameContext;
-        this.npcReactionManager = NPCReactionManager.getInstance();
         this.llmManager = LLMManager.getInstance();
     }
 
@@ -119,29 +119,15 @@ public class UserActionHandler {
     }
 
     /**
-     * 게시글 작성 처리
+     * 게시글 작성 처리 (DB 저장만)
      */
     private void handleCreatePost(UserAction action) {
-        GameState gameState = gameContext.getGameState();
-        LocalDateTime currentGameTime = gameState.getCurrentDateTime();
-        int currentSentiment = gameState.getReputation();
-        String pid = action.getPlayerId();
+        PostService postService = gameContext.getPostService();
 
-        // MiNa 관련 여부 (일단 false로, 비동기로 업데이트)
-        boolean isRelatedMina = false;
+        // DB에 게시글 저장 (이미 postActions.jsp에서 저장되었으므로 여기서는 추가 작업 없음)
+        System.out.println("[UserActionHandler] 게시글 작성 처리 완료: " + action.getTitle());
 
-        // 이후 시간 스킵에서 추가 반응이 나오도록 큐에 예약
-        npcReactionManager.scheduleCommentReactions(
-            action.getTargetId(),
-            action.getTitle(),
-            action.getContent(),
-            currentGameTime,
-            currentSentiment,
-            isRelatedMina
-        );
-        System.out.println("[UserActionHandler] NPC 댓글 반응 예약됨, 큐 크기: " + npcReactionManager.getQueueSize());
-
-        // 비동기로 MiNa 관련 여부 확인 및 업데이트
+        // 비동기로 MiNa 관련 여부 확인 → POST_CREATED 이벤트 발행
         checkMinaRelatedAsync(action);
     }
 
@@ -209,7 +195,7 @@ public class UserActionHandler {
     }
 
     /**
-     * MiNa 관련 여부를 비동기로 확인하고 DB 업데이트
+     * MiNa 관련 여부를 비동기로 확인하고 POST_CREATED 이벤트 발행
      */
     private void checkMinaRelatedAsync(UserAction action) {
         if (action.getActionType() != ActionType.CREATE_POST) {
@@ -217,6 +203,7 @@ public class UserActionHandler {
         }
 
         PostService postService = gameContext.getPostService();
+        EventBus eventBus = gameContext.getEventBus();
 
         // 별도 스레드에서 LLM 호출
         new Thread(() -> {
@@ -226,24 +213,30 @@ public class UserActionHandler {
                 // DB 업데이트
                 postService.updatePostMinaRelated(action.getTargetId(), isRelatedMina);
 
-                System.out.println("[UserActionHandler] MiNa 관련 여부 업데이트 완료: "
+                System.out.println("[UserActionHandler] MiNa 관련 여부 확인 완료: "
                     + action.getTargetId() + " = " + isRelatedMina);
 
-                // MiNa 관련 글이면 추가 NPC 반응 예약
-                if (isRelatedMina) {
-                    GameState gameState = gameContext.getGameState();
-                    npcReactionManager.scheduleCommentReactions(
-                        action.getTargetId(),
-                        action.getTitle(),
-                        action.getContent(),
-                        gameState.getCurrentDateTime(),
-                        gameState.getReputation(),
-                        true // MiNa 관련
-                    );
-                    System.out.println("[UserActionHandler] MiNa 관련 글 → 추가 NPC 반응 예약");
-                }
+                // POST_CREATED 이벤트 발행 (NPC 댓글 생성 트리거)
+                eventBus.emit(BusEvent.POST_CREATED, Map.of(
+                    "postId", action.getTargetId(),
+                    "title", action.getTitle(),
+                    "content", action.getContent(),
+                    "playerId", action.getPlayerId(),
+                    "isRelatedMina", isRelatedMina
+                ));
+                System.out.println("[UserActionHandler] POST_CREATED 이벤트 발행 (isRelatedMina: " + isRelatedMina + ")");
+
             } catch (Exception e) {
                 System.err.println("[UserActionHandler] MiNa 관련 여부 확인 실패: " + e.getMessage());
+
+                // 실패해도 이벤트는 발행 (isRelatedMina = false로)
+                eventBus.emit(BusEvent.POST_CREATED, Map.of(
+                    "postId", action.getTargetId(),
+                    "title", action.getTitle(),
+                    "content", action.getContent(),
+                    "playerId", action.getPlayerId(),
+                    "isRelatedMina", false
+                ));
             }
         }).start();
     }

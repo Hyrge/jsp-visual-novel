@@ -14,6 +14,7 @@ import model.GameState;
 import model.entity.Event;
 import model.enums.EventStatus;
 import model.enums.EventType;
+import model.enums.BusEvent;
 
 public class EventService {
     private List<Map<String, Object>> eventConfig;
@@ -67,7 +68,7 @@ public class EventService {
                 Event event = EventFactory.createRandomEvent(config, today);
 
                 activeEvents.put(event.getId(), event);
-                eventBus.emit("EVENT_TRIGGERED", event);
+                eventBus.emit(BusEvent.EVENT_TRIGGERED, event);
 
                 // 후속 이벤트 스케줄링
                 scheduleSubsequentEvents(event, today);
@@ -126,7 +127,7 @@ public class EventService {
         event.setStatus(EventStatus.ACTIVE);
         // ... initialize other fields
         activeEvents.put(event.getId(), event);
-        eventBus.emit("EVENT_TRIGGERED", event);
+        eventBus.emit(BusEvent.EVENT_TRIGGERED, event);
         return event;
     }
 

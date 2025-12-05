@@ -6,6 +6,7 @@ import java.util.List;
 import model.EventBus;
 import model.GameState;
 import model.entity.Message;
+import model.enums.BusEvent;
 
 public class MessageService {
     private List<Message> messages = new ArrayList<>();
@@ -17,7 +18,7 @@ public class MessageService {
 
     public void sendMessage(Message message) {
         messages.add(message);
-        eventBus.emit("MESSAGE_SENT", message);
+        eventBus.emit(BusEvent.MESSAGE_SENT, message);
     }
 
     public List<Message> getMessages() {

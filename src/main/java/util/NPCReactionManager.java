@@ -14,6 +14,7 @@ import dto.Comment;
 import manager.DataManager;
 import model.EventBus;
 import model.GameState;
+import model.enums.BusEvent;
 import service.PostService;
 
 /**
@@ -40,7 +41,7 @@ public class NPCReactionManager {
         this.playerPid = playerPid;
 
         // POST_CREATED 이벤트 구독
-        eventBus.subscribe("POST_CREATED", this::onPostCreated);
+        eventBus.subscribe(BusEvent.POST_CREATED, this::onPostCreated);
     }
 
     /**
@@ -128,7 +129,7 @@ public class NPCReactionManager {
                 System.out.println("[NPCReactionManager] NPC 댓글 생성 및 저장: " + npcNickname + " at " + commentTime);
 
                 // NPC_COMMENT_CREATED 이벤트 발행
-                eventBus.emit("NPC_COMMENT_CREATED", Map.of(
+                eventBus.emit(BusEvent.NPC_COMMENT_CREATED, Map.of(
                     "npcId", npcId,
                     "postId", postId,
                     "commentTime", commentTime

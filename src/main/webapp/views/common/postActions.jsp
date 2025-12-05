@@ -5,7 +5,7 @@
 <%@ page import="util.RandomStringUtil" %>
 <%@ page import="model.GameContext" %>
 <%@ page import="model.entity.UserAction" %>
-<%@ page import="model.entity.UserAction.ActionType" %>
+<%@ page import="model.enums.ActionType" %>
 <%@ page import="java.time.LocalDateTime" %>
 <%@ page import="org.apache.commons.fileupload2.core.DiskFileItemFactory" %>
 <%@ page import="org.apache.commons.fileupload2.core.FileItem" %>
@@ -128,15 +128,15 @@
 
             if (success) {
                 // UserAction 생성
-                UserAction action = new UserAction(ActionType.CREATE_POST, postId, pid);
-                action.setTitle(title.trim());
-                action.setContent(content.trim());
-                action.setTimestamp(currentDateTime);
+                UserAction requestedAction = new UserAction(ActionType.CREATE_POST, postId, pid);
+                requestedAction.setTitle(title.trim());
+                requestedAction.setContent(content.trim());
+                requestedAction.setTimestamp(currentDateTime);
 
                 // UserActionHandler를 통해 시스템 반응 처리
                 if (gameContext != null) {
                     UserActionHandler handler = new UserActionHandler(gameContext);
-                    handler.handle(action);
+                    handler.handle(requestedAction);
                 }
 
                 // 게시판 목록으로 리다이렉트

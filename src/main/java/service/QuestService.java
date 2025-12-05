@@ -8,6 +8,7 @@ import model.EventBus;
 import model.GameState;
 import model.entity.Quest;
 import model.enums.QuestStatus;
+import model.enums.BusEvent;
 
 public class QuestService {
     private List<Quest> quests = new ArrayList<>();
@@ -36,14 +37,14 @@ public class QuestService {
         quest.setStatus(QuestStatus.COMPLETED);
         gameState.addReputation(quest.getRewardReputation());
 
-        eventBus.emit("QUEST_COMPLETED", quest);
+        eventBus.emit(BusEvent.QUEST_COMPLETED, quest);
 
         if (quest.hasNextQuest()) {
             String nextQuestId = quest.getNextQuestId();
             Quest nextQuest = QuestFactory.createQuest(nextQuestId);
             if (nextQuest != null) {
                 quests.add(nextQuest);
-                eventBus.emit("QUEST_ADDED", nextQuest);
+                eventBus.emit(BusEvent.QUEST_ADDED, nextQuest);
             }
         }
     }
