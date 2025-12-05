@@ -7,25 +7,9 @@
 <jsp:useBean id="gameContext" class="model.GameContext" scope="session" />
 <%
     // GameContext가 초기화되지 않았다면 초기화
-    if (gameContext.getGameState() == null) {
-        String pid = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("pid".equals(cookie.getName())) {
-                    pid = cookie.getValue();
-                    break;
-                }
-            }
-        }
-
-        // pid가 없으면 index.jsp로 리다이렉트
-        if (pid == null) {
-            response.sendRedirect(request.getContextPath() + "/index.jsp");
-            return;
-        }
-
-        gameContext.init(pid, DataManager.getInstance());
+    if (gameContext.getPid() == null) {
+    	response.sendRedirect(request.getContextPath() + "/index.jsp");
+        return;
     }
 %>
 
