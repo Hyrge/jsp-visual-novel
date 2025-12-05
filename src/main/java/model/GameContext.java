@@ -5,6 +5,7 @@ import service.EventService;
 import service.MessageService;
 import service.PostService;
 import service.QuestService;
+import service.TimeService;
 import util.SavePathManager;
 
 public class GameContext {
@@ -15,6 +16,7 @@ public class GameContext {
     private final QuestService questService;
     private final MessageService messageService;
     private final PostService postService;
+    private final TimeService timeService;
     private final DataManager dataManager;
 
     public GameContext() {
@@ -26,6 +28,7 @@ public class GameContext {
         this.questService = null;
         this.messageService = null;
         this.postService = null;
+        this.timeService = null;
     }
 
     public GameContext(String pid) {
@@ -37,6 +40,7 @@ public class GameContext {
         this.questService = new QuestService(gameState, eventBus);
         this.messageService = new MessageService(eventBus);
         this.postService = new PostService(dataManager);
+        this.timeService = new TimeService(gameState, eventBus);
     }
 
     // Getters
@@ -66,6 +70,10 @@ public class GameContext {
 
     public PostService getPostService() {
         return postService;
+    }
+
+    public TimeService getTimeService() {
+        return timeService;
     }
 
 }

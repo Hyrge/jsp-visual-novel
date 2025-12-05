@@ -104,32 +104,28 @@ public class PostService {
     }
 
     /**
-     * 댓글 목록 조회 (JSON + DB 병합)
+     * 댓글 목록 조회 (JSON + DB 병합, 플레이어 + 시간 필터링)
      */
-    public List<Comment> getComments(String postId) {
-        return getComments(postId, null);
-    }
-
-    /**
-     * 댓글 목록 조회 (JSON + DB 병합, 플레이어 필터링)
-     */
-    public List<Comment> getComments(String postId, String playerPid) {
+    public List<Comment> getComments(String postId, String playerPid, java.time.LocalDateTime currentTime) {
         Map<Integer, Comment> resultMap = new HashMap<>();
 
-        // 1. JSON 초기 데이터 먼저 추가 (모든 플레이어 공통)
+        // 1. JSON 초기 데이터 먼저 추가 (시간 필터링)
         List<Comment> jsonComments = dataManager.getInitialComments().get(postId);
         if (jsonComments != null) {
             for (Comment c : jsonComments) {
-                resultMap.put(c.getCommentId(), c);
+                if (currentTime == null || !c.getCreatedAt().isAfter(currentTime)) {
+                    resultMap.put(c.getCommentId(), c);
+                }
             }
         }
 
-        // 2. DB 동적 데이터 추가 (playerPid로 필터링, JSON에 없는 것만)
+        // 2. DB 동적 데이터 추가 (playerPid + 시간 필터링)
         List<Comment> dbComments = commentDAO.findByPostId(postId, playerPid);
         for (Comment c : dbComments) {
             if (!resultMap.containsKey(c.getCommentId())
                 && c.getContent() != null
-                && !c.getContent().isEmpty()) {
+                && !c.getContent().isEmpty()
+                && (currentTime == null || !c.getCreatedAt().isAfter(currentTime))) {
                 resultMap.put(c.getCommentId(), c);
             }
         }
@@ -179,6 +175,13 @@ public class PostService {
      */
     public boolean deletePost(String postId) {
         return postDAO.delete(postId);
+    }
+
+    /**
+     * 게시글의 MiNa 관련 여부 업데이트
+     */
+    public boolean updatePostMinaRelated(String postId, boolean isRelatedMina) {
+        return postDAO.updateMinaRelated(postId, isRelatedMina);
     }
 
     /**
@@ -240,6 +243,7 @@ public class PostService {
         return getComments(postId, playerPid);
     }
 }
+
 
 
 

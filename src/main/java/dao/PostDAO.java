@@ -121,6 +121,23 @@ public class PostDAO {
         }
     }
 
+    public boolean updateMinaRelated(String postId, boolean isRelatedMina) {
+        String sql = "UPDATE posts SET related_mina = ? WHERE post_id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setBoolean(1, isRelatedMina);
+            pstmt.setString(2, postId);
+
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean delete(String postId) {
         String sql = "DELETE FROM posts WHERE post_id = ?";
 

@@ -3,16 +3,10 @@ package model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import dto.Comment;
-import manager.DataManager;
-import service.PostService;
-import util.NPCReactionManager;
-import util.NPCReactionManager.NPCReactionResult;
 
 public class GameState {
     @JsonIgnore
@@ -27,6 +21,9 @@ public class GameState {
 
     // 게임의 목표 날짜 (고정값: 2025-12-03)
     private LocalDate targetDate = LocalDate.of(2025, 12, 3);
+
+    // 이벤트 시간 큐 (시간순 자동 정렬)
+    private PriorityQueue<LocalDateTime> eventTimes = new PriorityQueue<>();
 
     // Jackson 역직렬화용 기본 생성자
     public GameState() {
@@ -109,7 +106,7 @@ public class GameState {
     }
 
     /**
-     * 게임 시간을 분 단위로 진행
+     * 게임 시간을 분 단위로 진행 (시계만 이동)
      * @param minutes 진행할 분
      */
     public void advanceTime(int minutes) {
@@ -120,81 +117,37 @@ public class GameState {
     }
 
     /**
-     * 다음 이벤트 시간으로 점프하고 해당 이벤트들 처리
-     * @param playerPid 플레이어 PID (댓글 저장용)
-     * @return 처리된 이벤트 수
+     * 이벤트 시간을 큐에 추가
+     * @param time 이벤트가 발생할 시간
      */
-    public int advanceToNextEvent(String playerPid) {
-        NPCReactionManager reactionManager = NPCReactionManager.getInstance();
-        
-        // 다음 이벤트 시간 확인
-        LocalDateTime nextEventTime = reactionManager.getNextReactionTime();
-        if (nextEventTime == null) {
-            System.out.println("[GameState] 예약된 이벤트가 없습니다.");
-            return 0;
-        }
-        
-        // 시간 점프
-        this.currentDate = nextEventTime.toLocalDate();
-        this.currentTime = nextEventTime.toLocalTime();
-        System.out.println("[GameState] 시간 점프: " + nextEventTime);
-        
-        // 해당 시간까지의 이벤트 처리
-        List<NPCReactionResult> results = reactionManager.processReactions(nextEventTime);
-        
-        // 댓글 이벤트 DB 저장
-        PostService postService = new PostService(DataManager.getInstance());
-        int savedCount = 0;
-        
-        for (NPCReactionResult result : results) {
-            if (result.getType() == NPCReactionManager.NPCReactionType.COMMENT && result.getGeneratedText() != null) {
-                try {
-                    String postId = (String) result.getOriginalParameters().get("postId");
-                    
-                    Comment comment = new Comment();
-                    comment.setPostId(postId);
-                    comment.setPlayerPid(playerPid);
-                    comment.setContent(result.getGeneratedText());
-                    comment.setCreatedAt(result.getExecutedTime());
-                    
-                    // NPC 닉네임 설정
-                    String npcNickname = postService.assignNicknameForNPC(result.getNpcId(), postId);
-                    comment.setAuthorNickname(npcNickname);
-                    
-                    if (postService.createComment(comment)) {
-                        savedCount++;
-                        System.out.println("[GameState] NPC 댓글 저장: " + npcNickname);
-                    }
-                } catch (Exception e) {
-                    System.err.println("[GameState] 댓글 저장 오류: " + e.getMessage());
-                }
-            }
-        }
-        
-        System.out.println("[GameState] " + savedCount + "개의 이벤트 처리됨");
-        return savedCount;
+    public void addEventTime(LocalDateTime time) {
+        eventTimes.add(time);
     }
 
     /**
-     * 다음 이벤트까지 남은 시간(분) 반환
-     * @return 남은 분, 이벤트 없으면 -1
-     */
-    public long getMinutesToNextEvent() {
-        NPCReactionManager reactionManager = NPCReactionManager.getInstance();
-        LocalDateTime nextEventTime = reactionManager.getNextReactionTime();
-        
-        if (nextEventTime == null) {
-            return -1;
-        }
-        
-        return java.time.Duration.between(getCurrentDateTime(), nextEventTime).toMinutes();
-    }
-
-    /**
-     * 다음 이벤트 시간 조회
+     * 다음 이벤트 시간 조회 (큐에서 peek)
      * @return 다음 이벤트 시간, 없으면 null
      */
     public LocalDateTime getNextEventTime() {
-        return NPCReactionManager.getInstance().getNextReactionTime();
+        return eventTimes.peek();
+    }
+
+    /**
+     * 다음 이벤트가 있는지 확인 (▶ 버튼 활성화 여부)
+     * @return 다음 이벤트가 있으면 true
+     */
+    public boolean hasNextEvent() {
+        return !eventTimes.isEmpty();
+    }
+
+    /**
+     * 다음 이벤트 시간으로 점프 (시계만 이동)
+     */
+    public void jumpToNextEvent() {
+        LocalDateTime next = eventTimes.poll();
+        if (next != null) {
+            this.currentDate = next.toLocalDate();
+            this.currentTime = next.toLocalTime();
+        }
     }
 }
