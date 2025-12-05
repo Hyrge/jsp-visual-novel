@@ -122,7 +122,7 @@ public class PostDAO {
     }
 
     public boolean updateMinaRelated(String postId, boolean isRelatedMina) {
-        String sql = "UPDATE posts SET related_mina = ? WHERE post_id = ?";
+        String sql = "UPDATE posts SET is_related_mina = ? WHERE post_id = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
