@@ -40,6 +40,10 @@ public class GameState {
         return reputation;
     }
 
+    public void setReputation(int reputation) {
+        this.reputation = reputation;
+    }
+
     public LocalDate getCurrentDate() {
         return currentDate;
     }
@@ -100,9 +104,88 @@ public class GameState {
      * @param minutes 진행할 분
      */
     public void advanceTime(int minutes) {
-        java.time.LocalDateTime current = getCurrentDateTime();
-        java.time.LocalDateTime advanced = current.plusMinutes(minutes);
+        LocalDateTime current = getCurrentDateTime();
+        LocalDateTime advanced = current.plusMinutes(minutes);
         this.currentDate = advanced.toLocalDate();
         this.currentTime = advanced.toLocalTime();
+    }
+
+    /**
+     * 다음 이벤트 시간으로 점프하고 해당 이벤트들 처리
+     * @param playerPid 플레이어 PID (댓글 저장용)
+     * @return 처리된 이벤트 수
+     */
+    public int advanceToNextEvent(String playerPid) {
+        NPCReactionManager reactionManager = NPCReactionManager.getInstance();
+        
+        // 다음 이벤트 시간 확인
+        LocalDateTime nextEventTime = reactionManager.getNextReactionTime();
+        if (nextEventTime == null) {
+            System.out.println("[GameState] 예약된 이벤트가 없습니다.");
+            return 0;
+        }
+        
+        // 시간 점프
+        this.currentDate = nextEventTime.toLocalDate();
+        this.currentTime = nextEventTime.toLocalTime();
+        System.out.println("[GameState] 시간 점프: " + nextEventTime);
+        
+        // 해당 시간까지의 이벤트 처리
+        List<NPCReactionResult> results = reactionManager.processReactions(nextEventTime);
+        
+        // 댓글 이벤트 DB 저장
+        PostService postService = new PostService(DataManager.getInstance());
+        int savedCount = 0;
+        
+        for (NPCReactionResult result : results) {
+            if (result.getType() == NPCReactionManager.NPCReactionType.COMMENT && result.getGeneratedText() != null) {
+                try {
+                    String postId = (String) result.getOriginalParameters().get("postId");
+                    
+                    Comment comment = new Comment();
+                    comment.setPostId(postId);
+                    comment.setPlayerPid(playerPid);
+                    comment.setContent(result.getGeneratedText());
+                    comment.setCreatedAt(result.getExecutedTime());
+                    
+                    // NPC 닉네임 설정
+                    String npcNickname = postService.assignNicknameForNPC(result.getNpcId(), postId);
+                    comment.setAuthorNickname(npcNickname);
+                    
+                    if (postService.createComment(comment)) {
+                        savedCount++;
+                        System.out.println("[GameState] NPC 댓글 저장: " + npcNickname);
+                    }
+                } catch (Exception e) {
+                    System.err.println("[GameState] 댓글 저장 오류: " + e.getMessage());
+                }
+            }
+        }
+        
+        System.out.println("[GameState] " + savedCount + "개의 이벤트 처리됨");
+        return savedCount;
+    }
+
+    /**
+     * 다음 이벤트까지 남은 시간(분) 반환
+     * @return 남은 분, 이벤트 없으면 -1
+     */
+    public long getMinutesToNextEvent() {
+        NPCReactionManager reactionManager = NPCReactionManager.getInstance();
+        LocalDateTime nextEventTime = reactionManager.getNextReactionTime();
+        
+        if (nextEventTime == null) {
+            return -1;
+        }
+        
+        return java.time.Duration.between(getCurrentDateTime(), nextEventTime).toMinutes();
+    }
+
+    /**
+     * 다음 이벤트 시간 조회
+     * @return 다음 이벤트 시간, 없으면 null
+     */
+    public LocalDateTime getNextEventTime() {
+        return NPCReactionManager.getInstance().getNextReactionTime();
     }
 }

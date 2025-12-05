@@ -23,15 +23,14 @@ public class GameController {
 
     // saves/{pid} 폴더 생성 하고 DB에 플레이어 저장
     public void createPlayer(String pid) {
-        String basePath = System.getProperty("user.dir");
         if (playerDAO.exists(pid)) {
-            if (!SavePathManager.existsPlayerSaveFolder(basePath, pid)) {
-                SavePathManager.createPlayerSaveFolder(basePath, pid);
+            if (!SavePathManager.existsPlayerSaveFolder(pid)) {
+                SavePathManager.createPlayerSaveFolder(pid);
             }
             return;
         }
         // saves/{pid} 폴더 생성
-        SavePathManager.createPlayerSaveFolder(basePath, pid);
+        SavePathManager.createPlayerSaveFolder(pid);
         playerDAO.createPlayer(pid);
     }
 }
