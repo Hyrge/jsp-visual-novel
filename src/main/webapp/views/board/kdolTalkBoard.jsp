@@ -121,7 +121,10 @@
                                     String formattedDate = post.getCreatedAt().format(dateFormatter);
 
                                     // 댓글 개수 가져오기
-                                    int commentCount = gameContext.getPostService().getCommentsByPostId(post.getPostId()).size();
+                                    int commentCount = gameContext.getPostService().getCommentsByPostId(
+                                    		post.getPostId(), 
+                                    		playerPid,
+                                    		currentGameTime).size();
 
                                     // 닉네임 처리 (JSON에 없으면 NPC ID로부터 생성)
                                     String nickname = post.getAuthorNickname();
