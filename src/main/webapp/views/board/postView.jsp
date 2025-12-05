@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="manager.PostManager" %>
+<%@ page import="service.PostService" %>
 <%@ page import="dto.Post" %>
 <%@ page import="dto.Comment" %>
 <%@ page import="model.GameContext" %>
@@ -8,79 +8,59 @@
 <%@ page import="java.util.*" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<jsp:useBean id="gameContext" class="model.GameContext" scope="session" />
+
 <%
-    request.setCharacterEncoding("UTF-8");
+	request.setCharacterEncoding("UTF-8");
+    String pid = gameContext.getPid();
+    if (pid == null) {
+        response.sendRedirect(request.getContextPath() + "/index.jsp");
+        return;
+    }
+    
+    String contextPath = request.getContextPath();
 
     // 댓글 작성 처리 (POST 요청)
     if ("POST".equalsIgnoreCase(request.getMethod())) {
-        try {
-            // 쿠키에서 pid 가져오기
-            String pid = null;
-            Cookie[] cookies = request.getCookies();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if ("pid".equals(cookie.getName())) {
-                        pid = cookie.getValue();
-                        break;
-                    }
-                }
-            }
 
-            if (pid == null) {
-                response.sendRedirect(request.getContextPath() + "/index.jsp");
-                return;
-            }
+        String postId = request.getParameter("postId");
+        String commentContent = request.getParameter("commentContent");
+        String replyContent = request.getParameter("replyContent");
 
-            String postId = request.getParameter("postId");
-            String commentContent = request.getParameter("commentContent");
-            String replyContent = request.getParameter("replyContent");
+        String content = (commentContent != null && !commentContent.trim().isEmpty())
+                        ? commentContent.trim()
+                        : (replyContent != null ? replyContent.trim() : null);
 
-            String content = (commentContent != null && !commentContent.trim().isEmpty())
-                           ? commentContent.trim()
-                           : (replyContent != null ? replyContent.trim() : null);
+        if (postId == null || content == null || content.isEmpty()) {
+            out.println("<script>alert('댓글 내용을 입력해주세요.'); history.back();</script>");
+            return;
+        }
 
-            if (postId == null || content == null || content.isEmpty()) {
-                out.println("<script>alert('댓글 내용을 입력해주세요.'); history.back();</script>");
-                return;
-            }
+        LocalDateTime currentDateTime = gameContext.getGameState().getCurrentDateTime();
 
-            // GameContext에서 현재 게임 시간 가져오기
-            GameContext gameContext = (GameContext) session.getAttribute("gameContext");
-            LocalDateTime currentDateTime = null;
+        // Comment 객체 생성
+        Comment comment = new Comment();
+        comment.setPostId(postId);
+        comment.setPlayerPid(pid);
+        comment.setContent(content);
+        comment.setCreatedAt(currentDateTime);
+        comment.setParentCommentId(null); 
+
+        // PostService를 통해 DB에 저장
+        PostService postService = gameContext != null ? gameContext.getPostService() : new service.PostService(manager.DataManager.getInstance());
+        boolean success = postService.createComment(comment);
+
+        if (success) {
+            // 게임 시간 1분 진행
             if (gameContext != null) {
-                currentDateTime = gameContext.getGameState().getCurrentDateTime();
-            } else {
-                currentDateTime = LocalDateTime.now();
+                gameContext.getGameState().advanceTime(3); // 댓글 작성 시 3분 경과
             }
 
-            // Comment 객체 생성
-            Comment comment = new Comment();
-            comment.setPostId(postId);
-            comment.setPlayerPid(pid);
-            comment.setContent(content);
-            comment.setCreatedAt(currentDateTime);
-            comment.setParentCommentId(null); // 답글 기능은 추후 구현
-
-            // PostManager를 통해 DB에 저장
-            PostManager postManager = PostManager.getInstance();
-            boolean success = postManager.createComment(comment);
-
-            if (success) {
-                // 게임 시간 1분 진행
-                if (gameContext != null) {
-                    gameContext.getGameState().advanceTime(3); // 댓글 작성 시 3분 경과
-                }
-
-                // 같은 게시글 페이지로 리다이렉트
-                response.sendRedirect(request.getContextPath() + "/views/board/postView.jsp?id=" + postId);
-                return;
-            } else {
-                out.println("<script>alert('댓글 저장에 실패했습니다.'); history.back();</script>");
-                return;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            out.println("<script>alert('오류가 발생했습니다: " + e.getMessage() + "'); history.back();</script>");
+            // 같은 게시글 페이지로 리다이렉트
+            response.sendRedirect(request.getContextPath() + "/views/board/postView.jsp?id=" + postId);
+            return;
+        } else {
+            out.println("<script>alert('댓글 저장에 실패했습니다.'); history.back();</script>");
             return;
         }
     }
@@ -92,21 +72,17 @@
         return;
     }
 
-    // PostManager에서 게시글 데이터 가져오기
-    PostManager postManager = PostManager.getInstance();
-    Post post = postManager.getPost(postId);
+    // PostService에서 게시글 데이터 가져오기
+    PostService postService = gameContext.getPostService();
+    Post post = postService.getPost(postId);
 
     if (post == null) {
         out.println("<script>alert('게시글을 찾을 수 없습니다.'); location.href='" + request.getContextPath() + "/views/board/kdolTalkBoard.jsp';</script>");
         return;
     }
 
-    // 현재 플레이어 pid 가져오기
-    GameContext gameCtx = (GameContext) session.getAttribute("gameContext");
-    String playerPid = (gameCtx != null) ? gameCtx.getPid() : null;
-
     // 댓글 목록 가져오기 (playerPid로 필터링)
-    List<Comment> commentList = postManager.getComments(postId, playerPid);
+    List<Comment> commentList = postService.getComments(postId, pid);
 
     // JSP에서 사용할 데이터 변환
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -147,10 +123,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${post.title} - 케이돌 토크 - 더꾸</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css?v=2">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/board.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/postView.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/userTooltip.css">
+    <link rel="stylesheet" href="<%= contextPath %>/resources/css/style.css?v=2">
+    <link rel="stylesheet" href="<%= contextPath %>/resources/css/board.css">
+    <link rel="stylesheet" href="<%= contextPath %>/resources/css/postView.css">
+    <link rel="stylesheet" href="<%= contextPath %>/resources/css/userTooltip.css">
 </head>
 <body>
     <!-- 헤더 include -->
@@ -189,7 +165,7 @@
                     <!-- 이미지 표시 -->
                     <c:if test="${post.hasPictures && post.imageFile != null}">
                     <div class="post-image">
-                        <img src="${pageContext.request.contextPath}/saves/${post.playerPid}/${post.imageFile}" alt="첨부 이미지" onclick="openImageModal(this.src)">
+                        <img src="<%= contextPath %>/saves/${post.playerPid}/${post.imageFile}" alt="첨부 이미지" onclick="openImageModal(this.src)">
                     </div>
                     </c:if>
                     ${post.content}
@@ -211,12 +187,12 @@
 
                 <!-- 게시글 하단 버튼 -->
                 <div class="post-bottom-actions">
-                    <a href="${pageContext.request.contextPath}/views/board/kdolTalkBoard.jsp" class="btn btn-list">목록</a>
+                    <a href="<%= contextPath %>/views/board/kdolTalkBoard.jsp" class="btn btn-list">목록</a>
                     <div class="right-buttons">
                         <button type="button" class="btn btn-report" onclick="reportPost('${post.id}')">신고</button>
                         <!-- 본인 글인 경우만 표시 -->
                         <%--
-                        <a href="${pageContext.request.contextPath}/views/board/postEdit.jsp?id=${post.id}" class="btn btn-edit">수정</a>
+                        <a href="<%= contextPath %>/views/board/postEdit.jsp?id=${post.id}" class="btn btn-edit">수정</a>
                         <button type="button" class="btn btn-delete" onclick="deletePost('${post.id}')">삭제</button>
                         --%>
                     </div>
@@ -230,7 +206,7 @@
 
                     <!-- 댓글 작성 폼 -->
                     <div class="comment-write-section">
-                        <form id="commentForm" method="post" action="${pageContext.request.contextPath}/views/board/postView.jsp" onsubmit="return validateComment()">
+                        <form id="commentForm" method="post" action="<%= contextPath %>/views/board/postView.jsp" onsubmit="return validateComment()">
                             <input type="hidden" name="postId" value="${post.id}">
                             <textarea name="commentContent" id="commentContent" placeholder="댓글을 입력하세요..." rows="3" maxlength="500"></textarea>
                             <div class="comment-write-bottom">
@@ -265,7 +241,7 @@
 
                             <!-- 답글 작성 폼 (닉네임 클릭 시 나타남) -->
                             <div class="reply-form-section" id="replyForm-${comment.id}" style="display: none;">
-                                <form method="post" action="${pageContext.request.contextPath}/views/board/postView.jsp" onsubmit="return validateReply('${comment.id}')">
+                                <form method="post" action="<%= contextPath %>/views/board/postView.jsp" onsubmit="return validateReply('${comment.id}')">
                                     <input type="hidden" name="postId" value="${post.id}">
                                     <textarea name="replyContent" id="replyContent-${comment.id}" placeholder="답글을 입력하세요..." rows="2" maxlength="500"></textarea>
                                     <div class="reply-write-bottom">
@@ -319,9 +295,6 @@
 
     <!-- JavaScript 파일들 -->
     <script>
-        // contextPath를 전역 변수로 설정 (외부 JS 파일에서 사용)
-        var contextPath = '${pageContext.request.contextPath}';
-        
         // 이미지 모달 열기
         function openImageModal(src) {
             var modal = document.getElementById('imageModal');
@@ -343,10 +316,10 @@
             }
         });
     </script>
-    <script src="${pageContext.request.contextPath}/resources/js/validation.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/comment.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/post.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/charCounter.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/userTooltip.js"></script>
+    <script src="<%= contextPath %>/resources/js/validation.js"></script>
+    <script src="<%= contextPath %>/resources/js/comment.js"></script>
+    <script src="<%= contextPath %>/resources/js/post.js"></script>
+    <script src="<%= contextPath %>/resources/js/charCounter.js"></script>
+    <script src="<%= contextPath %>/resources/js/userTooltip.js"></script>
 </body>
 </html>
