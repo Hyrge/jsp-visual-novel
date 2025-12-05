@@ -9,11 +9,15 @@ import model.entity.Message;
 
 public class MessageService {
     private List<Message> messages = new ArrayList<>();
-    private GameState gameState;
+    private EventBus eventBus;
+
+    public MessageService(EventBus eventBus) {
+        this.eventBus = eventBus;
+    }
 
     public void sendMessage(Message message) {
         messages.add(message);
-        EventBus.getInstance().emit("MESSAGE_SENT", message);
+        eventBus.emit("MESSAGE_SENT", message);
     }
 
     public List<Message> getMessages() {

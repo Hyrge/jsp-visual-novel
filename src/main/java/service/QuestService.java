@@ -12,9 +12,11 @@ import model.enums.QuestStatus;
 public class QuestService {
     private List<Quest> quests = new ArrayList<>();
     private GameState gameState;
+    private EventBus eventBus;
 
-    public QuestService(GameState gameState) {
+    public QuestService(GameState gameState, EventBus eventBus) {
         this.gameState = gameState;
+        this.eventBus = eventBus;
     }
 
     public void completeQuest(String id) {
@@ -34,14 +36,14 @@ public class QuestService {
         quest.setStatus(QuestStatus.COMPLETED);
         gameState.addReputation(quest.getRewardReputation());
 
-        EventBus.getInstance().emit("QUEST_COMPLETED", quest);
+        eventBus.emit("QUEST_COMPLETED", quest);
 
         if (quest.hasNextQuest()) {
             String nextQuestId = quest.getNextQuestId();
             Quest nextQuest = QuestFactory.createQuest(nextQuestId);
             if (nextQuest != null) {
                 quests.add(nextQuest);
-                EventBus.getInstance().emit("QUEST_ADDED", nextQuest);
+                eventBus.emit("QUEST_ADDED", nextQuest);
             }
         }
     }

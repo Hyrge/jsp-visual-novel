@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 public class EventBus {
     private Map<String, List<Consumer<Object>>> listeners = new HashMap<>();
 
-    private EventBus() {
+    public EventBus() {
     }
 
     public void subscribe(String eventName, Consumer<Object> listener) {

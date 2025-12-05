@@ -2,6 +2,7 @@ package util;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import model.EventBus;
 import model.GameState;
 import model.entity.Quest;
 
@@ -28,23 +30,28 @@ public class SavePathManager {
         objectMapper.registerModule(new JavaTimeModule());
     }
 
+    // GameController용 오버로드 (EventBus 없이 호출 가능)
     public static boolean createPlayerSaveFolder(String pid) {
+        return createPlayerSaveFolder(pid, null);
+    }
+
+    public static boolean createPlayerSaveFolder(String pid, EventBus eventBus) {
         try {
             Path playerDir = Paths.get(basePath, BASE_SAVE_DIR, pid);
 
             // 이미 존재하면 삭제함
             if (Files.exists(playerDir)) {
-                
+
             }
 
             Files.createDirectories(playerDir);
             Files.createDirectories(playerDir.resolve("images"));
 
-            // 초기 JSON 파일 생성
-            GameState initialGameState = new GameState();
-            initialGameState.setReputation(20);
+            // 초기 JSON 파일 생성 (EventBus는 나중에 주입될 것이므로 임시로 생성)
+            EventBus tempEventBus = (eventBus != null) ? eventBus : new EventBus();
+            GameState initialGameState = new GameState(tempEventBus);
             saveGameState(pid, initialGameState);
-            
+
             Files.writeString(playerDir.resolve("events.json"), "[]");
             Files.writeString(playerDir.resolve("messages.json"), "[]");
             Files.writeString(playerDir.resolve("quests.json"), "[]");
@@ -90,17 +97,36 @@ public class SavePathManager {
     /**
      * GameState를 JSON 파일에서 로드
      */
-    public static GameState loadGameState(String pid) {
+    public static GameState loadGameState(String pid, EventBus eventBus) {
         try {
             String filePath = getJsonFilePath(pid, "gamestate.json");
             File file = new File(filePath);
             if (!file.exists()) {
-                return null;
+                System.out.println("Game State file 이 존재하지 않음, 새로 생성");
+                return new GameState(eventBus);
             }
-            return objectMapper.readValue(file, GameState.class);
+            GameState gameState = objectMapper.readValue(file, GameState.class);
+            // JSON에서 로드한 GameState는 EventBus가 없으므로 리플렉션으로 주입
+            injectEventBus(gameState, eventBus);
+            return gameState;
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+            System.out.println("Game State file 로드 실패, 새로 생성" + e.getMessage());
+            return new GameState(eventBus);
+        }
+    }
+
+    /**
+     * 리플렉션을 사용하여 GameState에 EventBus 주입
+     */
+    private static void injectEventBus(GameState gameState, EventBus eventBus) {
+        try {
+            Field eventBusField = GameState.class.getDeclaredField("eventBus");
+            eventBusField.setAccessible(true);
+            eventBusField.set(gameState, eventBus);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("EventBus 주입 실패", e);
         }
     }
 

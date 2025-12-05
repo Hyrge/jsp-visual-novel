@@ -20,12 +20,14 @@ public class EventService {
     private Map<String, Event> activeEvents = new HashMap<>();
     private Map<String, Event> scheduledEvents = new HashMap<>();
     private List<Map<String, Object>> randomEventConfigs = new ArrayList<>();
+    private EventBus eventBus;
 
-    public EventService(DataManager dataManager) {
+    public EventService(DataManager dataManager, EventBus eventBus) {
         if (dataManager == null) {
             throw new IllegalArgumentException("dataManager는 필수입니다.");
         }
         this.eventConfig = dataManager.getEventConfig();
+        this.eventBus = eventBus;
     }
 
     public void setEventConfig(List<Map<String, Object>> eventConfig) {
@@ -65,7 +67,7 @@ public class EventService {
                 Event event = EventFactory.createRandomEvent(config, today);
 
                 activeEvents.put(event.getId(), event);
-                EventBus.getInstance().emit("EVENT_TRIGGERED", event);
+                eventBus.emit("EVENT_TRIGGERED", event);
 
                 // 후속 이벤트 스케줄링
                 scheduleSubsequentEvents(event, today);
@@ -124,7 +126,7 @@ public class EventService {
         event.setStatus(EventStatus.ACTIVE);
         // ... initialize other fields
         activeEvents.put(event.getId(), event);
-        EventBus.getInstance().emit("EVENT_TRIGGERED", event);
+        eventBus.emit("EVENT_TRIGGERED", event);
         return event;
     }
 
