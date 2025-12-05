@@ -43,7 +43,7 @@ public class SavePathManager {
             // 초기 JSON 파일 생성
             GameState initialGameState = new GameState();
             initialGameState.setReputation(20);
-            saveGameState(basePath, pid, initialGameState);
+            saveGameState(pid, initialGameState);
             
             Files.writeString(playerDir.resolve("events.json"), "[]");
             Files.writeString(playerDir.resolve("messages.json"), "[]");
