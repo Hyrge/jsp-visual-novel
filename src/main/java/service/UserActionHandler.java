@@ -130,18 +130,6 @@ public class UserActionHandler {
         // MiNa 관련 여부 (일단 false로, 비동기로 업데이트)
         boolean isRelatedMina = false;
 
-        // 즉시 생성되는 온라인 NPC 댓글
-        int savedCount = npcReactionManager.generateImmediateOnlineComments(
-            action.getTargetId(),
-            action.getTitle(),
-            action.getContent(),
-            currentGameTime,
-            currentSentiment,
-            pid,
-            isRelatedMina
-        );
-        System.out.println("[UserActionHandler] 즉시 생성된 NPC 댓글 수: " + savedCount);
-
         // 이후 시간 스킵에서 추가 반응이 나오도록 큐에 예약
         npcReactionManager.scheduleCommentReactions(
             action.getTargetId(),
