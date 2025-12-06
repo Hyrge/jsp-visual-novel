@@ -168,6 +168,24 @@ public class QuestService {
     }
 
     /**
+     * 퀘스트 진행도 증가 (단일 목표용)
+     */
+    public void addQuestProgress(String questId, int amount) {
+        Quest quest = findQuestById(questId);
+        if (quest != null && quest.getStatus() == QuestStatus.IN_PROGRESS) {
+            quest.addProgress(amount);
+
+            // 완료 조건 체크
+            if (quest.isComplete()) {
+                updateQuestStatus(quest);
+            } else {
+                eventBus.emit(BusEvent.QUEST_PROGRESS_UPDATED, quest);
+                saveQuests();
+            }
+        }
+    }
+
+    /**
      * 퀘스트 상태 업데이트 (모든 objectives 완료 시 COMPLETABLE로)
      */
     private void updateQuestStatus(Quest quest) {
@@ -180,6 +198,7 @@ public class QuestService {
         } else if (quest.getStatus() == QuestStatus.AVAILABLE) {
             quest.setStatus(QuestStatus.IN_PROGRESS);
         }
+
     }
 
     /**

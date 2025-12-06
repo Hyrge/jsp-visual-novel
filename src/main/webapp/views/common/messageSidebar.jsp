@@ -102,8 +102,22 @@
             <button class="btn-back" onclick="showMsgList()">←</button>
             <h4>[<%= quest.getIssuer() %>] <%= quest.getTitle() %></h4>
         </div>
+        
         <div class="detail-content">
             <p><%= quest.getDescription() != null ? quest.getDescription().replace("\n", "<br>") : "" %></p>
+            
+            <%-- 상세보기 프로그레스바 --%>
+            <%
+                int detailCompleted = quest.getCompletedCount();
+                int detailTotal = quest.getTotalCount();
+                int detailPercent = detailTotal > 0 ? (detailCompleted * 100 / detailTotal) : 0;
+            %>
+            <div class="quest-progress" style="margin: 10px 0 20px 0;">
+                <div class="quest-progress-bar">
+                    <div class="quest-progress-fill" style="width: <%= detailPercent %>%"></div>
+                </div>
+                <span class="quest-progress-text"><%= detailCompleted %>/<%= detailTotal %></span>
+            </div>
             
             <% if (quest.getObjectives() != null && !quest.getObjectives().isEmpty()) { %>
             <ul class="quest-objectives">

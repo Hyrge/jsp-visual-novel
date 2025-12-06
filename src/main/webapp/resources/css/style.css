@@ -296,6 +296,96 @@ a:focus {
     color: #ff4081;
 }
 
+/* 퀘스트 아이템 스타일 */
+.quest-item {
+    background: linear-gradient(135deg, #f0f4ff 0%, #fff 100%);
+    border-left: 3px solid #1e2b58;
+}
+
+.quest-item.completable {
+    background: linear-gradient(135deg, #e8f5e9 0%, #fff 100%);
+    border-left-color: #4caf50;
+}
+
+.quest-item.completable .msg-title {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+/* 퀘스트 프로그레스바 */
+.quest-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.quest-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.quest-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1e2b58, #3949ab);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.quest-item.completable .quest-progress-fill {
+    background: linear-gradient(90deg, #4caf50, #81c784);
+}
+
+.quest-progress-text {
+    font-size: 11px;
+    color: #666;
+    white-space: nowrap;
+}
+
+/* 퀘스트 목표 리스트 (상세보기용) */
+.quest-objectives {
+    list-style: none;
+    padding: 15px;
+    margin: 0;
+    background: #f9f9f9;
+    border-radius: 6px;
+}
+
+.quest-objectives li {
+    padding: 8px 0;
+    border-bottom: 1px dashed #e0e0e0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.quest-objectives li:last-child {
+    border-bottom: none;
+}
+
+.quest-objectives li.completed {
+    color: #999;
+    text-decoration: line-through;
+}
+
+.quest-objectives li.completed .objective-check {
+    color: #4caf50;
+}
+
+.objective-check {
+    font-size: 14px;
+    color: #ccc;
+}
+
+.objective-text {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
 .msg-header {
     padding: 15px;
     background: #1e2b58;

@@ -47,6 +47,11 @@ public class QuestFactory {
             quest.setStatus(QuestStatus.AVAILABLE);
         }
 
+        // requiredProgress (단일 목표 퀘스트용)
+        if (config.containsKey("requiredProgress") && config.get("requiredProgress") instanceof Number) {
+            quest.setRequiredProgress(((Number) config.get("requiredProgress")).intValue());
+        }
+
         // 서브 목표(objectives)는 UI/로직에서 쓸 수 있게 변환
         if (config.containsKey("objectives") && config.get("objectives") instanceof List) {
             List<?> rawObjectives = (List<?>) config.get("objectives");

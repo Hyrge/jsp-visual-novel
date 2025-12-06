@@ -16,6 +16,10 @@ public class Quest {
     private String description;
     private QuestStatus status; // PENDING, AVAILABLE, IN_PROGRESS, COMPLETABLE, COMPLETED, FAILED
 
+    // 진행도 (objectives가 없을 때 사용)
+    private int currentProgress;
+    private int requiredProgress;
+
     // 서브 목표 (objectives만 사용, 단일 목표 없음)
     private List<QuestObjective> objectives;
 
@@ -33,29 +37,45 @@ public class Quest {
     private String relatedEventId;
 
     /**
-     * 모든 objectives가 완료되었는지 확인
+     * 완료 조건 확인
+     * - objectives가 있으면: 모든 objectives 완료 시 true
+     * - objectives가 없으면: currentProgress >= requiredProgress 시 true
      */
     public boolean isComplete() {
-        if (objectives == null || objectives.isEmpty()) {
-            return false;
+        if (objectives != null && !objectives.isEmpty()) {
+            return objectives.stream().allMatch(QuestObjective::isCompleted);
         }
-        return objectives.stream().allMatch(QuestObjective::isCompleted);
+        return currentProgress >= requiredProgress;
     }
 
     /**
-     * 완료된 objectives 수 반환
+     * 완료된 수치 반환
      */
     public int getCompletedCount() {
-        if (objectives == null)
-            return 0;
-        return (int) objectives.stream().filter(QuestObjective::isCompleted).count();
+        if (objectives != null && !objectives.isEmpty()) {
+            return (int) objectives.stream().filter(QuestObjective::isCompleted).count();
+        }
+        return currentProgress;
     }
 
     /**
-     * 전체 objectives 수 반환
+     * 전체 목표 수치 반환
      */
     public int getTotalCount() {
-        return objectives != null ? objectives.size() : 0;
+        if (objectives != null && !objectives.isEmpty()) {
+            return objectives.size();
+        }
+        return requiredProgress;
+    }
+
+    /**
+     * 진행도 증가 (단일 목표 퀘스트용)
+     */
+    public void addProgress(int amount) {
+        this.currentProgress += amount;
+        if (this.currentProgress > this.requiredProgress) {
+            this.currentProgress = this.requiredProgress;
+        }
     }
 
     public boolean hasNextQuest() {
@@ -101,6 +121,22 @@ public class Quest {
 
     public void setStatus(QuestStatus status) {
         this.status = status;
+    }
+
+    public int getCurrentProgress() {
+        return currentProgress;
+    }
+
+    public void setCurrentProgress(int currentProgress) {
+        this.currentProgress = currentProgress;
+    }
+
+    public int getRequiredProgress() {
+        return requiredProgress;
+    }
+
+    public void setRequiredProgress(int requiredProgress) {
+        this.requiredProgress = requiredProgress;
     }
 
     public List<QuestObjective> getObjectives() {
