@@ -14,8 +14,8 @@ public class QuestFactory {
     public static Quest createQuest(String id) {
         DataManager dataManager = DataManager.getInstance();
         if (dataManager.getQuestConfig() == null) {
-			return null;
-		}
+            return null;
+        }
 
         Map<String, Object> config = dataManager.getQuestConfig().stream()
                 .filter(c -> id.equals(c.get("id")))
@@ -23,8 +23,8 @@ public class QuestFactory {
                 .orElse(null);
 
         if (config == null) {
-			return null;
-		}
+            return null;
+        }
 
         Quest quest = new Quest();
         quest.setId((String) config.get("id"));
@@ -47,11 +47,6 @@ public class QuestFactory {
             quest.setStatus(QuestStatus.AVAILABLE);
         }
 
-        // 진행도 관련
-        if (config.containsKey("requiredProgress") && config.get("requiredProgress") != null) {
-            quest.setRequiredProgress(((Number) config.get("requiredProgress")).intValue());
-        }
-
         // 서브 목표(objectives)는 UI/로직에서 쓸 수 있게 변환
         if (config.containsKey("objectives") && config.get("objectives") instanceof List) {
             List<?> rawObjectives = (List<?>) config.get("objectives");
@@ -59,8 +54,8 @@ public class QuestFactory {
 
             for (Object obj : rawObjectives) {
                 if (!(obj instanceof Map)) {
-					continue;
-				}
+                    continue;
+                }
                 Map<?, ?> o = (Map<?, ?>) obj;
 
                 QuestObjective qo = new QuestObjective();
@@ -74,6 +69,12 @@ public class QuestFactory {
                     qo.setVisible((Boolean) o.get("visible"));
                 } else {
                     qo.setVisible(true);
+                }
+                // completed 필드 (기본값 false)
+                if (o.containsKey("completed") && o.get("completed") instanceof Boolean) {
+                    qo.setCompleted((Boolean) o.get("completed"));
+                } else {
+                    qo.setCompleted(false);
                 }
 
                 objectives.add(qo);
