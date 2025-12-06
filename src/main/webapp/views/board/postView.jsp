@@ -125,7 +125,12 @@
         commentMap.put("nickname", c.getNickname() != null ? c.getNickname() : "유저");
         commentMap.put("parent_comment_id", c.getParentCommentId() != null ? String.valueOf(c.getParentCommentId()) : "");
         commentMap.put("date", c.getCreatedAt().format(dateFormatter));
-        commentMap.put("content", c.getContent() != null ? c.getContent().replace("\n", "<br>") : "");
+        
+        // @닉네임 패턴을 클릭 가능한 멘션 링크로 변환
+        String content = c.getContent() != null ? c.getContent().replace("\n", "<br>") : "";
+        String parentId = c.getParentCommentId() != null ? String.valueOf(c.getParentCommentId()) : "";
+        content = content.replaceAll("@([^\\s]+)", "<span class=\"mention\" onclick=\"scrollToComment('" + parentId + "')\">@$1</span>");
+        commentMap.put("content", content);
         commentsData.add(commentMap);
     }
 

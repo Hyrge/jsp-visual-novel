@@ -76,3 +76,22 @@ function reportComment(commentId) {
 
     }
 }
+
+// @멘션 클릭 시 부모 댓글로 스크롤
+function scrollToComment(commentId) {
+    if (!commentId) return;
+
+    var targetComment = document.getElementById(commentId);
+    if (targetComment) {
+        // 부드러운 스크롤
+        targetComment.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // 하이라이트 효과
+        targetComment.style.transition = 'background-color 0.3s ease';
+        targetComment.style.backgroundColor = '#fff3cd';
+
+        setTimeout(function () {
+            targetComment.style.backgroundColor = '';
+        }, 1500);
+    }
+}
