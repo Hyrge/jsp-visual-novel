@@ -40,7 +40,7 @@ public class NPCReactionManager {
         this.postService = postService;
         this.playerPid = playerPid;
 
-        // POST_CREATED 이벤트 구독
+        // POST_CREATED 이벤트 구독 (플레이어 작성 + 기존 글이 보이게 됨)
         eventBus.subscribe(BusEvent.POST_CREATED, this::onPostCreated);
     }
 

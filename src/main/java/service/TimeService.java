@@ -100,9 +100,9 @@ public class TimeService {
         }
 
         // 날짜 스킵인 경우 일일 정산 이벤트
-        if (isDaySkip) {
-            eventBus.emit(BusEvent.DAILY_SETTLEMENT, Map.of("date", targetTime.toLocalDate()));
-        }
+        // if (isDaySkip) {
+        //     eventBus.emit(BusEvent.DAILY_SETTLEMENT, Map.of("date", targetTime.toLocalDate()));
+        // }
     }
 
     /**

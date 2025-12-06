@@ -8,12 +8,12 @@ public enum BusEvent {
     REPUTATION_CHANGED,      // 여론 변화
     TIME_ADVANCED,           // 시간 진행
     DAY_CHANGED,             // 날짜 변경
-    DAILY_SETTLEMENT,        // 일일 정산
+    // DAILY_SETTLEMENT,        // 일일 정산
 
     // 플레이어 행동 이벤트
     POST_CREATED,            // 게시글 작성
     COMMENT_CREATED,         // 댓글 작성
-    POST_DELETED,            // 게시글 삭제
+    // POST_DELETED,            // 게시글 삭제
 
     // NPC 반응 이벤트
     NPC_COMMENT_CREATED,     // NPC 댓글 생성
