@@ -69,8 +69,7 @@ public class NPCReactionManager {
      */
     private void generateAndSaveComments(String postId, String postTitle, String postContent,
                                          LocalDateTime currentTime, int currentSentiment, boolean isRelatedMina) {
-        // 랜덤하게 1~3명의 NPC가 반응
-        int numReactions = 1 + random.nextInt(3);
+        int numReactions = 8;
         List<Map<String, Object>> allProfiles = llmManager.getAllNPCProfiles();
         int savedCount = 0;
 
@@ -93,7 +92,10 @@ public class NPCReactionManager {
             boolean isOnline = isNPCOnline(profile, currentTime);
 
             // 반응 확률 체크
-            double reactionProbability = isOnline ? 0.7 : 0.5;
+            double reactionProbability = isOnline ? 0.7 : 0.3;
+            if(isRelatedMina) {
+                reactionProbability += 0.1;
+            }
             if (random.nextDouble() > reactionProbability) {
                 continue; // 이번엔 반응 안 함
             }
