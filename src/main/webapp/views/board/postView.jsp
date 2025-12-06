@@ -27,6 +27,7 @@
         String postId = request.getParameter("postId");
         String commentContent = request.getParameter("commentContent");
         String replyContent = request.getParameter("replyContent");
+        String parentCommentIdStr = request.getParameter("parentCommentId");
 
         String content = (commentContent != null && !commentContent.trim().isEmpty())
                         ? commentContent.trim()
@@ -35,6 +36,16 @@
         if (postId == null || content == null || content.isEmpty()) {
             out.println("<script>alert('댓글 내용을 입력해주세요.'); history.back();</script>");
             return;
+        }
+
+        // 대댓글인 경우 parentCommentId 파싱
+        Integer parentCommentId = null;
+        if (parentCommentIdStr != null && !parentCommentIdStr.trim().isEmpty()) {
+            try {
+                parentCommentId = Integer.parseInt(parentCommentIdStr.trim());
+            } catch (NumberFormatException e) {
+                // 파싱 실패 시 null 유지 (일반 댓글로 처리)
+            }
         }
 
         LocalDateTime currentDateTime = gameContext.getGameState().getCurrentDateTime();
@@ -46,7 +57,7 @@
         comment.setPlayerPid(pid);
         comment.setContent(content);
         comment.setCreatedAt(currentDateTime);
-        comment.setParentCommentId(null); 
+        comment.setParentCommentId(parentCommentId); 
 
         // PostService를 통해 DB에 저장
         PostService postService = gameContext != null ? gameContext.getPostService() : new service.PostService(manager.DataManager.getInstance());
@@ -223,7 +234,7 @@
                     <!-- 댓글 목록 -->
                     <div class="comment-list">
                         <c:forEach var="comment" items="${comments}">
-                        <div class="comment-item" id="${comment.comment_id}">
+                        <div class="comment-item${not empty comment.parent_comment_id && comment.parent_comment_id != '' ? ' reply-item' : ''}" id="${comment.comment_id}" data-parent="${comment.parent_comment_id}">
                             <div class="comment-header-row">
                                 <div class="comment-author-info">
                                     <span class="user-tooltip-wrapper comment-nickname-wrapper">
@@ -247,6 +258,7 @@
                             <div class="reply-form-section" id="replyForm-${comment.comment_id}" style="display: none;">
                                 <form method="post" action="<%= contextPath %>/views/board/postView.jsp" onsubmit="return validateReply('${comment.comment_id}')">
                                     <input type="hidden" name="postId" value="${post.id}">
+                                    <input type="hidden" name="parentCommentId" value="${comment.comment_id}">
                                     <textarea name="replyContent" id="replyContent-${comment.comment_id}" placeholder="답글을 입력하세요..." rows="2" maxlength="500"></textarea>
                                     <div class="reply-write-bottom">
                                         <span class="reply-char-count"><span id="replyLength-${comment.comment_id}">0</span>/500</span>

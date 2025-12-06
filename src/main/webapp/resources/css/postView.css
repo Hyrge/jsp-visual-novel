@@ -77,7 +77,7 @@
 
 .btn-vote:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-like {
@@ -442,6 +442,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -460,6 +461,7 @@
         transform: translateY(30px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -611,6 +613,7 @@
         transform: scale(0.8);
         opacity: 0;
     }
+
     to {
         transform: scale(1);
         opacity: 1;
@@ -622,10 +625,33 @@
     .post-image img {
         max-height: 400px;
     }
-    
+
     .image-modal .modal-close {
         top: 10px;
         right: 15px;
         font-size: 30px;
     }
+}
+
+/* 대댓글(Reply) 스타일 */
+.comment-item.reply-item {
+    margin-left: 40px;
+    padding-left: 25px;
+    background: #f9fafb;
+    border-left: 3px solid #1e2b58;
+    position: relative;
+}
+
+.comment-item.reply-item::before {
+    content: "\21B3";
+    position: absolute;
+    left: 8px;
+    top: 20px;
+    color: #1e2b58;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.comment-item.reply-item:hover {
+    background: #f0f4f8;
 }
