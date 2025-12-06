@@ -168,6 +168,30 @@ public class QuestService {
     }
 
     /**
+     * 검색어와 일치하는 퀘스트 목표가 있는지 확인하고 완료 처리
+     */
+    public void checkSearchObjectives(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty())
+            return;
+        String searchKeyword = keyword.trim().toLowerCase();
+
+        for (Quest quest : getActiveQuests()) {
+            if (quest.getObjectives() != null) {
+                for (QuestObjective obj : quest.getObjectives()) {
+                    if (!obj.isCompleted() && obj.getDescription() != null) {
+                        // 목표 설명에 검색어가 포함되어 있는지 확인
+                        if (obj.getDescription().toLowerCase().contains(searchKeyword)) {
+                            completeObjective(quest.getId(), obj.getId());
+                            System.out.println(
+                                    "[QuestService] 검색 퀘스트 완료: " + quest.getTitle() + " (키워드: " + searchKeyword + ")");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * 퀘스트 진행도 증가 (단일 목표용)
      */
     public void addQuestProgress(String questId, int amount) {

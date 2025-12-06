@@ -4,6 +4,7 @@
  */
 
 // 댓글 유효성 검사
+// 댓글 유효성 검사
 function validateComment() {
     var content = document.getElementById('commentContent').value.trim();
     if (content.length === 0) {
@@ -14,6 +15,15 @@ function validateComment() {
         alert('댓글은 500자 이내로 작성해주세요.');
         return false;
     }
+
+    // 액션 기록 (비동기, 페이지 이동에도 유지)
+    if (typeof contextPath === 'undefined') {
+        var contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
+    }
+
+    fetch(contextPath + '/api/action/handleAction.jsp?actionType=CREATE_COMMENT&content=' + encodeURIComponent(content) + '&targetId=t2', { keepalive: true })
+        .catch(err => console.error(err));
+
     return true;
 }
 

@@ -52,7 +52,7 @@
 
                 <!-- 검색 바 -->
                 <jsp:include page="../common/searchBar.jsp">
-                    <jsp:param name="action" value="${pageContext.request.contextPath}/board/search" />
+                    <jsp:param name="action" value="kdolTalkBoard.jsp" />
                     <jsp:param name="placeholder" value="검색어를 입력하세요" />
                 </jsp:include>
 
@@ -81,6 +81,20 @@
                                 if (categoryParam != null && !"all".equals(categoryParam)) {
                                     allPosts = allPosts.stream()
                                         .filter(p -> categoryParam.equals(p.getCategory()))
+                                        .collect(java.util.stream.Collectors.toList());
+                                }
+
+                                // 검색어 필터링
+                                String keywordParam = request.getParameter("keyword");
+                                if (keywordParam != null && !keywordParam.trim().isEmpty()) {
+                                    String keyword = keywordParam.trim().toLowerCase();
+                                    
+                                    // 퀘스트 체크 (검색어가 퀘스트 목표와 일치하면 완료 처리)
+                                    gameContext.getQuestService().checkSearchObjectives(keyword);
+                                    
+                                    allPosts = allPosts.stream()
+                                        .filter(p -> (p.getTitle() != null && p.getTitle().toLowerCase().contains(keyword)) ||
+                                                     (p.getContent() != null && p.getContent().toLowerCase().contains(keyword)))
                                         .collect(java.util.stream.Collectors.toList());
                                 }
 

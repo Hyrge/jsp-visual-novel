@@ -9,6 +9,10 @@ import model.GameState;
 import model.entity.UserAction;
 import model.enums.ActionType;
 import model.enums.BusEvent;
+import model.entity.Quest;
+import model.entity.QuestObjective;
+import service.QuestService;
+import service.PostService;
 import util.LLMManager;
 
 /**
@@ -30,6 +34,7 @@ public class UserActionHandler {
 
     /**
      * 플레이어 행동 처리
+     * 
      * @param action 플레이어 행동
      */
     public void handle(UserAction action) {
@@ -104,13 +109,13 @@ public class UserActionHandler {
                 break;
             case CREATE_COMMENT:
             case CREATE_REPLY:
-                minutes = 3;  // 댓글/대댓글 3분
+                minutes = 3; // 댓글/대댓글 3분
                 break;
             case UPDATE_POST:
-                minutes = 5;  // 수정 5분
+                minutes = 5; // 수정 5분
                 break;
             default:
-                minutes = 1;  // 기타 행동 1분
+                minutes = 1; // 기타 행동 1분
                 break;
         }
 
@@ -190,8 +195,45 @@ public class UserActionHandler {
      * 퀘스트 진행 상황 업데이트
      */
     private void updateQuestProgress(UserAction action) {
-        // TODO: 퀘스트 시스템과 연동
-        // 예: "게시글 5개 작성하기" 퀘스트 진행도 업데이트
+        QuestService questService = gameContext.getQuestService();
+        if (questService == null) {
+            return;
+        }
+
+        // 활성 퀘스트 목록 조회
+        for (Quest quest : questService.getActiveQuests()) {
+            boolean updated = false;
+
+            // 2. 쪽지 보내기 (Objectives 기반)
+            if (action.getActionType() == ActionType.SEND_MESSAGE) {
+                if (quest.getObjectives() != null) {
+                    for (QuestObjective obj : quest.getObjectives()) {
+                        if (!obj.isCompleted() && obj.getDescription() != null && obj.getDescription().contains("쪽지")) {
+                            questService.completeObjective(quest.getId(), obj.getId());
+                            updated = true;
+                        }
+                    }
+                }
+            }
+            // 3. 좋아요 (단일 목표) - ID: t1
+            else if (action.getActionType() == ActionType.LIKE) {
+                if ("t1".equals(quest.getId())) {
+                    questService.addQuestProgress(quest.getId(), 1);
+                    updated = true;
+                }
+            }
+            // 4. 댓글 작성 (단일 목표) - ID: t2
+            else if (action.getActionType() == ActionType.CREATE_COMMENT) {
+                if ("t2".equals(quest.getId())) {
+                    questService.addQuestProgress(quest.getId(), 1);
+                    updated = true;
+                }
+            }
+
+            if (updated) {
+                System.out.println("[UserActionHandler] 퀘스트 업데이트됨: " + quest.getTitle());
+            }
+        }
     }
 
     /**
@@ -214,16 +256,15 @@ public class UserActionHandler {
                 postService.updatePostMinaRelated(action.getTargetId(), isRelatedMina);
 
                 System.out.println("[UserActionHandler] MiNa 관련 여부 확인 완료: "
-                    + action.getTargetId() + " = " + isRelatedMina);
+                        + action.getTargetId() + " = " + isRelatedMina);
 
                 // POST_CREATED 이벤트 발행 (NPC 댓글 생성 트리거)
                 eventBus.emit(BusEvent.POST_CREATED, Map.of(
-                    "postId", action.getTargetId(),
-                    "title", action.getTitle(),
-                    "content", action.getContent(),
-                    "playerId", action.getPlayerId(),
-                    "isRelatedMina", isRelatedMina
-                ));
+                        "postId", action.getTargetId(),
+                        "title", action.getTitle(),
+                        "content", action.getContent(),
+                        "playerId", action.getPlayerId(),
+                        "isRelatedMina", isRelatedMina));
                 System.out.println("[UserActionHandler] POST_CREATED 이벤트 발행 (isRelatedMina: " + isRelatedMina + ")");
 
             } catch (Exception e) {
@@ -231,12 +272,11 @@ public class UserActionHandler {
 
                 // 실패해도 이벤트는 발행 (isRelatedMina = false로)
                 eventBus.emit(BusEvent.POST_CREATED, Map.of(
-                    "postId", action.getTargetId(),
-                    "title", action.getTitle(),
-                    "content", action.getContent(),
-                    "playerId", action.getPlayerId(),
-                    "isRelatedMina", false
-                ));
+                        "postId", action.getTargetId(),
+                        "title", action.getTitle(),
+                        "content", action.getContent(),
+                        "playerId", action.getPlayerId(),
+                        "isRelatedMina", false));
             }
         }).start();
     }

@@ -239,8 +239,24 @@ function closeSendMsgPopup() {
 
 function sendMessage(event) {
     event.preventDefault();
-    alert('쪽지 전송 기능은 구현 중입니다.');
-    closeSendMsgPopup();
+    
+    // 팝업 내 input 값 가져오기 (필요시)
+    // var content = document.querySelector('#sendMsgPopup textarea').value;
+    
+    // 액션 기록
+    var contextPath = '<%= request.getContextPath() %>';
+    fetch(contextPath + '/api/action/handleAction.jsp?actionType=SEND_MESSAGE&content=message_sent')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            console.log('Message action recorded:', data);
+            alert('쪽지를 보냈습니다.');
+            closeSendMsgPopup();
+        })
+        .catch(function(err) {
+            console.error('Failed to record message action:', err);
+            alert('쪽지 전송 중 오류가 발생했습니다.');
+        });
+        
     return false;
 }
 </script>
