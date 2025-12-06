@@ -36,25 +36,6 @@
         <span class="badge-count"><%= totalCount %></span>
     </div>
 
-    <!-- 쪽지 보내기 폼 -->
-    <div class="msg-send-form">
-        <h4>쪽지 보내기</h4>
-        <form id="sendMessageForm" onsubmit="return sendMessage(event)">
-            <div class="form-group">
-                <label for="recipientId">받는 사람 ID:</label>
-                <input type="text" id="recipientId" name="recipientId" placeholder="사용자 ID 입력" required maxlength="50">
-            </div>
-            <div class="form-group">
-                <label for="messageContent">메시지:</label>
-                <textarea id="messageContent" name="messageContent" placeholder="메시지 내용 (최대 500자)" required maxlength="500" rows="3"></textarea>
-                <div class="char-count">
-                    <span id="msgCharCount">0</span> / 500
-                </div>
-            </div>
-            <button type="submit" class="btn-send-msg">보내기</button>
-        </form>
-    </div>
-
     <!-- 쪽지 + 퀘스트 목록 (통합) -->
     <div id="msg-list-view">
         <ul class="msg-list">
@@ -63,14 +44,20 @@
                 String issuerIcon = quest.getIssuer() == QuestIssuer.SYSTEM ? "⚙️" : "🏢";
                 int completed = quest.getCompletedCount();
                 int total = quest.getTotalCount();
-                String progressText = "(" + completed + "/" + total + ")";
+                int percent = total > 0 ? (completed * 100 / total) : 0;
                 String statusClass = quest.getStatus() == QuestStatus.COMPLETABLE ? "completable" : "";
             %>
             <li class="msg-item quest-item <%= statusClass %>" onclick="showQuestDetail('<%= quest.getId() %>')">
                 <div class="msg-icon"><%= issuerIcon %></div>
                 <div class="msg-info">
                     <span class="msg-sender">[<%= quest.getIssuer() %>]</span>
-                    <span class="msg-title"><%= quest.getTitle() %> <%= progressText %></span>
+                    <span class="msg-title"><%= quest.getTitle() %></span>
+                    <div class="quest-progress">
+                        <div class="quest-progress-bar">
+                            <div class="quest-progress-fill" style="width: <%= percent %>%"></div>
+                        </div>
+                        <span class="quest-progress-text"><%= completed %>/<%= total %></span>
+                    </div>
                 </div>
             </li>
             <% } %>
@@ -101,6 +88,11 @@
             </li>
             <% } %>
         </ul>
+        
+        <!-- 쪽지 보내기 버튼 (목록 아래) -->
+        <div class="msg-send-btn-area">
+            <button type="button" class="btn-send-msg" onclick="openSendMsgPopup()">✉️ 쪽지 보내기</button>
+        </div>
     </div>
 
     <%-- ===== 퀘스트 상세 뷰 ===== --%>
@@ -192,16 +184,49 @@ function showQuestDetail(id) {
     if (detail) detail.style.display = 'block';
 }
 
-function sendMessage(event) {
-    event.preventDefault();
-    alert('쪽지 전송 기능은 구현 중입니다.');
-    return false;
-}
-
 function toggleMessageSidebar() {
     var sidebar = document.querySelector('.sidebar-area');
     if (sidebar) {
         sidebar.classList.toggle('hidden');
     }
+}
+
+// 쪽지 보내기 팝업 동적 로드
+function openSendMsgPopup() {
+    // 이미 로드됐으면 보여주기만
+    var existing = document.getElementById('sendMsgPopup');
+    if (existing) {
+        existing.style.display = 'flex';
+        return;
+    }
+    
+    // fetch로 팝업 HTML 로드
+    var contextPath = '<%= request.getContextPath() %>';
+    fetch(contextPath + '/views/common/sendMessagePopup.jsp')
+        .then(function(response) { return response.text(); })
+        .then(function(html) {
+            // body에 팝업 추가
+            var div = document.createElement('div');
+            div.innerHTML = html;
+            document.body.appendChild(div);
+            // 팝업 표시
+            var popup = document.getElementById('sendMsgPopup');
+            if (popup) popup.style.display = 'flex';
+        })
+        .catch(function(err) {
+            alert('팝업 로드 실패: ' + err);
+        });
+}
+
+function closeSendMsgPopup() {
+    var popup = document.getElementById('sendMsgPopup');
+    if (popup) popup.style.display = 'none';
+}
+
+function sendMessage(event) {
+    event.preventDefault();
+    alert('쪽지 전송 기능은 구현 중입니다.');
+    closeSendMsgPopup();
+    return false;
 }
 </script>
