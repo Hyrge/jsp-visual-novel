@@ -15,6 +15,7 @@
 <%@ page import="java.nio.file.*" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="util.SavePathManager" %>
+<%@ page import="dto.User"%>
 
 <%
     request.setCharacterEncoding("UTF-8");
@@ -26,6 +27,8 @@
         // 게시글 작성 처리
         GameContext gameContext = (GameContext) session.getAttribute("gameContext");
         String pid = gameContext != null ? gameContext.getPid() : null;
+        User player = (User) session.getAttribute("player");
+
 
         if (pid == null) {
             response.sendRedirect(request.getContextPath() + "/index.jsp");
@@ -121,6 +124,7 @@
             post.setDislikeCount(0);
             post.setImageFile(savedFileName); // 이미지 파일명 설정
             post.setRelatedMina(false); // 일단 false로, 비동기로 업데이트
+            post.setNickName(player.getNickname());
 
             // PostService를 통해 DB에 저장
             PostService postService = gameContext != null ? gameContext.getPostService() : new PostService(manager.DataManager.getInstance());

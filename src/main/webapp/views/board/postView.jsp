@@ -225,9 +225,9 @@
                         <c:forEach var="comment" items="${comments}">
                         <div class="comment-item" id="${comment.comment_id}">
                             <div class="comment-header-row">
-                                <div class="comment-nickname-info">
+                                <div class="comment-author-info">
                                     <span class="user-tooltip-wrapper comment-nickname-wrapper">
-                                        <span class="comment-nickname" onclick="toggleReplyForm('${comment.comment_id}', '${comment.nickname}')" style="cursor: pointer;">${comment.nickname}</span>
+                                        <span class="comment-author" onclick="toggleReplyForm('${comment.comment_id}', '${comment.nickname}')" style="cursor: pointer;">${comment.nickname}</span>
                                         <div class="user-tooltip">
                                             <a href="javascript:void(0)" class="user-tooltip-item" onclick="viewUserInfo('${comment.nickname}')">회원정보</a>
                                             <a href="javascript:void(0)" class="user-tooltip-item" onclick="sendMessage('${comment.nickname}')">쪽지 보내기</a>

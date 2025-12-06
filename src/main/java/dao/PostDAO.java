@@ -15,8 +15,8 @@ public class PostDAO {
 
     public boolean insert(Post post) {
         String sql = "INSERT INTO posts (post_id, player_pid, title, content, board_type, category, " +
-                     "created_at, has_pictures, like_count, dislike_count, is_related_mina, image_file) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                     "created_at, has_pictures, like_count, dislike_count, is_related_mina, image_file, nickname) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -33,6 +33,7 @@ public class PostDAO {
             pstmt.setInt(10, post.getDislikeCount());
             pstmt.setBoolean(11, post.isRelatedMina());
             pstmt.setString(12, post.getImageFile());
+            pstmt.setString(13, post.getNickname());
 
             return pstmt.executeUpdate() > 0;
 
@@ -159,6 +160,7 @@ public class PostDAO {
         post.setPlayerPid(rs.getString("player_pid"));
         post.setTitle(rs.getString("title"));
         post.setContent(rs.getString("content"));
+        post.setNickName(rs.getString("nickname"));
         post.setBoardType(rs.getString("board_type"));
         post.setCategory(rs.getString("category"));
 
