@@ -45,6 +45,12 @@ public class GameContext {
         this.postService = new PostService(dataManager);
         this.timeService = new TimeService(gameState, eventBus);
 
+        // EventService 초기화 (이벤트 config 로드)
+        this.eventService.setEventConfig(dataManager.getEventConfig());
+
+        // QuestService 초기화 (퀘스트 로드)
+        this.questService.initQuests(pid);
+
         // PostService 초기화 (EventBus 구독 + 게시글 로드)
         this.postService.setEventBus(eventBus);
         this.postService.setGameState(gameState);

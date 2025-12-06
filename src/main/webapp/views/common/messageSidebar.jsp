@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="model.GameContext" %>
 <%@ page import="model.entity.Message" %>
+<%@ page import="model.entity.Quest" %>
+<%@ page import="model.entity.QuestObjective" %>
+<%@ page import="model.enums.QuestStatus" %>
+<%@ page import="model.enums.QuestIssuer" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 
@@ -9,29 +13,27 @@
 <%-- 시간 스킵 처리 로직 --%>
 <jsp:include page="timeSkipHandler.jsp" />
 
+<%
+    List<Message> messages = gameContext.getMessageService().getMessages();
+    List<Quest> activeQuests = gameContext.getQuestService().getActiveQuests();
+    long unreadCount = messages.stream().filter(m -> !m.isRead()).count();
+    int totalCount = messages.size() + activeQuests.size();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd HH:mm");
+%>
+
 <div class="message-box">
     <!-- Status Section -->
     <div class="status-header">
         <h3>내 정보</h3>
         <div class="status-item">
             <span class="label">평판:</span>
-            <span class="value">
-                <%= gameContext.getGameState().getReputation() %>
-            </span>
+            <span class="value"><%= gameContext.getGameState().getReputation() %></span>
         </div>
     </div>
 
     <div class="msg-header">
         <h3>쪽지함</h3>
-        <%
-            List<Message> messages = gameContext.getMessageService().getMessages();
-            long unreadCount = messages.stream()
-                    .filter(m -> !m.isRead())
-                    .count();
-        %>
-        <span class="badge-count">
-            <%= unreadCount %>
-        </span>
+        <span class="badge-count"><%= totalCount %></span>
     </div>
 
     <!-- 쪽지 보내기 폼 -->
@@ -53,83 +55,153 @@
         </form>
     </div>
 
-    <!-- Message List View -->
+    <!-- 쪽지 + 퀘스트 목록 (통합) -->
     <div id="msg-list-view">
         <ul class="msg-list">
-            <%
-                if (messages.isEmpty()) {
+            <%-- ===== 퀘스트를 쪽지처럼 표시 ===== --%>
+            <% for (Quest quest : activeQuests) {
+                String issuerIcon = quest.getIssuer() == QuestIssuer.SYSTEM ? "⚙️" : "🏢";
+                int completed = quest.getCompletedCount();
+                int total = quest.getTotalCount();
+                String progressText = "(" + completed + "/" + total + ")";
+                String statusClass = quest.getStatus() == QuestStatus.COMPLETABLE ? "completable" : "";
             %>
+            <li class="msg-item quest-item <%= statusClass %>" onclick="showQuestDetail('<%= quest.getId() %>')">
+                <div class="msg-icon"><%= issuerIcon %></div>
+                <div class="msg-info">
+                    <span class="msg-sender">[<%= quest.getIssuer() %>]</span>
+                    <span class="msg-title"><%= quest.getTitle() %> <%= progressText %></span>
+                </div>
+            </li>
+            <% } %>
+            
+            <%-- ===== 일반 쪽지 표시 ===== --%>
+            <% for (Message msg : messages) {
+                String icon = "📢";
+                if (msg.getSender() == model.enums.SenderType.ADMIN) {
+                    icon = "👮";
+                } else if (msg.getSender() == model.enums.SenderType.COMPANY) {
+                    icon = "🏢";
+                }
+            %>
+            <li class="msg-item <%= msg.isRead() ? "read" : "unread" %>" onclick="showMsgDetail('<%= msg.getId() %>')">
+                <div class="msg-icon"><%= icon %></div>
+                <div class="msg-info">
+                    <span class="msg-sender">[<%= msg.getSender() %>]</span>
+                    <span class="msg-title"><%= msg.getTitle() %></span>
+                    <span class="msg-date"><%= msg.getCreatedAt().format(formatter) %></span>
+                </div>
+            </li>
+            <% } %>
+            
+            <%-- 둘 다 없으면 빈 메시지 --%>
+            <% if (messages.isEmpty() && activeQuests.isEmpty()) { %>
             <li class="msg-item msg-item-empty">
                 <span class="msg-empty-text">메시지가 없습니다.</span>
             </li>
-            <%
-                } else {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd HH:mm");
-
-                    for (Message msg : messages) {
-                        String icon = "📢";
-                        if (msg.getSender() == model.enums.SenderType.ADMIN) {
-                            icon = "👮";
-                        } else if (msg.getSender() == model.enums.SenderType.COMPANY) {
-                            icon = "🏢";
-                        }
-            %>
-            <li class="msg-item <%= msg.isRead() ? " read" : "unread" %>"
-                onclick="showMsgDetail('<%= msg.getId() %>')">
-                <div class="msg-icon">
-                    <%= icon %>
-                </div>
-                <div class="msg-info">
-                    <span class="msg-sender">[<%= msg.getSender() %>]</span>
-                    <span class="msg-title">
-                        <%= msg.getTitle() %>
-                    </span>
-                    <span class="msg-date">
-                        <%= msg.getCreatedAt().format(formatter) %>
-                    </span>
-                </div>
-            </li>
-            <%
-                    }
-                }
-            %>
+            <% } %>
         </ul>
     </div>
 
-    <!-- Message Detail Views -->
-    <%
-        for (Message msg : messages) {
-    %>
-    <div id="msg-detail-<%= msg.getId() %>" class="msg-detail">
+    <%-- ===== 퀘스트 상세 뷰 ===== --%>
+    <% for (Quest quest : activeQuests) { %>
+    <div id="quest-detail-<%= quest.getId() %>" class="msg-detail" style="display: none;">
+        <div class="detail-header">
+            <button class="btn-back" onclick="showMsgList()">←</button>
+            <h4>[<%= quest.getIssuer() %>] <%= quest.getTitle() %></h4>
+        </div>
+        <div class="detail-content">
+            <p><%= quest.getDescription() != null ? quest.getDescription().replace("\n", "<br>") : "" %></p>
+            
+            <% if (quest.getObjectives() != null && !quest.getObjectives().isEmpty()) { %>
+            <ul class="quest-objectives">
+                <% for (QuestObjective obj : quest.getObjectives()) { 
+                    if (!obj.isVisible()) continue;
+                %>
+                <li class="<%= obj.isCompleted() ? "completed" : "" %>">
+                    <span class="objective-check"><%= obj.isCompleted() ? "✓" : "○" %></span>
+                    <span class="objective-text"><%= obj.getDescription() %></span>
+                </li>
+                <% } %>
+            </ul>
+            <% } %>
+        </div>
+        
+        <% if (quest.getStatus() == QuestStatus.COMPLETABLE) { %>
+        <div class="detail-actions">
+            <form action="<%= request.getContextPath() %>/api/quest/completeQuest.jsp" method="post">
+                <input type="hidden" name="questId" value="<%= quest.getId() %>">
+                <button type="submit" class="btn-complete">
+                    완료하기 (+<%= quest.getRewardReputation() %> 평판)
+                </button>
+            </form>
+        </div>
+        <% } %>
+    </div>
+    <% } %>
+
+    <%-- ===== 쪽지 상세 뷰 ===== --%>
+    <% for (Message msg : messages) { %>
+    <div id="msg-detail-<%= msg.getId() %>" class="msg-detail" style="display: none;">
         <div class="detail-header">
             <button class="btn-back" onclick="showMsgList()">←</button>
             <h4>[<%= msg.getSender() %>] <%= msg.getTitle() %></h4>
         </div>
         <div class="detail-content">
-            <p>
-                <%= msg.getContent().replace("\n", "<br>" ) %>
-            </p>
+            <p><%= msg.getContent().replace("\n", "<br>") %></p>
         </div>
-        <%
-            if (msg.getRelatedQuestIds() != null && !msg.getRelatedQuestIds().isEmpty()) {
-        %>
+        <% if (msg.getRelatedQuestIds() != null && !msg.getRelatedQuestIds().isEmpty()) { %>
         <div class="detail-actions">
-            <button class="btn-complete"
-                    onclick="completeQuest(this, '<%= msg.getRelatedQuestIds().get(0) %>')">
+            <button class="btn-complete" onclick="showQuestDetail('<%= msg.getRelatedQuestIds().get(0) %>')">
                 퀘스트 확인
             </button>
         </div>
-        <%
-            }
-        %>
+        <% } %>
     </div>
-    <%
-        }
-    %>
+    <% } %>
 </div>
 
 <%-- 시간 스킵 컨트롤 패널 --%>
 <jsp:include page="timeControlPanel.jsp" />
 
 <script src="<%= request.getContextPath() %>/resources/js/charCounter.js?v=2"></script>
-<script src="<%= request.getContextPath() %>/resources/js/messageSidebar.js?v=2"></script>
+<script>
+// 최소한의 JS만 사용
+function showMsgList() {
+    document.getElementById('msg-list-view').style.display = 'block';
+    document.querySelectorAll('.msg-detail').forEach(function(el) {
+        el.style.display = 'none';
+    });
+}
+
+function showMsgDetail(id) {
+    document.getElementById('msg-list-view').style.display = 'none';
+    document.querySelectorAll('.msg-detail').forEach(function(el) {
+        el.style.display = 'none';
+    });
+    var detail = document.getElementById('msg-detail-' + id);
+    if (detail) detail.style.display = 'block';
+}
+
+function showQuestDetail(id) {
+    document.getElementById('msg-list-view').style.display = 'none';
+    document.querySelectorAll('.msg-detail').forEach(function(el) {
+        el.style.display = 'none';
+    });
+    var detail = document.getElementById('quest-detail-' + id);
+    if (detail) detail.style.display = 'block';
+}
+
+function sendMessage(event) {
+    event.preventDefault();
+    alert('쪽지 전송 기능은 구현 중입니다.');
+    return false;
+}
+
+function toggleMessageSidebar() {
+    var sidebar = document.querySelector('.sidebar-area');
+    if (sidebar) {
+        sidebar.classList.toggle('hidden');
+    }
+}
+</script>

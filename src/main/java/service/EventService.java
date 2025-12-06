@@ -29,6 +29,26 @@ public class EventService {
         }
         this.eventConfig = dataManager.getEventConfig();
         this.eventBus = eventBus;
+
+        // EventBus 구독 설정
+        subscribeToEvents();
+    }
+
+    /**
+     * EventBus 이벤트 구독
+     */
+    private void subscribeToEvents() {
+        // DAY_CHANGED 이벤트 구독 - 날짜가 바뀔 때마다 이벤트 체크
+        eventBus.subscribe(BusEvent.DAY_CHANGED, data -> {
+            if (data instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> eventData = (Map<String, Object>) data;
+                LocalDate currentDate = (LocalDate) eventData.get("currentDate");
+                System.out.println("[EventService] DAY_CHANGED 수신: " + currentDate);
+                checkEvents(currentDate);
+                checkScheduledEvents(currentDate);
+            }
+        });
     }
 
     public void setEventConfig(List<Map<String, Object>> eventConfig) {
@@ -69,12 +89,45 @@ public class EventService {
 
                 activeEvents.put(event.getId(), event);
                 eventBus.emit(BusEvent.EVENT_TRIGGERED, event);
+                System.out.println("[EventService] 랜덤 이벤트 발생: " + event.getTitle());
 
                 // 후속 이벤트 스케줄링
                 scheduleSubsequentEvents(event, today);
 
                 break; // Trigger only one event per day
             }
+        }
+    }
+
+    /**
+     * 스케줄된 이벤트 체크 - 해당 날짜에 예정된 이벤트 트리거
+     */
+    public void checkScheduledEvents(LocalDate today) {
+        List<String> triggeredIds = new ArrayList<>();
+
+        for (Map.Entry<String, Event> entry : scheduledEvents.entrySet()) {
+            Event event = entry.getValue();
+
+            // 이미 활성화된 이벤트는 스킵
+            if (activeEvents.containsKey(event.getId())) {
+                continue;
+            }
+
+            // 날짜가 일치하면 트리거
+            if (event.getTriggeredAt() != null && event.getTriggeredAt().equals(today)) {
+                activeEvents.put(event.getId(), event);
+                eventBus.emit(BusEvent.EVENT_TRIGGERED, event);
+                triggeredIds.add(event.getId());
+                System.out.println("[EventService] 스케줄 이벤트 발생: " + event.getTitle() + " (날짜: " + today + ")");
+
+                // 후속 이벤트 스케줄링
+                scheduleSubsequentEvents(event, today);
+            }
+        }
+
+        // 트리거된 이벤트는 scheduledEvents에서 제거
+        for (String id : triggeredIds) {
+            scheduledEvents.remove(id);
         }
     }
 
@@ -90,8 +143,8 @@ public class EventService {
             // config에서 해당 이벤트 찾기
             Map<String, Object> subsequentConfig = findEventConfigById(subsequentId);
             if (subsequentConfig == null) {
-				continue;
-			}
+                continue;
+            }
 
             // 후속 이벤트 생성
             Event subsequentEvent = EventFactory.createScheduledEvent(subsequentConfig);
@@ -110,8 +163,8 @@ public class EventService {
     // ID로 이벤트 config 찾기
     private Map<String, Object> findEventConfigById(String eventId) {
         if (eventConfig == null) {
-			return null;
-		}
+            return null;
+        }
 
         for (Map<String, Object> config : eventConfig) {
             if (eventId.equals(config.get("id"))) {
@@ -137,4 +190,3 @@ public class EventService {
                 .collect(Collectors.toList());
     }
 }
-
