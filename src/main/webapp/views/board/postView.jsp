@@ -142,6 +142,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="contextPath" content="<%= contextPath %>">
     <title>${post.title} - 케이돌 토크 - 더꾸</title>
     <link rel="stylesheet" href="<%= contextPath %>/resources/css/style.css?v=2">
     <link rel="stylesheet" href="<%= contextPath %>/resources/css/board.css">
@@ -167,10 +168,10 @@
                     <h2 class="post-title">${post.title}</h2>
                     <div class="post-meta">
                         <span class="user-tooltip-wrapper">
-                            <span class="author post-author-link">${post.author}</span>
+                            <span class="author post-author-link">${post.nickname}</span>
                             <div class="user-tooltip">
-                                <a href="javascript:void(0)" class="user-tooltip-item" onclick="viewUserInfo('${post.author}')">회원정보</a>
-                                <a href="javascript:void(0)" class="user-tooltip-item" onclick="sendMessage('${post.author}')">쪽지 보내기</a>
+                                <a href="javascript:void(0)" class="user-tooltip-item" onclick="viewUserInfo('${post.playerPid}', '${post.nickname}')">회원정보</a>
+                                <a href="javascript:void(0)" class="user-tooltip-item" onclick="sendMessage('${post.nickname}')">쪽지 보내기</a>
                             </div>
                         </span>
                         <span class="separator">|</span>
@@ -245,7 +246,7 @@
                                     <span class="user-tooltip-wrapper comment-nickname-wrapper">
                                         <span class="comment-author" onclick="toggleReplyForm('${comment.comment_id}', '${comment.nickname}')" style="cursor: pointer;">${comment.nickname}</span>
                                         <div class="user-tooltip">
-                                            <a href="javascript:void(0)" class="user-tooltip-item" onclick="viewUserInfo('${comment.nickname}')">회원정보</a>
+                                            <a href="javascript:void(0)" class="user-tooltip-item" onclick="viewUserInfo('${comment.player_id}', '${comment.nickname}')">회원정보</a>
                                             <a href="javascript:void(0)" class="user-tooltip-item" onclick="sendMessage('${comment.nickname}')">쪽지 보내기</a>
                                         </div>
                                     </span>

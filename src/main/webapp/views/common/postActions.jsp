@@ -143,8 +143,8 @@
                     handler.handle(requestedAction);
                 }
 
-                // 게시판 목록으로 리다이렉트
-                response.sendRedirect(request.getContextPath() + "/views/board/kdolTalkBoard.jsp");
+                // 작성한 게시글로 리다이렉트
+                response.sendRedirect(request.getContextPath() + "/views/board/postView.jsp?id=" + postId);
                 return;
             } else {
                 out.println("<script>alert('게시글 저장에 실패했습니다.'); history.back();</script>");
