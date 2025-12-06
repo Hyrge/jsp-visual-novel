@@ -36,13 +36,13 @@ public class CommentDAO {
             pstmt.setString(6, comment.getNickname());
 
             int rows = pstmt.executeUpdate();
+            return rows > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("[CommentDAO] " + e.getMessage());
+            return false;
         }
-
-        return false;
     }
 
     public List<Comment> findByPostId(String postId) {
@@ -70,7 +70,7 @@ public class CommentDAO {
             sql.append(" AND created_at <= ?");
         }
 
-        sql.append(" ORDER BY comment_seq ASC, created_at ASC");
+        sql.append(" ORDER BY created_at ASC");
 
         List<Comment> comments = new ArrayList<>();
 
@@ -143,9 +143,9 @@ public class CommentDAO {
     private Comment mapResultSetToComment(ResultSet rs) throws SQLException {
         Comment comment = new Comment();
         comment.setCommentId(rs.getInt("comment_id"));
-        comment.setCommentSeq(rs.getInt("comment_seq"));
         comment.setPostId(rs.getString("post_id"));
         comment.setPlayerPid(rs.getString("player_pid"));
+        comment.setNickname(rs.getString("nickname"));
         comment.setContent(rs.getString("content"));
 
         int parentId = rs.getInt("parent_comment_id");

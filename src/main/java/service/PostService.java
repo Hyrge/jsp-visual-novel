@@ -123,15 +123,9 @@ public class PostService {
             }
         }
 
-        // 3. 정렬 (comment_seq, created_at)
+        // 3. 정렬 (created_at 오름차순)
         List<Comment> result = new ArrayList<>(resultMap.values());
-        result.sort((c1, c2) -> {
-            int seqCompare = Integer.compare(c1.getCommentSeq(), c2.getCommentSeq());
-            if (seqCompare != 0) {
-				return seqCompare;
-			}
-            return c1.getCreatedAt().compareTo(c2.getCreatedAt());
-        });
+        result.sort((c1, c2) -> c1.getCreatedAt().compareTo(c2.getCreatedAt()));
 
         return result;
     }

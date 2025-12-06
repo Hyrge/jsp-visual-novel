@@ -9,6 +9,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <jsp:useBean id="gameContext" class="model.GameContext" scope="session" />
+<jsp:useBean id="player" class="dto.User" scope="session" />
 
 <%
 	request.setCharacterEncoding("UTF-8");
@@ -41,6 +42,7 @@
         // Comment 객체 생성
         Comment comment = new Comment();
         comment.setPostId(postId);
+        comment.setNickname(player.getNickname());
         comment.setPlayerPid(pid);
         comment.setContent(content);
         comment.setCreatedAt(currentDateTime);
@@ -91,7 +93,7 @@
     postData.put("id", post.getPostId());
     postData.put("category", post.getCategory());
     postData.put("title", post.getTitle());
-    postData.put("author", post.getNickname() != null ? post.getNickname() : "유저");
+    postData.put("nickname", post.getNickname() != null ? post.getNickname() : "유저");
     postData.put("playerPid", post.getPlayerPid()); // 이미지 경로용
     postData.put("date", post.getCreatedAt().format(dateFormatter));
     postData.put("views", "0"); // TODO: 조회수 기능 추가
@@ -107,8 +109,10 @@
     List<Map<String, String>> commentsData = new ArrayList<>();
     for (Comment c : commentList) {
         Map<String, String> commentMap = new HashMap<>();
-        commentMap.put("id", String.valueOf(c.getCommentId()));
-        commentMap.put("author", c.getNickname() != null ? c.getNickname() : "유저");
+        commentMap.put("comment_id", String.valueOf(c.getCommentId()));
+        commentMap.put("player_id", c.getPlayerPid());
+        commentMap.put("nickname", c.getNickname() != null ? c.getNickname() : "유저");
+        commentMap.put("parent_comment_id", c.getParentCommentId() != null ? String.valueOf(c.getParentCommentId()) : "");
         commentMap.put("date", c.getCreatedAt().format(dateFormatter));
         commentMap.put("content", c.getContent() != null ? c.getContent().replace("\n", "<br>") : "");
         commentsData.add(commentMap);
@@ -219,19 +223,19 @@
                     <!-- 댓글 목록 -->
                     <div class="comment-list">
                         <c:forEach var="comment" items="${comments}">
-                        <div class="comment-item" id="comment-${comment.id}">
+                        <div class="comment-item" id="${comment.comment_id}">
                             <div class="comment-header-row">
-                                <div class="comment-author-info">
-                                    <span class="user-tooltip-wrapper comment-author-wrapper">
-                                        <span class="comment-author" onclick="toggleReplyForm('${comment.id}', '${comment.author}')" style="cursor: pointer;">${comment.author}</span>
+                                <div class="comment-nickname-info">
+                                    <span class="user-tooltip-wrapper comment-nickname-wrapper">
+                                        <span class="comment-nickname" onclick="toggleReplyForm('${comment.comment_id}', '${comment.nickname}')" style="cursor: pointer;">${comment.nickname}</span>
                                         <div class="user-tooltip">
-                                            <a href="javascript:void(0)" class="user-tooltip-item" onclick="viewUserInfo('${comment.author}')">회원정보</a>
-                                            <a href="javascript:void(0)" class="user-tooltip-item" onclick="sendMessage('${comment.author}')">쪽지 보내기</a>
+                                            <a href="javascript:void(0)" class="user-tooltip-item" onclick="viewUserInfo('${comment.nickname}')">회원정보</a>
+                                            <a href="javascript:void(0)" class="user-tooltip-item" onclick="sendMessage('${comment.nickname}')">쪽지 보내기</a>
                                         </div>
                                     </span>
                                     <span class="comment-date">${comment.date}</span>
                                 </div>
-                                <button type="button" class="btn-comment-report" onclick="reportComment('${comment.id}')">
+                                <button type="button" class="btn-comment-report" onclick="reportComment('${comment.comment_id}')">
                                     신고
                                 </button>
                             </div>
@@ -240,14 +244,14 @@
                             </div>
 
                             <!-- 답글 작성 폼 (닉네임 클릭 시 나타남) -->
-                            <div class="reply-form-section" id="replyForm-${comment.id}" style="display: none;">
-                                <form method="post" action="<%= contextPath %>/views/board/postView.jsp" onsubmit="return validateReply('${comment.id}')">
+                            <div class="reply-form-section" id="replyForm-${comment.comment_id}" style="display: none;">
+                                <form method="post" action="<%= contextPath %>/views/board/postView.jsp" onsubmit="return validateReply('${comment.comment_id}')">
                                     <input type="hidden" name="postId" value="${post.id}">
-                                    <textarea name="replyContent" id="replyContent-${comment.id}" placeholder="답글을 입력하세요..." rows="2" maxlength="500"></textarea>
+                                    <textarea name="replyContent" id="replyContent-${comment.comment_id}" placeholder="답글을 입력하세요..." rows="2" maxlength="500"></textarea>
                                     <div class="reply-write-bottom">
-                                        <span class="reply-char-count"><span id="replyLength-${comment.id}">0</span>/500</span>
+                                        <span class="reply-char-count"><span id="replyLength-${comment.comment_id}">0</span>/500</span>
                                         <div class="reply-buttons">
-                                            <button type="button" class="btn btn-cancel" onclick="closeReplyForm('${comment.id}')">취소</button>
+                                            <button type="button" class="btn btn-cancel" onclick="closeReplyForm('${comment.comment_id}')">취소</button>
                                             <button type="submit" class="btn btn-reply-submit">답글 작성</button>
                                         </div>
                                     </div>

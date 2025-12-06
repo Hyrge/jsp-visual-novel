@@ -10,6 +10,7 @@
 <%
    
 	GameContext gameContext = (GameContext) session.getAttribute("gameContext");
+    PlayerDAO playerDAO = new PlayerDAO();
 	String pid = null;
 	
     if (gameContext == null || gameContext.getPid() == null) {
@@ -22,9 +23,9 @@
         GameController.getInstance().createPlayer(pid);
         session.setAttribute("gameContext", gameContext);
     }else {
-    		pid = gameContext.getPid();
+        pid = gameContext.getPid();
+        if(!playerDAO.exists(pid)) GameController.getInstance().createPlayer(pid);
     }
-    PlayerDAO playerDAO = new PlayerDAO();
     playerDAO.updateLastAccess(pid);
 %>
 <%
@@ -34,7 +35,7 @@
 
     // 1. 관리자 계정 체크 (하드코딩)
     if ("admin".equals(userId) && "1234".equals(password)) {
-        session.setAttribute("user", new User(pid, userId, password, "회사가기싫당"));
+        session.setAttribute("player", new User(pid, userId, password, "회사가기싫당"));
         response.sendRedirect(request.getContextPath() + "/views/board/kdolTalkBoard.jsp");
         return;
     }

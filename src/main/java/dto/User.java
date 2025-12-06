@@ -23,7 +23,7 @@ public class User {
         this.userId = userId;
         this.password = password;
         this.nickname = nickname;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now().minusYears(1);
     }
 
     // Getter & Setter
