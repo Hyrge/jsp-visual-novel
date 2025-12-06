@@ -4,7 +4,7 @@ var currentOpenReplyForm = null;
 // 답글 폼 토글 (닉네임 클릭 시)
 function toggleReplyForm(commentId, username) {
     var replyForm = document.getElementById('replyForm-' + commentId);
-    var replyTextarea = document.getElementById('replyContent-' + commentId);
+    var replyEditor = document.getElementById('replyContent-' + commentId);
     var replyLengthSpan = document.getElementById('replyLength-' + commentId);
 
     // 다른 답글 폼이 열려있으면 닫기
@@ -17,42 +17,71 @@ function toggleReplyForm(commentId, username) {
         replyForm.style.display = 'block';
         currentOpenReplyForm = commentId;
 
-        // @멘션 추가
-        var mention = '@' + username + ' ';
-        replyTextarea.value = mention;
+        // @멘션을 강조된 span으로 추가
+        var mentionHtml = '<span class="mention" contenteditable="false">@' + username + '</span>&nbsp;';
+        replyEditor.innerHTML = mentionHtml;
 
         // 글자 수 업데이트
-        replyLengthSpan.textContent = mention.length;
+        var textLength = replyEditor.innerText.trim().length;
+        replyLengthSpan.textContent = textLength;
 
-        // 텍스트 영역에 포커스 + 커서를 멘션 뒤로 이동
-        replyTextarea.focus();
-        replyTextarea.setSelectionRange(mention.length, mention.length);
-
-        // 글자 수 실시간 카운트 이벤트 리스너 추가 (중복 방지)
-        replyTextarea.removeEventListener('input', updateReplyLength);
-        replyTextarea.addEventListener('input', updateReplyLength);
+        // 에디터에 포커스 + 커서를 멘션 뒤로 이동
+        replyEditor.focus();
+        placeCaretAtEnd(replyEditor);
     } else {
         // 이미 열려있으면 닫기
         closeReplyForm(commentId);
     }
 }
 
-// 답글 글자 수 업데이트 함수
-function updateReplyLength(event) {
-    var textarea = event.target;
-    var commentId = textarea.id.replace('replyContent-', '');
-    var lengthSpan = document.getElementById('replyLength-' + commentId);
-    lengthSpan.textContent = textarea.value.length;
+// 커서를 요소 맨 끝으로 이동
+function placeCaretAtEnd(el) {
+    el.focus();
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
+// 답글 입력 핸들러 (실시간 @멘션 감지)
+function handleReplyInput(commentId) {
+    var replyEditor = document.getElementById('replyContent-' + commentId);
+    var replyLengthSpan = document.getElementById('replyLength-' + commentId);
+    var replyInput = document.getElementById('replyInput-' + commentId);
+
+    // 글자 수 업데이트
+    var textLength = replyEditor.innerText.trim().length;
+    replyLengthSpan.textContent = Math.min(textLength, 500);
+
+    // hidden input에 텍스트 내용 저장 (폼 제출용)
+    replyInput.value = replyEditor.innerText.trim();
+}
+
+// 키보드 이벤트 핸들러 (Enter 제출 방지 등)
+function handleReplyKeydown(event, commentId) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        // Shift 없이 Enter 시 줄바꿈 대신 아무것도 안 함 (또는 제출)
+        // event.preventDefault();
+    }
+
+    // 글자 수 제한
+    var replyEditor = document.getElementById('replyContent-' + commentId);
+    var textLength = replyEditor.innerText.trim().length;
+    if (textLength >= 500 && event.key !== 'Backspace' && event.key !== 'Delete') {
+        event.preventDefault();
+    }
 }
 
 // 답글 폼 닫기
 function closeReplyForm(commentId) {
     var replyForm = document.getElementById('replyForm-' + commentId);
-    var replyTextarea = document.getElementById('replyContent-' + commentId);
+    var replyEditor = document.getElementById('replyContent-' + commentId);
     var replyLengthSpan = document.getElementById('replyLength-' + commentId);
 
     replyForm.style.display = 'none';
-    replyTextarea.value = '';
+    replyEditor.innerHTML = '';
     replyLengthSpan.textContent = '0';
 
     if (currentOpenReplyForm === commentId) {
@@ -60,10 +89,30 @@ function closeReplyForm(commentId) {
     }
 }
 
+// 답글 유효성 검사 (폼 제출 전)
+function validateReply(commentId) {
+    var replyEditor = document.getElementById('replyContent-' + commentId);
+    var replyInput = document.getElementById('replyInput-' + commentId);
+    var content = replyEditor.innerText.trim();
+
+    if (!content || content.length === 0) {
+        alert('답글 내용을 입력해주세요.');
+        return false;
+    }
+
+    if (content.length > 500) {
+        alert('답글은 500자를 초과할 수 없습니다.');
+        return false;
+    }
+
+    // hidden input에 최종 내용 저장
+    replyInput.value = content;
+    return true;
+}
+
 // 댓글 삭제
 function deleteComment(commentId) {
     if (confirm('정말 삭제하시겠습니까?')) {
-        // TODO: 서버에 댓글 삭제 요청 전송
         console.log('댓글 삭제:', commentId);
         location.reload();
     }
@@ -73,7 +122,6 @@ function deleteComment(commentId) {
 function reportComment(commentId) {
     if (confirm('이 댓글을 신고하시겠습니까?')) {
         // TODO: 신고 처리
-
     }
 }
 
@@ -83,10 +131,8 @@ function scrollToComment(commentId) {
 
     var targetComment = document.getElementById(commentId);
     if (targetComment) {
-        // 부드러운 스크롤
         targetComment.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-        // 하이라이트 효과
         targetComment.style.transition = 'background-color 0.3s ease';
         targetComment.style.backgroundColor = '#fff3cd';
 

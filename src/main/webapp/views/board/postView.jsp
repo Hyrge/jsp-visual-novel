@@ -264,7 +264,13 @@
                                 <form method="post" action="<%= contextPath %>/views/board/postView.jsp" onsubmit="return validateReply('${comment.comment_id}')">
                                     <input type="hidden" name="postId" value="${post.id}">
                                     <input type="hidden" name="parentCommentId" value="${comment.comment_id}">
-                                    <textarea name="replyContent" id="replyContent-${comment.comment_id}" placeholder="답글을 입력하세요..." rows="2" maxlength="500"></textarea>
+                                    <input type="hidden" name="replyContent" id="replyInput-${comment.comment_id}">
+                                    <div class="reply-editor" 
+                                         id="replyContent-${comment.comment_id}" 
+                                         contenteditable="true" 
+                                         data-placeholder="답글을 입력하세요..."
+                                         oninput="handleReplyInput('${comment.comment_id}')"
+                                         onkeydown="handleReplyKeydown(event, '${comment.comment_id}')"></div>
                                     <div class="reply-write-bottom">
                                         <span class="reply-char-count"><span id="replyLength-${comment.comment_id}">0</span>/500</span>
                                         <div class="reply-buttons">
