@@ -45,6 +45,11 @@ public class GameContext {
         this.postService = new PostService(dataManager);
         this.timeService = new TimeService(gameState, eventBus);
 
+        // PostService 초기화 (EventBus 구독 + 게시글 로드)
+        this.postService.setEventBus(eventBus);
+        this.postService.setGameState(gameState);
+        this.postService.initPosts(pid);
+
         // NPCReactionManager 초기화 (EventBus 구독)
         this.npcReactionManager = new NPCReactionManager(eventBus, gameState, postService, pid);
     }

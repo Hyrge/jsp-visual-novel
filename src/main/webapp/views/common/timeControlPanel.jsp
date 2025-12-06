@@ -4,9 +4,8 @@
 <jsp:useBean id="gameContext" class="model.GameContext" scope="session" />
 
 <%
-    // timeSkipHandler.jsp에서 설정한 변수 가져오기
-    Boolean hasNextEvent = (Boolean) request.getAttribute("hasNextEvent");
-    if (hasNextEvent == null) hasNextEvent = false;
+    // 세션의 gameContext에서 직접 hasNextEvent 확인
+    boolean hasNextEvent = gameContext.getGameState().hasNextEvent();
 %>
 
 <link rel="stylesheet" href="<%= request.getContextPath() %>/resources/css/timeControlPanel.css">

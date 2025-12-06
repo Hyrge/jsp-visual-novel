@@ -1,5 +1,6 @@
 package service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,16 +14,28 @@ import dto.Comment;
 import dto.Post;
 import manager.DataManager;
 import manager.NPCUserManager;
+import model.EventBus;
+import model.GameState;
 import model.NPCUser;
+import model.enums.BusEvent;
 
 /**
  * 게시글/댓글 서비스
  * - JSON 초기 데이터와 DB 동적 데이터 병합
+ * - totalPosts: 모든 게시글 (시간 상관없이)
+ * - publishedPosts: 현재 시점에 게시판에 보이는 게시글
  */
 public class PostService {
     private final PostDAO postDAO;
     private final CommentDAO commentDAO;
     private final DataManager dataManager;
+    private EventBus eventBus;
+    private GameState gameState;
+
+    // 모든 게시글 (시간 상관없이)
+    private Map<String, Post> totalPosts;
+    // 현재 시점에 게시판에 보이는 게시글
+    private Map<String, Post> publishedPosts;
 
     public PostService(DataManager dataManager) {
         if (dataManager == null) {
@@ -31,69 +44,120 @@ public class PostService {
         this.dataManager = dataManager;
         this.postDAO = new PostDAO();
         this.commentDAO = new CommentDAO();
+        this.totalPosts = new HashMap<>();
+        this.publishedPosts = new HashMap<>();
     }
 
     /**
-     * 게시글 조회 (JSON + DB 병합)
+     * EventBus, GameState 설정 (GameContext에서 호출)
      */
-    public Post getPost(String postId) {
-        // JSON에서 먼저 조회 (초기 데이터)
-        Post jsonPost = dataManager.getInitialPosts().get(postId);
-        if (jsonPost != null) {
-            return jsonPost;
-        }
+    public void setEventBus(EventBus eventBus) {
+        this.eventBus = eventBus;
+        // TIME_ADVANCED 이벤트 구독
+        eventBus.subscribe(BusEvent.TIME_ADVANCED, this::onTimeAdvanced);
+    }
 
-        // JSON에 없으면 DB에서 조회 (동적 데이터)
-        return postDAO.findById(postId);
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 
     /**
-     * 게시판별 게시글 목록 조회 (시간 필터링 + 플레이어 필터링 필수)
+     * TIME_ADVANCED 이벤트 핸들러 - 해당 시간의 게시글 publish
      */
-    public List<Post> getPostsByBoardType(String boardType, java.time.LocalDateTime currentTime, String playerPid) {
-        if (currentTime == null) {
-            throw new IllegalArgumentException("currentTime은 필수입니다");
-        }
-        if (playerPid == null) {
-            throw new IllegalArgumentException("playerPid는 필수입니다");
-        }
+    private void onTimeAdvanced(Object data) {
+        Map<String, Object> timeData = (Map<String, Object>) data;
+        LocalDateTime afterTime = (LocalDateTime) timeData.get("after");
+        publishPostAt(afterTime);
+    }
 
-        Map<String, Post> resultMap = new HashMap<>();
+    /**
+     * 게시글 초기화 (JSON + DB 로드 → totalPosts, 이벤트 시간 등록)
+     */
+    public void initPosts(String playerPid) {
+        // 게임 시작 시간 (9월 1일 09:00)
+        LocalDateTime gameStartTime = LocalDateTime.of(2025, 9, 1, 9, 0);
 
-        // 1. JSON 초기 데이터 먼저 추가 (모든 플레이어 공통)
-        long jsonCount = dataManager.getInitialPosts().values().stream()
-            .filter(p -> boardType.equals(p.getBoardType()))
-            .filter(p -> currentTime == null || !p.getCreatedAt().isAfter(currentTime))
-            .peek(p -> resultMap.put(p.getPostId(), p))
-            .count();
-        System.out.println("PostService: Found " + jsonCount + " posts from JSON for board type: " + boardType);
+        // 1. JSON 초기 데이터 로드
+        totalPosts.putAll(dataManager.getInitialPosts());
+        System.out.println("[PostService] JSON에서 " + dataManager.getInitialPosts().size() + "개 게시글 로드");
 
-        // 2. DB 동적 데이터 추가 (playerPid로 필터링, JSON에 없는 것만)
+        // 2. DB 동적 데이터 로드
         try {
-            List<Post> dbPosts = postDAO.findByBoardType(boardType, playerPid);
-            int dbCount = 0;
+            List<Post> dbPosts = postDAO.findByBoardType("talk", playerPid);
             for (Post dbPost : dbPosts) {
-                if (!resultMap.containsKey(dbPost.getPostId())
-                    && dbPost.getContent() != null
-                    && !dbPost.getContent().isEmpty()
-                    && (currentTime == null || !dbPost.getCreatedAt().isAfter(currentTime))) {
-                    resultMap.put(dbPost.getPostId(), dbPost);
-                    dbCount++;
+                if (dbPost.getContent() != null && !dbPost.getContent().isEmpty()) {
+                    totalPosts.put(dbPost.getPostId(), dbPost);
                 }
             }
-            System.out.println("PostService: Found " + dbCount + " NEW posts from DB for board type: " + boardType + " (playerPid: " + playerPid + ")");
+            System.out.println("[PostService] DB에서 " + dbPosts.size() + "개 게시글 로드");
         } catch (Exception e) {
-            System.err.println("PostService: Error loading DB posts: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[PostService] DB 게시글 로드 오류: " + e.getMessage());
         }
 
-        // 3. 정렬 (최신순)
-        List<Post> result = resultMap.values().stream()
+        // 3. 각 게시글 처리
+        for (Post post : totalPosts.values()) {
+            if (!post.getCreatedAt().isAfter(gameStartTime)) {
+                // 게임 시작 시간 이전 게시글 → 바로 publishedPosts에 추가
+                publishedPosts.put(post.getPostId(), post);
+            } else {
+                // 게임 시작 시간 이후 게시글 → 이벤트 시간에 등록
+                if (gameState != null) {
+                    gameState.addEventTime(post.getCreatedAt());
+                }
+            }
+        }
+
+        System.out.println("[PostService] publishedPosts: " + publishedPosts.size() + "개, 이벤트 시간 등록: " + (totalPosts.size() - publishedPosts.size()) + "개");
+        System.out.println("[PostService] totalPosts 초기화 완료: " + totalPosts.size() + "개");
+    }
+
+    /**
+     * 해당 시간에 맞는 게시글을 publishedPosts에 추가 (POST_CREATED 이벤트 발행)
+     */
+    public void publishPostAt(LocalDateTime time) {
+        for (Post post : totalPosts.values()) {
+            // 아직 publish 안 된 것 중에서 해당 시간에 맞는 것만
+            if (!publishedPosts.containsKey(post.getPostId())
+                && post.getCreatedAt().equals(time)) {
+                publishPost(post);
+            }
+        }
+    }
+
+    /**
+     * 게시글을 publishedPosts에 추가하고 POST_CREATED 이벤트 발행
+     */
+    private void publishPost(Post post) {
+        publishedPosts.put(post.getPostId(), post);
+        System.out.println("[PostService] 게시글 publish: " + post.getTitle());
+
+        // POST_CREATED 이벤트 발행
+        if (eventBus != null) {
+            eventBus.emit(BusEvent.POST_CREATED, Map.of(
+                "postId", post.getPostId(),
+                "title", post.getTitle(),
+                "content", post.getContent(),
+                "isRelatedMina", post.isRelatedMina()
+            ));
+        }
+    }
+
+    /**
+     * 게시글 조회 (publishedPosts에서 조회)
+     */
+    public Post getPost(String postId) {
+        return publishedPosts.get(postId);
+    }
+
+    /**
+     * 게시판별 게시글 목록 조회 (publishedPosts에서 필터링)
+     */
+    public List<Post> getPostsByBoardType(String boardType, LocalDateTime currentTime, String playerPid) {
+        // publishedPosts에서 boardType으로 필터링 후 최신순 정렬
+        return publishedPosts.values().stream()
+            .filter(p -> boardType.equals(p.getBoardType()))
             .sorted((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()))
             .collect(Collectors.toList());
-
-        System.out.println("PostService: Returning " + result.size() + " total posts");
-        return result;
     }
 
     /**
@@ -131,10 +195,18 @@ public class PostService {
     }
 
     /**
-     * 새 게시글 작성 (DB에 저장)
+     * 새 게시글 작성 (DB 저장 + totalPosts + publishedPosts 추가)
+     * 플레이어가 작성한 글은 즉시 게시되므로 둘 다 추가하고 POST_CREATED 이벤트 발행
      */
     public boolean createPost(Post post) {
-        return postDAO.insert(post);
+        boolean dbResult = postDAO.insert(post);
+        if (dbResult) {
+            // totalPosts에 추가
+            totalPosts.put(post.getPostId(), post);
+            // publishedPosts에 추가 + 이벤트 발행
+            publishPost(post);
+        }
+        return dbResult;
     }
 
     /**

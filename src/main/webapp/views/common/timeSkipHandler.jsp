@@ -37,8 +37,4 @@
         return;
     }
 
-    // 다음 이벤트 존재 여부 확인 (버튼 활성화 여부 결정)
-    boolean hasNextEvent = gameContext.getGameState().hasNextEvent();
-    request.setAttribute("hasNextEvent", hasNextEvent);
-
 %>

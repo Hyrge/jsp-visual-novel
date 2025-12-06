@@ -62,13 +62,36 @@ public class TimeService {
 
     /**
      * ⏩ 버튼: 다음 날로 스킵
+     * 다음 날 09:00 이전(08:59까지)의 모든 이벤트를 순차적으로 처리
      */
     public void skipToNextDay() {
-        LocalDate nextDay = gameState.getCurrentDate().plusDays(1);
+        LocalDate currentDay = gameState.getCurrentDate();
+        LocalDate nextDay = currentDay.plusDays(1);
         LocalDateTime nextDayStart = LocalDateTime.of(nextDay, LocalTime.of(9, 0));
 
-        System.out.println("[TimeService] 다음날로 스킵: " + nextDay);
-        jumpToTime(nextDayStart, true);
+        System.out.println("[TimeService] 다음날로 스킵: " + currentDay + " → " + nextDay);
+
+        // 다음 날 09:00 이전의 모든 이벤트를 순차적으로 처리
+        int eventCount = 0;
+        while (true) {
+            LocalDateTime nextEventTime = gameState.getNextEventTime();
+
+            // 다음 이벤트가 없거나, 다음 날 09:00 이후의 이벤트면 종료
+            if (nextEventTime == null || !nextEventTime.isBefore(nextDayStart)) {
+                break;
+            }
+
+            // 이벤트 처리
+            skipToNextEvent();
+            eventCount++;
+        }
+
+        System.out.println("[TimeService] " + eventCount + "개의 이벤트 순차 처리 완료");
+
+        // 마지막으로 다음 날 09:00으로 점프
+        if (!gameState.getCurrentDateTime().equals(nextDayStart)) {
+            jumpToTime(nextDayStart, true);
+        }
     }
 
     /**
@@ -78,9 +101,10 @@ public class TimeService {
         LocalDateTime before = gameState.getCurrentDateTime();
         LocalDate beforeDate = before.toLocalDate();
 
-        // 시간 점프
+        // 시간 점프 + 해당 이벤트만 제거
         gameState.setCurrentDate(targetTime.toLocalDate());
         gameState.setCurrentTime(targetTime.toLocalTime());
+        gameState.removeEventTime(targetTime);  // 해당 이벤트만 제거
 
         // 시간 경과 이벤트 발행
         long minutesSkipped = java.time.Duration.between(before, targetTime).toMinutes();

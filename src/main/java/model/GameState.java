@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.TreeSet;
 import model.enums.BusEvent;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -26,8 +26,8 @@ public class GameState {
     // 게임의 목표 날짜 (고정값: 2025-12-03)
     private LocalDate targetDate = LocalDate.of(2025, 12, 3);
 
-    // 이벤트 시간 큐 (시간순 자동 정렬)
-    private PriorityQueue<LocalDateTime> eventTimes = new PriorityQueue<>();
+    // 이벤트 시간 (시간순 정렬 + 중복 자동 방지)
+    private TreeSet<LocalDateTime> eventTimes = new TreeSet<>();
 
     // Jackson 역직렬화용 기본 생성자
     public GameState() {
@@ -117,9 +117,9 @@ public class GameState {
         LocalDateTime current = getCurrentDateTime();
         LocalDateTime target = current.plusMinutes(minutes);
 
-        // 시간을 이동하면서 지나간 이벤트 시간들을 큐에서 제거
-        while (!eventTimes.isEmpty() && !eventTimes.peek().isAfter(target)) {
-            eventTimes.poll(); // 지나간 이벤트는 큐에서 제거
+        // 시간을 이동하면서 지나간 이벤트 시간들을 제거
+        while (!eventTimes.isEmpty() && !eventTimes.first().isAfter(target)) {
+            eventTimes.pollFirst(); // 지나간 이벤트는 제거
         }
 
         // 시간 이동
@@ -128,20 +128,22 @@ public class GameState {
     }
 
     /**
-     * 이벤트 시간을 큐에 추가
+     * 이벤트 시간을 추가 (TreeSet이라 중복 자동 방지)
      * @param time 이벤트가 발생할 시간
      */
     public void addEventTime(LocalDateTime time) {
-        eventTimes.add(time);
-        System.out.println("[GameState] 이벤트 시간 추가: " + time + " (총 " + eventTimes.size() + "개)");
+        boolean added = eventTimes.add(time);
+        if (added) {
+            System.out.println("[GameState] 이벤트 시간 추가: " + time + " (총 " + eventTimes.size() + "개)");
+        }
     }
 
     /**
-     * 다음 이벤트 시간 조회 (큐에서 peek)
+     * 다음 이벤트 시간 조회
      * @return 다음 이벤트 시간, 없으면 null
      */
     public LocalDateTime getNextEventTime() {
-        return eventTimes.peek();
+        return eventTimes.isEmpty() ? null : eventTimes.first();
     }
 
     /**
@@ -150,9 +152,9 @@ public class GameState {
      */
     public boolean hasNextEvent() {
         boolean hasEvent = !eventTimes.isEmpty();
-        System.out.println("[GameState] hasNextEvent 체크: " + hasEvent + " (큐 크기: " + eventTimes.size() + ")");
+        System.out.println("[GameState] hasNextEvent 체크: " + hasEvent + " (이벤트 수: " + eventTimes.size() + ")");
         if (hasEvent) {
-            System.out.println("[GameState] 다음 이벤트 시간: " + eventTimes.peek());
+            System.out.println("[GameState] 다음 이벤트 시간: " + eventTimes.first());
         }
         return hasEvent;
     }
@@ -161,11 +163,20 @@ public class GameState {
      * 다음 이벤트 시간으로 점프 (시계만 이동)
      */
     public void jumpToNextEvent() {
-        LocalDateTime next = eventTimes.poll();
+        LocalDateTime next = eventTimes.pollFirst();
         if (next != null) {
             this.currentDate = next.toLocalDate();
             this.currentTime = next.toLocalTime();
         }
+    }
+
+    /**
+     * 특정 시간의 이벤트를 제거
+     * @param time 제거할 이벤트 시간
+     */
+    public void removeEventTime(LocalDateTime time) {
+        boolean removed = eventTimes.remove(time);
+        System.out.println("[GameState] 이벤트 시간 제거: " + time + " (성공: " + removed + ", 남은 이벤트: " + eventTimes.size() + ")");
     }
 
     public User getUser() {

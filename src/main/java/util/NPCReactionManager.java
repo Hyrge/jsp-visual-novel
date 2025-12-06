@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 import dto.Comment;
 import manager.DataManager;
@@ -46,7 +47,7 @@ public class NPCReactionManager {
 
     /**
      * POST_CREATED 이벤트 핸들러
-     * 게시글이 생성되면 즉시 NPC 댓글을 생성하고 DB에 저장
+     * 게시글이 생성되면 비동기로 NPC 댓글을 생성하고 DB에 저장
      */
     private void onPostCreated(Object data) {
         Map<String, Object> postData = (Map<String, Object>) data;
@@ -60,8 +61,10 @@ public class NPCReactionManager {
 
         System.out.println("[NPCReactionManager] POST_CREATED 이벤트 수신: " + postTitle);
 
-        // NPC 댓글 즉시 생성 및 DB 저장
-        generateAndSaveComments(postId, postTitle, postContent, currentTime, currentSentiment, isRelatedMina);
+        // 비동기로 NPC 댓글 생성 및 DB 저장
+        CompletableFuture.runAsync(() -> {
+            generateAndSaveComments(postId, postTitle, postContent, currentTime, currentSentiment, isRelatedMina);
+        });
     }
 
     /**
