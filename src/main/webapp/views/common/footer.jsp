@@ -23,3 +23,12 @@
     </div>
 </div>
 
+<!-- 공통 스크립트 -->
+<script src="${pageContext.request.contextPath}/resources/js/questChecker.js"></script>
+<script>
+    // QuestChecker 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+        QuestChecker.init('${pageContext.request.contextPath}');
+    });
+</script>
+

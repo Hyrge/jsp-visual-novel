@@ -88,10 +88,9 @@
                                 String keywordParam = request.getParameter("keyword");
                                 if (keywordParam != null && !keywordParam.trim().isEmpty()) {
                                     String keyword = keywordParam.trim().toLowerCase();
-                                    
-                                    // 퀘스트 체크 (검색어가 퀘스트 목표와 일치하면 완료 처리)
-                                    gameContext.getQuestService().checkSearchObjectives(keyword);
-                                    
+
+                                    // 퀘스트 체크는 클라이언트(questChecker.js)에서 처리
+
                                     allPosts = allPosts.stream()
                                         .filter(p -> (p.getTitle() != null && p.getTitle().toLowerCase().contains(keyword)) ||
                                                      (p.getContent() != null && p.getContent().toLowerCase().contains(keyword)))
