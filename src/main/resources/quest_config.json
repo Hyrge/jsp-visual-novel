@@ -2,9 +2,9 @@
   {
     "id": "start",
     "issuer": "SYSTEM",
-    "title": "더꾸에 상주하는 안티팬 3명 영구 정지 먹이기",
+    "title": "더꾸에 상주하는 안티팬 3명 영구 정지 먹이기 [미구현]",
     "content": "커뮤니티에 상주하는 안티팬은 존재만으로도 아티스트의 평판에 크게 영향을 줍니다. 회유하는 것으로 부정도를 낮출 수는 있어도 그들은 절대 개심하지 않을 겁니다. 유일한 방법은 오로지 부단한 노력으로 신고하는 것뿐입니다. <br> - 부정적인 댓글과 게시글을 보는 족족 신고하세요 <br> - 지속적으로 안티팬의 행적을 추적하여 증거를 수집하세요 <br> - 신고 게시판에 그동안의 증거들을 모아 정지를 요구하세요 <br> 건승을 빕니다",
-    "status": "AVAILABLE",
+    "status": "IN_PROGRESS",
     "requiredProgress": 3,
     "objectives": null,
     "rewardReputation": 0,
@@ -18,7 +18,7 @@
     "issuer": "COMPANY",
     "title": "MiNa에 대한 여론 조사 후 보고서 쓰기[1]",
     "content": "MiNa, 미나, 노민아 등 아티스트에 대해 다양한 키워드로 써치해보세요",
-    "status": "AVAILABLE",
+    "status": "IN_PROGRESS",
     "requiredProgress": 3,
     "objectives": [
 	    {"id": 1, "description": "`MiNa`로 써치하기", "visible": true},

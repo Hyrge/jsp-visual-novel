@@ -66,6 +66,7 @@ public class QuestService {
 
     /**
      * quest_config.json에서 초기 퀘스트 로드
+     * 모든 상태의 퀘스트를 로드하되, 이벤트 연동이 없는 것만 로드
      */
     private void loadInitialQuests() {
         DataManager dataManager = DataManager.getInstance();
@@ -82,16 +83,16 @@ public class QuestService {
 
             @SuppressWarnings("unchecked")
             java.util.Map<String, Object> config = (java.util.Map<String, Object>) obj;
-            String status = (String) config.get("status");
             String relatedEventId = (String) config.get("relatedEventId");
 
-            // AVAILABLE 상태이고, 이벤트 연동이 없는 퀘스트만 초기 로드
-            if ("AVAILABLE".equals(status) && relatedEventId == null) {
+            // 이벤트 연동이 없는 모든 퀘스트를 로드 (상태 무관)
+            // 초기에는 IN_PROGRESS 상태인 것만 활성화됨 (getActiveQuests에서 필터링)
+            if (relatedEventId == null) {
                 String id = (String) config.get("id");
                 Quest quest = QuestFactory.createQuest(id);
                 if (quest != null) {
                     quests.add(quest);
-                    System.out.println("[QuestService] 초기 퀘스트 로드: " + quest.getTitle());
+                    System.out.println("[QuestService] 초기 퀘스트 로드: " + quest.getTitle() + " (상태: " + quest.getStatus() + ")");
                 }
             }
         }
@@ -233,12 +234,23 @@ public class QuestService {
 
         // 다음 퀘스트 활성화
         if (quest.hasNextQuest()) {
-            Quest nextQuest = QuestFactory.createQuest(quest.getNextQuestId());
+            String nextQuestId = quest.getNextQuestId();
+            Quest nextQuest = findQuestById(nextQuestId);
+            
+            // 이미 로드된 퀘스트가 있으면 상태만 업데이트
             if (nextQuest != null) {
-                nextQuest.setStatus(QuestStatus.AVAILABLE);
-                quests.add(nextQuest);
+                nextQuest.setStatus(QuestStatus.IN_PROGRESS);
                 eventBus.emit(BusEvent.QUEST_ADDED, nextQuest);
-                System.out.println("[QuestService] 다음 퀘스트 활성화: " + nextQuest.getTitle());
+                System.out.println("[QuestService] 다음 퀘스트 활성화: " + nextQuest.getTitle() + " (상태: IN_PROGRESS)");
+            } else {
+                // 새로 로드
+                nextQuest = QuestFactory.createQuest(nextQuestId);
+                if (nextQuest != null) {
+                    nextQuest.setStatus(QuestStatus.IN_PROGRESS);
+                    quests.add(nextQuest);
+                    eventBus.emit(BusEvent.QUEST_ADDED, nextQuest);
+                    System.out.println("[QuestService] 다음 퀘스트 활성화: " + nextQuest.getTitle() + " (상태: IN_PROGRESS)");
+                }
             }
         }
 
