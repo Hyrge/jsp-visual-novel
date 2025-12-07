@@ -11,7 +11,8 @@
         "like_count": 350,
         "dislike_count": 2,
         "is_related_mina": true,
-        "nickname": "케이팝러버"
+        "nickname": "케이팝러버",
+        "image_file": "webapp/resources/image/토끼.png"
     },
     {
         "post_id": "m_2002",
@@ -53,7 +54,8 @@
         "like_count": 520,
         "dislike_count": 5,
         "is_related_mina": true,
-        "nickname": "학식먹음"
+        "nickname": "학식먹음",
+        "image_file": "webapp/resources/image/수트.png"
     },
     {
         "post_id": "m_2005",

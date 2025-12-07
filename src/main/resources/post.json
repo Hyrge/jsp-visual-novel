@@ -39,7 +39,8 @@
         "like_count": 80,
         "dislike_count": 0,
         "is_related_mina": false,
-        "nickname": "집순이"
+        "nickname": "집순이",
+        "image_file": "webapp/resources/image/화채.png"
     },
     {
         "post_id": "p_0904",
