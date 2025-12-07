@@ -15,19 +15,21 @@
     gap: 8px;
 }
 
-.current-date, .d-day-counter {
+.current-date,
+.d-day-counter {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-.date-label, .d-day-label {
+.date-label,
+.d-day-label {
     font-size: 10px;
     color: #ffffff;
 }
 
 .date-value {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: #212529;
 }
@@ -44,7 +46,8 @@
     gap: 6px;
 }
 
-.btn-time-skip, .btn-day-skip {
+.btn-time-skip,
+.btn-day-skip {
     display: flex;
     align-items: center;
     justify-content: center;

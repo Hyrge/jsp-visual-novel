@@ -28,10 +28,7 @@
             <span class="date-label">현재:</span>
             <span class="date-value"><%= formattedDate %> <%= formattedTime %></span>
         </div>
-        <div class="d-day-counter">
-            <span class="d-day-label">앨범 발매</span>
-            <span class="d-day-value"><%= gameContext.getGameState().getDDayText() %></span>
-        </div>
+
     </div>
 
     <div class="time-actions">

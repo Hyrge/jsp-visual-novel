@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!-- 왼쪽 고정 사이드 배너 -->
+<jsp:include page="leftBanner.jsp" />
+
 <!-- 푸터 영역 -->
 <div class="footer">
     <div class="xe_width clearBoth">
