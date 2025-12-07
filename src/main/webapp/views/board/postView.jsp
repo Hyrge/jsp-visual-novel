@@ -111,8 +111,18 @@
     postData.put("likes", String.valueOf(post.getLikeCount()));
     postData.put("dislikes", String.valueOf(post.getDislikeCount()));
     postData.put("content", post.getContent().replace("\n", "<br>"));
-    postData.put("imageFile", post.getImageFile()); // 이미지 파일명
-    postData.put("hasPictures", post.isHasPictures()); // 이미지 유무
+    String imageFilename = post.getImageFile();
+    String imagePath = null;
+    if (imageFilename != null && !imageFilename.trim().isEmpty()) {
+        if (imageFilename.startsWith("webapp/")) {
+            imagePath = contextPath + "/" + imageFilename.substring(7);
+        } else {
+            imagePath = contextPath + "/saves/" + post.getPlayerPid() + "/images/" + imageFilename;
+        }
+    }
+    
+    postData.put("imageFile", imagePath); 
+    postData.put("hasPictures", post.isHasPictures()); 
 
     request.setAttribute("post", postData);
 
@@ -186,7 +196,7 @@
                     <!-- 이미지 표시 -->
                     <c:if test="${post.hasPictures && post.imageFile != null}">
                     <div class="post-image">
-                        <img src="<%= contextPath %>/saves/${post.playerPid}/${post.imageFile}" alt="첨부 이미지" onclick="openImageModal(this.src)">
+                        <img src="${post.imageFile}" alt="첨부 이미지" onclick="openImageModal(this.src)">
                     </div>
                     </c:if>
                     ${post.content}
