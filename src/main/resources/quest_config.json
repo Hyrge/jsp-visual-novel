@@ -72,7 +72,7 @@
     "issuer": "COMPANY",
     "title": "MiNa의 게시글에 들어가 Like하기",
     "content": "MiNa의 게시글에 들어가 좋아요를 10회 누르세요.",
-    "status": "AVAILABLE",
+    "status": "IN_PROGRESS",
     "requiredProgress": 10,
     "objectives": null,
     "rewardReputation": 1,

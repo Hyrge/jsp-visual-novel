@@ -1,6 +1,5 @@
 package service;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import model.EventBus;
@@ -9,10 +8,6 @@ import model.GameState;
 import model.entity.UserAction;
 import model.enums.ActionType;
 import model.enums.BusEvent;
-import model.entity.Quest;
-import model.entity.QuestObjective;
-import service.QuestService;
-import service.PostService;
 import util.LLMManager;
 
 /**
@@ -21,7 +16,7 @@ import util.LLMManager;
  * - NPC 반응 생성
  * - 여론 변화
  * - 이벤트 트리거
- * - 퀘스트 업데이트 등
+ * (퀘스트 진행은 클라이언트 questChecker.js에서 처리)
  */
 public class UserActionHandler {
     private final GameContext gameContext;
@@ -87,8 +82,7 @@ public class UserActionHandler {
             // 4. 이벤트 트리거 체크
             checkEventTriggers(action);
 
-            // 5. 퀘스트 진행 상황 업데이트
-            updateQuestProgress(action);
+            // 퀘스트 진행은 클라이언트(questChecker.js)에서 처리
 
         } catch (Exception e) {
             System.err.println("[UserActionHandler] 처리 오류: " + e.getMessage());
@@ -189,51 +183,6 @@ public class UserActionHandler {
     private void checkEventTriggers(UserAction action) {
         // TODO: 행동에 따른 이벤트 발생 확인
         // 예: "MiNa 관련 게시글 10개 작성" → 특정 이벤트 트리거
-    }
-
-    /**
-     * 퀘스트 진행 상황 업데이트
-     */
-    private void updateQuestProgress(UserAction action) {
-        QuestService questService = gameContext.getQuestService();
-        if (questService == null) {
-            return;
-        }
-
-        // 활성 퀘스트 목록 조회
-        for (Quest quest : questService.getActiveQuests()) {
-            boolean updated = false;
-
-            // 2. 쪽지 보내기 (Objectives 기반)
-            if (action.getActionType() == ActionType.SEND_MESSAGE) {
-                if (quest.getObjectives() != null) {
-                    for (QuestObjective obj : quest.getObjectives()) {
-                        if (!obj.isCompleted() && obj.getDescription() != null && obj.getDescription().contains("쪽지")) {
-                            questService.completeObjective(quest.getId(), obj.getId());
-                            updated = true;
-                        }
-                    }
-                }
-            }
-            // 3. 좋아요 (단일 목표) - ID: t1
-            else if (action.getActionType() == ActionType.LIKE) {
-                if ("t1".equals(quest.getId())) {
-                    questService.addQuestProgress(quest.getId(), 1);
-                    updated = true;
-                }
-            }
-            // 4. 댓글 작성 (단일 목표) - ID: t2
-            else if (action.getActionType() == ActionType.CREATE_COMMENT) {
-                if ("t2".equals(quest.getId())) {
-                    questService.addQuestProgress(quest.getId(), 1);
-                    updated = true;
-                }
-            }
-
-            if (updated) {
-                System.out.println("[UserActionHandler] 퀘스트 업데이트됨: " + quest.getTitle());
-            }
-        }
     }
 
     /**

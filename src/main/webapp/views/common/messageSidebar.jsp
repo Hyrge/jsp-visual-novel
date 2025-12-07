@@ -15,7 +15,10 @@
 
 <%
     List<Message> messages = gameContext.getMessageService().getMessages();
-    List<Quest> activeQuests = gameContext.getQuestService().getActiveQuests();
+    // IN_PROGRESS와 COMPLETABLE 퀘스트만 표시
+    List<Quest> activeQuests = gameContext.getQuestService().getActiveQuests().stream()
+        .filter(q -> q.getStatus() == QuestStatus.IN_PROGRESS || q.getStatus() == QuestStatus.COMPLETABLE)
+        .collect(java.util.stream.Collectors.toList());
     long unreadCount = messages.stream().filter(m -> !m.isRead()).count();
     int totalCount = messages.size() + activeQuests.size();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd HH:mm");

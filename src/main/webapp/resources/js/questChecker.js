@@ -62,8 +62,8 @@ const QuestChecker = (function() {
         't1': {
             event: 'LIKE',
             check: (data, quest) => {
-                // data: { authorId, postId }
-                if (data.authorId === 'mina_official' || data.authorNickname === 'MiNa') {
+                // MiNa 관련 게시글이면 진행
+                if (data.isRelatedMina) {
                     return { increment: 1 };
                 }
                 return null;

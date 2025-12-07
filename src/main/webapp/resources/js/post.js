@@ -5,43 +5,31 @@
 
 // 게시글 추천/비추천
 function votePost(postId, voteType) {
-    // 액션 타입 매핑
     var actionType = (voteType === 'like') ? 'LIKE' : 'DISLIKE';
+    var ctx = document.querySelector('meta[name="contextPath"]')?.content
+              || window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
 
-    // 비동기로 액션 기록
-    if (typeof contextPath !== 'undefined') { // postView.jsp에 메타태그나 전역변수로 있다고 가정하거나, 아래처럼 구해야 함
-        // contextPath가 없으면 구하기
-        var ctx = window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
+    fetch(ctx + '/api/action/handleAction.jsp?actionType=' + actionType + '&targetId=' + postId)
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            console.log('[post.js] 응답:', data, 'isRelatedMina:', data.isRelatedMina);
+            if (data.success) {
+                // UI 업데이트
+                var countEl = document.querySelector('.btn-' + voteType + ' .vote-count');
+                if (countEl) countEl.innerText = parseInt(countEl.innerText) + 1;
 
-        fetch(ctx + '/api/action/handleAction.jsp?actionType=' + actionType + '&targetId=' + postId)
-            .then(function (res) { return res.json(); })
-            .then(function (data) {
-                console.log('Vote recorded:', data);
-                if (data.success) {
-                    // UI 업데이트 (간이)
-                    var countEl = document.querySelector('.btn-' + voteType + ' .vote-count');
-                    if (countEl) countEl.innerText = parseInt(countEl.innerText) + 1;
-                    alert('반영되었습니다.');
-                } else {
-                    alert('오류가 발생했습니다.');
+                // 퀘스트 체크 (좋아요/싫어요 둘 다)
+                if (window.QuestChecker) {
+                    QuestChecker.onLike({
+                        postId: postId,
+                        isRelatedMina: data.isRelatedMina || false
+                    });
                 }
-            })
-            .catch(function (err) {
-                console.error('Failed to record vote:', err);
-            });
-    } else {
-        // contextPath 구하기 fallback
-        var ctx = window.location.pathname.substring(0, window.location.pathname.indexOf("/", 2));
-        fetch(ctx + '/api/action/handleAction.jsp?actionType=' + actionType + '&targetId=' + postId)
-            .then(function (res) { return res.json(); })
-            .then(function (data) {
-                if (data.success) {
-                    var countEl = document.querySelector('.btn-' + voteType + ' .vote-count');
-                    if (countEl) countEl.innerText = parseInt(countEl.innerText) + 1;
-                    alert('반영되었습니다.');
-                }
-            });
-    }
+            }
+        })
+        .catch(function (err) {
+            console.error('Vote failed:', err);
+        });
 }
 
 // 게시글 신고
