@@ -1,0 +1,5 @@
+gemini.api.key= api 키는 최종보고서에 적어놓았습니다 
+gemini.api.url=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+gemini.model=gemini-2.5-flash
+gemini.temperature=0.7
+gemini.max_tokens=1000
